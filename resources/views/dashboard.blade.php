@@ -1,11 +1,17 @@
-<div class="flex h-full w-full font-sans">
-    @include('layouts.side-bar')
-    <div class="flex-1 overflow-y-auto p-8 bg-gray-50 dark:bg-gray-900">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Oder Management Dashboard</h2>
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Dashboard') }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    {{ __("You're logged in!") }}
+                </div>
+            </div>
         </div>
-
-
     </div>
-</div>
+</x-app-layout>
