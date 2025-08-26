@@ -25,13 +25,13 @@
             <!-- Menu Items -->
             <ul class="space-y-2">
                 <li>
-                    <a class="flex items-centerc bg-white px-4 py-2 rounded">
-                        <span>Money Junction</span>
+                    <a class="flex items-center bg-white px-4 py-2 rounded">
+                        <span>Money Junction Iworld</span>
                     </a>
                 </li>
 
                 <li>
-                    <a href=""
+                    <a href="{{ route('dashboard') }}"
                         class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('dashboard') ? 'bg-gray-200' : '' }}">
                         <img src="{{ asset('images/statisctics.png') }}" alt="Dashboard" class="w-6 h-6 mr-5" />
                         <span>Dashboard</span>
@@ -39,16 +39,16 @@
                 </li>
 
                 <li>
-                    <a href=""
-                        class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('sampleDevelopment.*') ? 'bg-gray-200' : '' }}">
+                    <a href="{{ route('finance.index') }}"
+                        class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('finance.*') ? 'bg-gray-200' : '' }}">
                         <img src="{{ asset('images/acquisition.png') }}" alt="" class="w-6 h-6 mr-5" />
-                        <span>Sales & Invoices</span>
+                        <span>Finance PLC</span>
                     </a>
                 </li>
 
                 <li>
-                    <a href=""
-                        class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('productCatalog.*') ? 'bg-gray-200' : '' }}">
+                    <a href="{{ route('financeReport.index') }}"
+                        class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('financeReport.*') ? 'bg-gray-200' : '' }}">
                         <img src="{{ asset('images/stock.png') }}" alt="" class="w-6 h-6 mr-5" />
                         <span>Reports</span>
                     </a>
@@ -60,7 +60,7 @@
             <!-- Profile and Logout as Sidebar Buttons -->
             <ul class="space-y-2 border-t pt-4 mt-4">
                 <li>
-                    <a href=""
+                    <a href="{{ route('profile.show') }}"
                         class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('profile.edit') ? 'bg-gray-200' : '' }}">
                         <img src="{{ asset('images/employee.png') }}" alt="Profile Icon" class="w-6 h-6 mr-5" />
                         <span>Profile</span>
