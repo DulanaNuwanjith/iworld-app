@@ -8,25 +8,24 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gradient-to-br from-blue-500 to-white">
+<body class="bg-gradient-to-br from-gray-500 to-white">
     <div class="flex items-center justify-center min-h-screen">
         <div class="w-full max-w-4xl bg-white shadow-lg rounded-2xl overflow-hidden flex">
             <!-- Left Panel -->
             <div
-                class="w-1/2 bg-gradient-to-br from-blue-500 to-blue-300 text-white flex flex-col justify-center items-center p-8">
+                class="w-1/2 bg-gradient-to-br from-gray-500 to-gray-100 text-white flex flex-col justify-center items-center p-8">
                 <div class=" items-center rounded-lg mt-6 h-40 mb-32">
                     <img src="{{ asset('images/logo.png') }}" alt="Logo" class="w-72 object-contain" />
                 </div>
-                <p class="text-sm text-center font-sans px-4 text-blue-900">
-                    Our vision is to be the market leader in service and quality exceeding customer expectations all the
-                    time being a partner in progress to win the global market competition in every aspect.
+                <p class="text-sm text-center font-sans px-4 text-black">
+                    Our vision is to be the leading phone shop, delivering exceptional service and top-quality products that exceed customer expectations every time, while becoming a trusted partner in progress and competing successfully in the global mobile market.
                 </p>
             </div>
 
             <!-- Right Panel -->
             <div class="w-1/2 p-8 flex flex-col justify-center">
-                <h2 class="text-2xl font-sans font-bold text-blue-800 mb-2">IWORLD MANAGEMENT SYSTEM</h2>
-                <h2 class="text-lg font-sans font-bold text-blue-800 mb-2">(RANGIRI HOLDINGS)</h2>
+                <h2 class="text-2xl font-sans font-bold text-gray-800 mb-2">IWORLD MANAGEMENT SYSTEM</h2>
+                <h2 class="text-lg font-sans font-bold text-gray-800 mb-2">(GAMPAHA)</h2>
                 <p class="text-sm text-gray-600 mb-6 font-semibold">Login to your account to continue</p>
                 <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -73,7 +72,7 @@
                     </div>
 
                     <button type="submit"
-                        class="w-full font-sans font-semibold bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition">LOGIN</button>
+                        class="w-full font-sans font-semibold bg-gray-600 text-white py-2 rounded-full hover:bg-gray-700 transition">LOGIN</button>
                 </form>
             </div>
         </div>
