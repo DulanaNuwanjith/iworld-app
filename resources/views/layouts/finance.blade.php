@@ -18,13 +18,13 @@
     <div class="flex h-full w-full">
         @include('layouts.side-bar')
 
-        <div class="flex-1 overflow-y-auto relative bg-white dark:bg-gray-900">
+        <div class="flex-1 overflow-y-auto relative bg-white">
             <!-- ✅ TAB NAVIGATION (VISIBLE IN ALL PAGES) -->
-            <div class="sticky top-0 z-50 flex space-x-4 border-b border-gray-300 bg-white p-5 dark:bg-gray-800">
+            <div class="sticky top-0 z-50 flex space-x-4 border-b border-gray-300 bg-white p-5">
                 {{-- Inquiry Details Tab: visible to Customer Coordinator, Admin, Superadmin --}}
 
                 <a href="{{ route('finance.index') }}"
-                    class="pb-2 px-3 font-semibold {{ request()->routeIs('finance.*') ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600' }}">
+                    class="pb-2 px-3 font-semibold {{ request()->routeIs('finance.*') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
                     Finance
                 </a>
 

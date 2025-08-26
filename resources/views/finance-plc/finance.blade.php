@@ -132,12 +132,12 @@
                             {{-- Filters --}}
                             <div class="flex justify-start">
                                 <button onclick="toggleFilterForm()"
-                                    class="bg-white border border-blue-500 text-blue-500 hover:text-blue-600 hover:border-blue-600 font-semibold py-1 px-3 rounded shadow flex items-center gap-2 mb-6">
+                                    class="bg-white border border-gray-500 text-gray-500 hover:text-gray-600 hover:border-gray-600 font-semibold py-1 px-3 rounded shadow flex items-center gap-2 mb-6">
                                     <img src="{{ asset('icons/filter.png') }}" class="w-6 h-6" alt="Filter Icon">
                                     Filters
                                 </button>
                                 <button onclick="toggleReportForm()"
-                                    class="bg-white border border-blue-500 text-blue-500 hover:text-blue-600 hover:border-blue-600 font-semibold py-1 px-3 rounded shadow flex items-center gap-2 mb-6 ml-2">
+                                    class="bg-white border border-gray-500 text-gray-500 hover:text-gray-600 hover:border-gray-600 font-semibold py-1 px-3 rounded shadow flex items-center gap-2 mb-6 ml-2">
                                     Generate Report
                                 </button>
                             </div>
@@ -153,26 +153,16 @@
                                 </div>
 
                                 <div class="flex justify-between items-center mb-6">
-                                    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Sample Inquiry
-                                        Records
+                                    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Finance Records
                                     </h1>
 
                                     <div class="flex space-x-3">
-                                        {{-- Only show Add New Order if NOT ADMIN --}}
-                                        @if (Auth::user()->role !== 'ADMIN')
-                                            <button
-                                                onclick="document.getElementById('addSampleModal').classList.remove('hidden')"
-                                                class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow">
-                                                + Add New Order
-                                            </button>
-                                        @endif
 
-                                        <a href="">
-                                            <button
-                                                class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow">
-                                                Sample Stock Management
-                                            </button>
-                                        </a>
+                                        <button
+                                            onclick="document.getElementById('addFinanceModal').classList.remove('hidden')"
+                                            class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded shadow">
+                                            + Add Finance Order
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -189,79 +179,19 @@
                                             </th>
                                             <th
                                                 class="font-bold sticky top-0 bg-gray-200 dark:bg-gray-700 px-4 py-3 w-32 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Inquiry Receive Date
+                                                Buyer Details
                                             </th>
                                             <th
                                                 class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-32 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Customer
+                                                Item Details
                                             </th>
                                             <th
                                                 class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-36 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Customer Merchandiser
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-36 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Customer Coordinator
+                                                Mails & Passwords
                                             </th>
                                             <th
                                                 class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-32 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Item
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-32 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Quality Reference
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-40 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Item Description
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-20 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Size
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-32 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Colour
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-32 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Style
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-40 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Customer Requested Sample Quantity
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-32 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Customer Special Comments
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-32 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Customer Requested Dates
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-48 text-xs uppercase text-gray-600 dark:text-gray-300 whitespace-normal break-words">
-                                                Sent order to sample development
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-32 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Development Plan Date
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-36 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Production Status
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-48 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Reference No
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-52 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Customer Delivery Status
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 z-30 bg-gray-200 px-4 py-3 w-56 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
-                                                Customer Decision
+                                                Price & Payment
                                             </th>
                                             <th
                                                 class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-72 text-xs text-gray-600 dark:text-gray-300 uppercase whitespace-normal break-words">
@@ -276,6 +206,15 @@
 
                                     <tbody id="sampleInquiryRecords"
                                         class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                        <tr>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
 
                                     </tbody>
                                 </table>
@@ -295,4 +234,16 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function toggleFilterForm() {
+            const form = document.getElementById('filterFormContainer');
+            form.classList.toggle('hidden');
+        }
+
+        function toggleReportForm() {
+            const form = document.getElementById('reportFormContainer');
+            form.classList.toggle('hidden');
+        }
+    </script>
 @endsection
