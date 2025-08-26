@@ -26,7 +26,7 @@
             <ul class="space-y-2">
                 <li>
                     <a class="flex items-centerc bg-white px-4 py-2 rounded">
-                        <span>Money Junction Iworld check</span>
+                        <span>Money Junction</span>
                     </a>
                 </li>
 
