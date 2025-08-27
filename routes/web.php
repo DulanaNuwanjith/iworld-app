@@ -20,7 +20,10 @@ Route::get('financeReport', function () {
         return view('report.financeReport');
     })->name('financeReport.index');
 
-Route::post('/finance-orders', [FinanceOrderController::class, 'store'])->name('financeOrders.store');
+Route::get('/finance', [FinanceOrderController::class, 'index'])->name('finance.index');
+Route::post('/finance/store', [FinanceOrderController::class, 'store'])->name('financeOrders.store');
+Route::get('/finance/{id}/edit', [FinanceOrderController::class, 'edit'])->name('finance.edit');
+Route::delete('/finance/{id}', [FinanceOrderController::class, 'destroy'])->name('finance.destroy');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
