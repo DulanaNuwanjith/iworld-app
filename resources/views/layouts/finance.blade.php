@@ -9,12 +9,6 @@
 
 <body class="bg-white text-gray-900">
 
-    @php
-        use Illuminate\Support\Facades\Auth;
-
-        $role = Auth::user()->role;
-    @endphp
-
     <div class="flex h-full w-full">
         @include('layouts.side-bar')
 
