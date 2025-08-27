@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\FinanceOrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -18,6 +19,8 @@ Route::get('finance', function () {
 Route::get('financeReport', function () {
         return view('report.financeReport');
     })->name('financeReport.index');
+
+Route::post('/finance-orders', [FinanceOrderController::class, 'store'])->name('financeOrders.store');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

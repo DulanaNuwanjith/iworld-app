@@ -223,11 +223,196 @@
 
                             </div>
 
-                            <!-- Add Sample Modal -->
-                            <div id="addSampleModal"
+                            <!-- Add Finance Modal -->
+                            <div id="addFinanceModal"
                                 class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center py-5">
+                                <div class="w-full max-w-[700px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-4 transform transition-all scale-95 max-h-[calc(100vh-10rem)] overflow-y-auto"
+                                    onclick="event.stopPropagation()">
+                                    <div class="max-w-[600px] mx-auto p-8">
+                                        <h2
+                                            class="text-2xl font-semibold mb-8 text-blue-900 mt-4 dark:text-gray-100 text-center">
+                                            Add New Finance Order
+                                        </h2>
 
+                                        <form action="{{ route('financeOrders.store') }}" method="POST"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            <div class="space-y-4">
+
+                                                <!-- Order Number (auto) -->
+                                                <div>
+                                                    <label
+                                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Order
+                                                        Number</label>
+                                                    <input type="text" name="order_number" value="Auto Generated"
+                                                        readonly
+                                                        class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-sm cursor-not-allowed">
+                                                </div>
+
+                                                <!-- Item Created Date -->
+                                                <div>
+                                                    <label
+                                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Item
+                                                        Created Date</label>
+                                                    <input type="date" name="item_created_date" required
+                                                        class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                                </div>
+
+                                                <!-- Buyer Info -->
+                                                <div class="flex gap-4">
+                                                    <div class="w-1/2">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Buyer
+                                                            Name</label>
+                                                        <input type="text" name="buyer_name" required
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                                    </div>
+                                                    <div class="w-1/2">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Buyer
+                                                            ID</label>
+                                                        <input type="text" name="buyer_id" required
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <label
+                                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Buyer
+                                                        Address</label>
+                                                    <textarea name="buyer_address" required
+                                                        class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white text-sm"></textarea>
+                                                </div>
+
+                                                <div class="flex gap-4">
+                                                    <div class="w-1/2">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone
+                                                            1</label>
+                                                        <input type="text" name="phone_1" required
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                                    </div>
+                                                    <div class="w-1/2">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone
+                                                            2</label>
+                                                        <input type="text" name="phone_2"
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                                    </div>
+                                                </div>
+
+                                                <!-- ID Photo & Electricity Bill Photo -->
+                                                <div class="flex gap-4">
+                                                    <div class="w-1/2">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">ID
+                                                            Photo</label>
+                                                        <input type="file" name="id_photo" accept="image/*"
+                                                            class="w-full mt-1 text-sm">
+                                                    </div>
+                                                    <div class="w-1/2">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">House
+                                                            Electricity Bill</label>
+                                                        <input type="file" name="electricity_bill_photo" accept="image/*"
+                                                            class="w-full mt-1 text-sm">
+                                                    </div>
+                                                </div>
+
+                                                <!-- Item Details -->
+                                                <div class="flex gap-4">
+                                                    <div class="w-1/2">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Item
+                                                            Name</label>
+                                                        <input type="text" name="item_name" required
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                                    </div>
+                                                    <div class="w-1/2">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">EMI
+                                                            Number</label>
+                                                        <input type="text" name="emi_number" required
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <label
+                                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">Colour</label>
+                                                    <input type="text" name="colour" required
+                                                        class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                                </div>
+
+                                                <!-- Photos -->
+                                                <div class="flex gap-4">
+                                                    <div class="w-1/3">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Photo
+                                                            1</label>
+                                                        <input type="file" name="photo_1" accept="image/*"
+                                                            class="w-full mt-1 text-sm">
+                                                    </div>
+                                                    <div class="w-1/3">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Photo
+                                                            2</label>
+                                                        <input type="file" name="photo_2" accept="image/*"
+                                                            class="w-full mt-1 text-sm">
+                                                    </div>
+                                                    <div class="w-1/3">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Photo
+                                                            About</label>
+                                                        <input type="file" name="photo_about" accept="image/*"
+                                                            class="w-full mt-1 text-sm">
+                                                    </div>
+                                                </div>
+
+                                                <!-- iCloud Details -->
+                                                <div class="flex gap-4">
+                                                    <div class="w-1/3">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">iCloud
+                                                            Mail</label>
+                                                        <input type="email" name="icloud_mail" required
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                                    </div>
+                                                    <div class="w-1/3">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">iCloud
+                                                            Password</label>
+                                                        <input type="text" name="icloud_password" required
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                                    </div>
+                                                    <div class="w-1/3">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Screen
+                                                            Lock Password</label>
+                                                        <input type="text" name="screen_lock_password" required
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <!-- Buttons -->
+                                            <div class="flex justify-end gap-3 mt-6">
+                                                <button type="button"
+                                                    onclick="document.getElementById('addFinanceModal').classList.add('hidden')"
+                                                    class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded hover:bg-gray-300">
+                                                    Cancel
+                                                </button>
+                                                <button type="submit"
+                                                    class="px-4 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600">
+                                                    Create Finance Order
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
