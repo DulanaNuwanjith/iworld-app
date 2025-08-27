@@ -21,6 +21,7 @@
                         <div class="p-4 text-gray-900">
                             {{-- Style for Sweet Alert --}}
                             <style>
+                                /* Toast style */
                                 .swal2-toast {
                                     font-size: 0.875rem;
                                     padding: 0.75rem 1rem;
@@ -28,16 +29,19 @@
                                     background-color: #ffffff !important;
                                     position: relative;
                                     box-sizing: border-box;
-                                    color: #3b82f6 !important;
+                                    color: #6c757d !important;
+                                    /* Medium gray */
                                 }
 
                                 .swal2-toast .swal2-title,
                                 .swal2-toast .swal2-html-container {
-                                    color: #3b82f6 !important;
+                                    color: #495057 !important;
+                                    /* Darker gray */
                                 }
 
                                 .swal2-toast .swal2-icon {
-                                    color: #3b82f6 !important;
+                                    color: #6c757d !important;
+                                    /* Icon gray */
                                 }
 
                                 .swal2-shadow {
@@ -51,13 +55,15 @@
                                     left: 0;
                                     width: 100%;
                                     height: 3px;
-                                    background-color: #3b82f6;
+                                    background-color: #6c757d;
+                                    /* Gray underline */
                                     border-radius: 0 0 8px 8px;
                                 }
                             </style>
 
                             <script>
                                 document.addEventListener('DOMContentLoaded', () => {
+                                    // Success toast
                                     @if (session('success'))
                                         Swal.fire({
                                             toast: true,
@@ -73,6 +79,7 @@
                                         });
                                     @endif
 
+                                    // Error toast
                                     @if (session('error'))
                                         Swal.fire({
                                             toast: true,
@@ -85,9 +92,11 @@
                                             customClass: {
                                                 popup: 'swal2-toast swal2-shadow'
                                             },
+                                            iconColor: '#6c757d'
                                         });
                                     @endif
 
+                                    // Validation errors toast
                                     @if ($errors->any())
                                         Swal.fire({
                                             toast: true,
@@ -101,26 +110,27 @@
                                             customClass: {
                                                 popup: 'swal2-toast swal2-shadow'
                                             },
+                                            iconColor: '#6c757d'
                                         });
                                     @endif
                                 });
-                            </script>
 
-                            <script>
+                                // Delete confirmation
                                 function confirmDelete(id) {
                                     Swal.fire({
-                                        title: 'Are you sure?',
-                                        text: "This record will be permanently deleted!",
+                                        title: '<span style="color:#495057;">Are you sure?</span>',
+                                        html: '<span style="color:#6c757d;">This record will be permanently deleted!</span>',
                                         icon: 'warning',
                                         showCancelButton: true,
-                                        confirmButtonColor: '#3b82f6',
-                                        cancelButtonColor: '#6c757d',
+                                        confirmButtonColor: '#dc3545', // Red
+                                        cancelButtonColor: '#adb5bd', // Light gray
                                         confirmButtonText: 'Yes, delete it!',
+                                        cancelButtonText: 'Cancel',
                                         background: '#ffffff',
-                                        color: '#3b82f6',
                                         customClass: {
                                             popup: 'swal2-toast swal2-shadow'
-                                        }
+                                        },
+                                        iconColor: '#6c757d'
                                     }).then((result) => {
                                         if (result.isConfirmed) {
                                             document.getElementById(`delete-form-${id}`).submit();
@@ -153,7 +163,7 @@
                                 </div>
 
                                 <div class="flex justify-between items-center mb-6">
-                                    <h1 class="text-2xl font-bold text-gray-800">Finance Records
+                                    <h1 class="text-2xl font-bold text-gray-800">Finance PLC Records
                                     </h1>
 
                                     <div class="flex space-x-3">
@@ -174,7 +184,7 @@
                                     <thead class="bg-gray-200 text-left">
                                         <tr class="text-center">
                                             <th
-                                                class="font-bold sticky left-0 top-0 z-20 bg-white px-4 py-3 w-32 text-xs text-gray-600 uppercase whitespace-normal break-words">
+                                                class="font-bold sticky top-0 bg-gray-200  px-4 py-3 w-32 text-xs text-gray-600  uppercase whitespace-normal break-words">
                                                 Order No
                                             </th>
                                             <th
@@ -182,39 +192,41 @@
                                                 Buyer Details
                                             </th>
                                             <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-56 text-xs text-gray-600 uppercase whitespace-normal break-words">
+                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-48 text-xs text-gray-600 uppercase whitespace-normal break-words">
                                                 Item Details
                                             </th>
                                             <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-36 text-xs text-gray-600 uppercase whitespace-normal break-words">
+                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-48 text-xs text-gray-600 uppercase whitespace-normal break-words">
                                                 Mails & Passwords
                                             </th>
                                             <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-32 text-xs text-gray-600 uppercase whitespace-normal break-words">
+                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-56 text-xs text-gray-600 uppercase whitespace-normal break-words">
                                                 Price & Payment
                                             </th>
                                             <th
                                                 class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-56 text-xs text-gray-600 uppercase whitespace-normal break-words">
                                                 Note
                                             </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-56 text-xs text-gray-600 uppercase whitespace-normal break-words">
+                                            {{-- <th
+                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-36 text-xs text-gray-600 uppercase whitespace-normal break-words">
                                                 Action
-                                            </th>
+                                            </th> --}}
                                         </tr>
                                     </thead>
 
-                                    <tbody class="bg-white divide-y divide-gray-200">
+                                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                         @foreach ($financeOrders as $order)
-                                            <tr class="text-center">
+                                            <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200  text-left">
                                                 <!-- Order No -->
-                                                <td class="sticky left-0 bg-white px-4 py-3 text-xs">
-                                                    {{ $order->order_number }}
+                                                <td class="text-center px-4 py-3">
+                                                    <div class="font-bold">{{ $order->order_number }}</div>
+                                                    <div class="text-xs">
+                                                        {{ \Carbon\Carbon::parse($order->item_created_date)->format('Y-m-d') }}
+                                                    </div>
                                                 </td>
 
                                                 <!-- Buyer Details -->
                                                 <td class="px-4 py-3 text-xs text-left">
-                                                    <div>Created: {{ $order->item_created_date }}</div>
                                                     <div>Name: {{ $order->buyer_name }}</div>
                                                     <div>ID: {{ $order->buyer_id }}</div>
                                                     <div>Address: {{ $order->buyer_address }}</div>
@@ -261,43 +273,157 @@
                                                     <div>Screen Lock: {{ $order->screen_lock_password }}</div>
                                                 </td>
 
-                                                <!-- Price & Payment -->
-                                                <td class="px-4 py-3 text-xs">
-                                                    {{ $order->price ?? '-' }}
+                                                @php
+                                                    $firstPayment = $order->payments
+                                                        ->where('installment_number', 1)
+                                                        ->first();
+
+                                                    $secondPaymentDate = $firstPayment
+                                                        ? \Carbon\Carbon::parse($firstPayment->paid_at)->addDays(30)
+                                                        : null;
+                                                    $thirdPaymentDate = $firstPayment
+                                                        ? \Carbon\Carbon::parse($firstPayment->paid_at)->addDays(60)
+                                                        : null;
+                                                @endphp
+
+                                                <td class="px-4 py-3 text-xs text-center">
+                                                    <div>Full amount: LKR {{ number_format($order->price, 2) }}</div>
+
+                                                    <div class="mt-2">
+                                                        @php
+                                                            // Get array of paid installment numbers
+                                                            $paidInstallments = $order->payments
+                                                                ->where('amount', '>', 0)
+                                                                ->pluck('installment_number')
+                                                                ->toArray();
+                                                        @endphp
+
+                                                        @for ($i = 1; $i <= 3; $i++)
+                                                            @php
+                                                                $payment = $order->payments
+                                                                    ->where('installment_number', $i)
+                                                                    ->first();
+                                                                $paidAmount = $payment->amount ?? 0;
+                                                                $remainingAmount = max(
+                                                                    round(
+                                                                        $order->price - $order->payments->sum('amount'),
+                                                                        2,
+                                                                    ),
+                                                                    0,
+                                                                );
+
+                                                                // Determine expected payment date
+                                                                $firstPayment = $order->payments
+                                                                    ->where('installment_number', 1)
+                                                                    ->first();
+                                                                if ($i == 2 && $firstPayment) {
+                                                                    $expectedDate = $firstPayment->paid_at
+                                                                        ? \Carbon\Carbon::parse(
+                                                                            $firstPayment->paid_at,
+                                                                        )->addDays(30)
+                                                                        : null;
+                                                                } elseif ($i == 3 && $firstPayment) {
+                                                                    $expectedDate = $firstPayment->paid_at
+                                                                        ? \Carbon\Carbon::parse(
+                                                                            $firstPayment->paid_at,
+                                                                        )->addDays(60)
+                                                                        : null;
+                                                                } else {
+                                                                    $expectedDate = null;
+                                                                }
+
+                                                                // Determine if button should be enabled
+                                                                $canPay = false;
+                                                                if ($i == 1) {
+                                                                    $canPay = true;
+                                                                } // 1st installment always enabled
+                                                                if ($i == 2) {
+                                                                    $canPay = in_array(1, $paidInstallments);
+                                                                } // 2nd enabled only if 1st paid
+                                                                if ($i == 3) {
+                                                                    $canPay = in_array(2, $paidInstallments);
+                                                                } // 3rd enabled only if 2nd paid
+                                                            @endphp
+
+                                                            @if ($paidAmount > 0)
+                                                                <div class="text-green-600 text-xs mt-1">
+                                                                    Payment {{ $i }}: LKR
+                                                                    {{ number_format($paidAmount, 2) }}
+                                                                    @if ($payment && $payment->paid_at)
+                                                                        ({{ $payment->paid_at->format('Y-m-d') }})
+                                                                    @endif
+                                                                </div>
+                                                            @elseif($remainingAmount > 0)
+                                                                <div class="text-blue-600 text-xs mb-1">
+                                                                    @if ($expectedDate)
+                                                                        Expected Date: {{ $expectedDate->format('Y-m-d') }}
+                                                                    @endif
+                                                                </div>
+                                                                <form
+                                                                    action="{{ route('finance.payInstallment', [$order->id, $i]) }}"
+                                                                    method="POST" class="flex gap-2 items-center mt-1">
+                                                                    @csrf
+                                                                    @method('PATCH')
+                                                                    <label class="text-xs font-medium">Payment
+                                                                        {{ $i }}:</label>
+                                                                    <input type="number" name="amount"
+                                                                        class="w-20 px-2 py-1 border border-gray-300 rounded text-xs"
+                                                                        value="{{ $remainingAmount }}" min="0"
+                                                                        max="{{ $remainingAmount }}">
+                                                                    <button type="submit"
+                                                                        class="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                        @unless ($canPay) disabled @endunless>
+                                                                        Pay
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+                                                        @endfor
+
+                                                        <!-- Remaining Balance -->
+                                                        <div class="mt-2 text-red-600 font-medium">
+                                                            Balance: LKR
+                                                            {{ number_format(max($order->price - $order->payments->sum('amount'), 0), 2) }}
+                                                        </div>
+                                                    </div>
                                                 </td>
 
                                                 <!-- Note -->
-                                                <td class="px-4 py-3 text-xs">
-                                                    {{ $order->note ?? '-' }}
-                                                </td>
-
-                                                <!-- Actions -->
-                                                <td class="px-4 py-3 text-xs">
-                                                    <!-- Edit button -->
-                                                    <a href=""
-                                                        class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">
-                                                        Edit
-                                                    </a>
-
-                                                    <!-- Delete button -->
-                                                    <form action="{{ route('finance.destroy', $order->id) }}"
-                                                        method="POST" class="inline-block">
+                                                <td class="px-4 py-3 text-xs text-center whitespace-normal break-words">
+                                                    <form action="{{ route('finance.update-note', $order->id) }}"
+                                                        method="POST" class="w-full">
                                                         @csrf
-                                                        @method('DELETE')
+                                                        @method('PATCH')
+
+                                                        <textarea name="note" class="w-full px-2 py-1 border border-gray-300 rounded-md text-sm" rows="2" required>{{ old('note', $order->note) }}</textarea>
+
                                                         <button type="submit"
-                                                            onclick="return confirm('Are you sure you want to delete this order?')"
-                                                            class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600">
-                                                            Delete
+                                                            class="w-full mt-1 px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition-all duration-200 text-xs">
+                                                            Save
                                                         </button>
                                                     </form>
                                                 </td>
+
+                                                <!-- Actions -->
+                                                {{-- <td class="px-4 py-3 text-xs text-center">
+                                                    <form id="delete-form-{{ $order->id }}"
+                                                        action="{{ route('finance.destroy', $order->id) }}" method="POST"
+                                                        class="flex justify-center">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button"
+                                                            onclick="confirmDelete('{{ $order->id }}')"
+                                                            class="bg-red-600 h-10 mt-1 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
+                                                            Delete
+                                                        </button>
+                                                    </form>
+                                                </td> --}}
                                             </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
                             </div>
                             <div class="py-6 flex justify-center">
-
+                                {{ $financeOrders->links() }}
                             </div>
 
                             <!-- Add Finance Modal -->
@@ -306,8 +432,7 @@
                                 <div class="w-full max-w-[700px] bg-white rounded-2xl shadow-2xl p-4 transform transition-all scale-95 max-h-[calc(100vh-10rem)] overflow-y-auto"
                                     onclick="event.stopPropagation()">
                                     <div class="max-w-[600px] mx-auto p-8">
-                                        <h2
-                                            class="text-2xl font-semibold mb-8 text-gray-900 mt-4 text-center">
+                                        <h2 class="text-2xl font-semibold mb-8 text-gray-900 mt-4 text-center">
                                             Add New Finance Order
                                         </h2>
 
@@ -318,8 +443,7 @@
 
                                                 <!-- Item Created Date -->
                                                 <div>
-                                                    <label
-                                                        class="block text-sm font-medium text-gray-700 ">Item
+                                                    <label class="block text-sm font-medium text-gray-700 ">Item
                                                         Created Date</label>
                                                     <input type="date" name="item_created_date" required
                                                         class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
@@ -328,15 +452,13 @@
                                                 <!-- Buyer Info -->
                                                 <div class="flex gap-4">
                                                     <div class="w-1/2">
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700 ">Buyer
+                                                        <label class="block text-sm font-medium text-gray-700 ">Buyer
                                                             Name</label>
                                                         <input type="text" name="buyer_name" required
                                                             class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
                                                     </div>
                                                     <div class="w-1/2">
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700">Buyer
+                                                        <label class="block text-sm font-medium text-gray-700">Buyer
                                                             ID</label>
                                                         <input type="text" name="buyer_id" required
                                                             class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
@@ -344,24 +466,20 @@
                                                 </div>
 
                                                 <div>
-                                                    <label
-                                                        class="block text-sm font-medium text-gray-700">Buyer
+                                                    <label class="block text-sm font-medium text-gray-700">Buyer
                                                         Address</label>
-                                                    <textarea name="buyer_address" required
-                                                        class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm"></textarea>
+                                                    <textarea name="buyer_address" required class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm"></textarea>
                                                 </div>
 
                                                 <div class="flex gap-4">
                                                     <div class="w-1/2">
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700">Phone
+                                                        <label class="block text-sm font-medium text-gray-700">Phone
                                                             1</label>
                                                         <input type="text" name="phone_1" required
                                                             class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
                                                     </div>
                                                     <div class="w-1/2">
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700">Phone
+                                                        <label class="block text-sm font-medium text-gray-700">Phone
                                                             2</label>
                                                         <input type="text" name="phone_2"
                                                             class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
@@ -371,15 +489,13 @@
                                                 <!-- ID Photo & Electricity Bill Photo -->
                                                 <div class="flex gap-4">
                                                     <div class="w-1/2">
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700">ID
+                                                        <label class="block text-sm font-medium text-gray-700">ID
                                                             Photo</label>
                                                         <input type="file" name="id_photo" accept="image/*"
                                                             class="w-full mt-1 text-sm">
                                                     </div>
                                                     <div class="w-1/2">
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700">House
+                                                        <label class="block text-sm font-medium text-gray-700">House
                                                             Electricity Bill</label>
                                                         <input type="file" name="electricity_bill_photo"
                                                             accept="image/*" class="w-full mt-1 text-sm">
@@ -389,47 +505,53 @@
                                                 <!-- Item Details -->
                                                 <div class="flex gap-4">
                                                     <div class="w-1/2">
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700 ">Item
+                                                        <label class="block text-sm font-medium text-gray-700 ">Item
                                                             Name</label>
                                                         <input type="text" name="item_name" required
                                                             class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
                                                     </div>
                                                     <div class="w-1/2">
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700">EMI
+                                                        <label class="block text-sm font-medium text-gray-700">EMI
                                                             Number</label>
                                                         <input type="text" name="emi_number" required
                                                             class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
                                                     </div>
                                                 </div>
 
-                                                <div>
-                                                    <label
-                                                        class="block text-sm font-medium text-gray-700">Colour</label>
-                                                    <input type="text" name="colour" required
-                                                        class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                                <!-- Item Details -->
+                                                <div class="flex gap-4">
+                                                    <div class="w-1/2">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-700">Colour</label>
+                                                        <input type="text" name="colour" required
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                                    </div>
+                                                    <div class="w-1/2">
+                                                        <label
+                                                            class="block text-sm font-medium text-gray-700">Price</label>
+                                                        <input type="number" name="price" required step="0.01"
+                                                            min="0"
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                                            placeholder="Enter amount in LKR">
+                                                    </div>
                                                 </div>
 
                                                 <!-- Photos -->
                                                 <div class="flex gap-4">
                                                     <div class="w-1/3">
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700">Photo
+                                                        <label class="block text-sm font-medium text-gray-700">Photo
                                                             1</label>
                                                         <input type="file" name="photo_1" accept="image/*"
                                                             class="w-full mt-1 text-sm">
                                                     </div>
                                                     <div class="w-1/3">
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700">Photo
+                                                        <label class="block text-sm font-medium text-gray-700">Photo
                                                             2</label>
                                                         <input type="file" name="photo_2" accept="image/*"
                                                             class="w-full mt-1 text-sm">
                                                     </div>
                                                     <div class="w-1/3">
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700">Photo
+                                                        <label class="block text-sm font-medium text-gray-700">Photo
                                                             About</label>
                                                         <input type="file" name="photo_about" accept="image/*"
                                                             class="w-full mt-1 text-sm">
@@ -439,22 +561,19 @@
                                                 <!-- iCloud Details -->
                                                 <div class="flex gap-4">
                                                     <div class="w-1/3">
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700">iCloud
+                                                        <label class="block text-sm font-medium text-gray-700">iCloud
                                                             Mail</label>
                                                         <input type="email" name="icloud_mail" required
                                                             class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
                                                     </div>
                                                     <div class="w-1/3">
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700">iCloud
+                                                        <label class="block text-sm font-medium text-gray-700">iCloud
                                                             Password</label>
                                                         <input type="text" name="icloud_password" required
                                                             class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
                                                     </div>
                                                     <div class="w-1/3">
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700">Screen
+                                                        <label class="block text-sm font-medium text-gray-700">Screen
                                                             Lock Password</label>
                                                         <input type="text" name="screen_lock_password" required
                                                             class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">

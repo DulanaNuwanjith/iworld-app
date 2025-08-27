@@ -27,6 +27,8 @@ return new class extends Migration {
             $table->string('icloud_mail');
             $table->string('icloud_password');
             $table->string('screen_lock_password');
+            $table->string('price')->nullable();
+            $table->string('note')->nullable();
             $table->timestamps();
         });
     }

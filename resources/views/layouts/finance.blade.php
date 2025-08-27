@@ -23,12 +23,10 @@
                 </a>
 
                 {{-- Sample Preparation R&D Tab: visible to Sample Developers, Admin, Superadmin --}}
-                {{-- @if (in_array($role, ['SAMPLEDEVELOPER', 'ADMIN', 'SUPERADMIN', 'PRODUCTIONOFFICER']))
-                <a href="{{ route('sample-preparation-details.index') }}"
-                   class="pb-2 px-3 font-semibold {{ request()->routeIs('sample-preparation-details.*') ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600' }}">
-                    Research & Development
+                <a href="{{ route('nearestPayments.index') }}"
+                   class="pb-2 px-3 font-semibold {{ request()->routeIs('nearestPayments.*') ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600' }}">
+                    Nearest Expected Payments 
                 </a>
-            @endif --}}
 
                 {{-- Sample Preparation Production Tab: visible to Production Officer, Admin, Superadmin --}}
                 {{-- @if (in_array($role, ['PRODUCTIONOFFICER', 'ADMIN', 'SUPERADMIN']))

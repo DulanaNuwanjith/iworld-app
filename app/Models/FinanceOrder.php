@@ -28,5 +28,25 @@ class FinanceOrder extends Model
         'icloud_mail',
         'icloud_password',
         'screen_lock_password',
+        'price',
+        'note'
     ];
+
+    protected $casts = [
+        'item_created_date' => 'datetime',
+        'price' => 'float',
+    ];
+
+    public function payments()
+    {
+        return $this->hasMany(FinancePayment::class);
+    }
+
+    // Get remaining balance
+    public function remainingBalance()
+    {
+        $paid = $this->payments()->sum('amount');
+        return $this->price - $paid;
+    }
+
 }
