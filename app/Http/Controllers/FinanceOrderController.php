@@ -7,6 +7,7 @@ use App\Models\FinanceOrder;
 use App\Models\FinancePayment;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class FinanceOrderController extends Controller
 {
@@ -117,22 +118,59 @@ class FinanceOrderController extends Controller
 
         $request->validate([
             'amount' => 'required|numeric|min:0',
+            'overdue_days' => 'nullable|integer|min:0',
         ]);
 
-        // Create or update payment record for this installment
+        // Calculate overdue charges
+        $overdueAmount = 0;
+        if (($installmentNumber == 2 || $installmentNumber == 3) && $request->overdue_days) {
+            $rate = $installmentNumber == 2 ? 200 : 500;
+            $overdueAmount = $rate * $request->overdue_days;
+        }
+
+        // Total payment including overdue
+        $totalPayment = $request->amount + $overdueAmount;
+
+        // Create or update current payment
         $payment = FinancePayment::firstOrNew([
             'finance_order_id' => $order->id,
             'installment_number' => $installmentNumber,
         ]);
 
-        // Add the new amount to existing payment
-        $payment->amount = ($payment->amount ?? 0) + $request->amount;
+        $payment->amount = ($payment->amount ?? 0) + $totalPayment;
+        $payment->overdue_days = $request->overdue_days ?? 0;
+        $payment->overdue_amount = $overdueAmount;
         $payment->paid_at = now();
         $payment->save();
 
-        return redirect()->back()->with('success', "Payment added to Installment {$installmentNumber}!");
-    }
+        // 🔹 Set expected dates for future installments after first payment
+        if ($installmentNumber == 1) {
+            $firstPaymentDate = $payment->paid_at;
 
+            // Installment 2 expected date = 30 days after first payment
+            $payment2 = FinancePayment::firstOrNew([
+                'finance_order_id' => $order->id,
+                'installment_number' => 2,
+            ]);
+            $payment2->expected_date = Carbon::parse($firstPaymentDate)->addDays(30);
+            $payment2->amount = $payment2->amount ?? 0;
+            $payment2->save();
+
+            // Installment 3 expected date = 60 days after first payment
+            $payment3 = FinancePayment::firstOrNew([
+                'finance_order_id' => $order->id,
+                'installment_number' => 3,
+            ]);
+            $payment3->expected_date = Carbon::parse($firstPaymentDate)->addDays(60);
+            $payment3->amount = $payment3->amount ?? 0;
+            $payment3->save();
+        }
+
+        return redirect()->back()->with(
+            'success',
+            "Payment {$installmentNumber} completed! Total paid: LKR {$totalPayment}"
+        );
+    }
 
     public function remainingBalance($orderId)
     {

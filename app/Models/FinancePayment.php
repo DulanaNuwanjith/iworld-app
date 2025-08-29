@@ -16,6 +16,9 @@ class FinancePayment extends Model
         'installment_number',
         'amount',
         'paid_at',
+        'overdue_amount',
+        'overdue_days',
+        'expected_date',
     ];
 
     protected $casts = [

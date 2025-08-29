@@ -291,11 +291,14 @@
 
                                                     <div class="mt-2">
                                                         @php
-                                                            // Get array of paid installment numbers
                                                             $paidInstallments = $order->payments
-                                                                ->where('amount', '>', 0)
                                                                 ->pluck('installment_number')
                                                                 ->toArray();
+                                                            $totalPaid = $order->payments->sum('amount');
+                                                            $totalOverdue = $order->payments->sum('overdue_amount');
+                                                            $actualPaid = $totalPaid - $totalOverdue;
+                                                            $balance = max($order->price - $actualPaid, 0);
+                                                            $installmentAmount = round($order->price / 3, 2); // equal installments
                                                         @endphp
 
                                                         @for ($i = 1; $i <= 3; $i++)
@@ -304,88 +307,171 @@
                                                                     ->where('installment_number', $i)
                                                                     ->first();
                                                                 $paidAmount = $payment->amount ?? 0;
-                                                                $remainingAmount = max(
-                                                                    round(
-                                                                        $order->price - $order->payments->sum('amount'),
-                                                                        2,
-                                                                    ),
+                                                                $overdueAmount = $payment->overdue_amount ?? 0;
+                                                                $expectedDate = $payment->expected_date ?? null;
+                                                                $installmentRemaining = max(
+                                                                    $installmentAmount - ($paidAmount - $overdueAmount),
                                                                     0,
                                                                 );
-
-                                                                // Determine expected payment date
-                                                                $firstPayment = $order->payments
-                                                                    ->where('installment_number', 1)
-                                                                    ->first();
-                                                                if ($i == 2 && $firstPayment) {
-                                                                    $expectedDate = $firstPayment->paid_at
-                                                                        ? \Carbon\Carbon::parse(
-                                                                            $firstPayment->paid_at,
-                                                                        )->addDays(30)
-                                                                        : null;
-                                                                } elseif ($i == 3 && $firstPayment) {
-                                                                    $expectedDate = $firstPayment->paid_at
-                                                                        ? \Carbon\Carbon::parse(
-                                                                            $firstPayment->paid_at,
-                                                                        )->addDays(60)
-                                                                        : null;
-                                                                } else {
-                                                                    $expectedDate = null;
-                                                                }
-
-                                                                // Determine if button should be enabled
-                                                                $canPay = false;
-                                                                if ($i == 1) {
-                                                                    $canPay = true;
-                                                                } // 1st installment always enabled
-                                                                if ($i == 2) {
-                                                                    $canPay = in_array(1, $paidInstallments);
-                                                                } // 2nd enabled only if 1st paid
-                                                                if ($i == 3) {
-                                                                    $canPay = in_array(2, $paidInstallments);
-                                                                } // 3rd enabled only if 2nd paid
+                                                                $canPay =
+                                                                    $i == 1 ||
+                                                                    ($i == 2 && in_array(1, $paidInstallments)) ||
+                                                                    ($i == 3 && in_array(2, $paidInstallments));
                                                             @endphp
 
                                                             @if ($paidAmount > 0)
                                                                 <div class="text-green-600 text-xs mt-1">
                                                                     Payment {{ $i }}: LKR
-                                                                    {{ number_format($paidAmount, 2) }}
-                                                                    @if ($payment && $payment->paid_at)
-                                                                        ({{ $payment->paid_at->format('Y-m-d') }})
+                                                                    {{ number_format($paidAmount - $overdueAmount, 2) }}
+                                                                    @if ($overdueAmount > 0)
+                                                                        (Overdue: LKR
+                                                                        {{ number_format($overdueAmount, 2) }})
+                                                                    @endif
+                                                                    @if ($payment->paid_at)
+                                                                        ({{ \Carbon\Carbon::parse($payment->paid_at)->format('Y-m-d') }})
                                                                     @endif
                                                                 </div>
-                                                            @elseif($remainingAmount > 0)
-                                                                <div class="text-blue-600 text-xs mb-1">
+                                                            @elseif ($installmentRemaining > 0)
+                                                                <div class="text-blue-600 text-xs mt-1">
+                                                                    Payment {{ $i }}: Pending
                                                                     @if ($expectedDate)
-                                                                        Expected Date: {{ $expectedDate->format('Y-m-d') }}
+                                                                        (expected date:
+                                                                        {{ \Carbon\Carbon::parse($expectedDate)->format('Y-m-d') }})
                                                                     @endif
                                                                 </div>
-                                                                <form
-                                                                    action="{{ route('finance.payInstallment', [$order->id, $i]) }}"
-                                                                    method="POST" class="flex gap-2 items-center mt-1">
-                                                                    @csrf
-                                                                    @method('PATCH')
-                                                                    <label class="text-xs font-medium">Payment
-                                                                        {{ $i }}:</label>
-                                                                    <input type="number" name="amount"
-                                                                        class="w-20 px-2 py-1 border border-gray-300 rounded text-xs"
-                                                                        value="{{ $remainingAmount }}" min="0"
-                                                                        max="{{ $remainingAmount }}">
-                                                                    <button type="submit"
-                                                                        class="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                                                                        @unless ($canPay) disabled @endunless>
+
+                                                                @if ($canPay)
+                                                                    <button
+                                                                        onclick="openPaymentModal({{ $order->id }}, {{ $i }}, {{ $installmentRemaining }}, '{{ $expectedDate }}')"
+                                                                        class="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600">
                                                                         Pay
                                                                     </button>
-                                                                </form>
+                                                                @endif
                                                             @endif
                                                         @endfor
 
-                                                        <!-- Remaining Balance -->
+                                                        <!-- Remaining Balance (excluding overdue amounts) -->
+                                                        @php
+                                                            $totalPaid = $order->payments->sum('amount'); // includes overdue
+                                                            $totalOverdue = $order->payments->sum('overdue_amount'); // sum of all overdue
+                                                            $balance = max(
+                                                                $order->price - ($totalPaid - $totalOverdue),
+                                                                0,
+                                                            ); // excludes overdue
+                                                        @endphp
+
                                                         <div class="mt-2 text-red-600 font-medium">
-                                                            Balance: LKR
-                                                            {{ number_format(max($order->price - $order->payments->sum('amount'), 0), 2) }}
+                                                            Balance: LKR {{ number_format($balance, 2) }}
                                                         </div>
+
+                                                        @if ($totalOverdue > 0)
+                                                            <div class="mt-1 text-orange-600 text-xs font-medium">
+                                                                Total Overdue Paid: LKR
+                                                                {{ number_format($totalOverdue, 2) }}
+                                                            </div>
+                                                        @endif
                                                     </div>
                                                 </td>
+
+                                                <!-- Payment Modal -->
+                                                <div id="paymentModal"
+                                                    class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                                    <div class="bg-white rounded-lg p-6 w-96 relative">
+                                                        <h2 class="text-lg font-semibold mb-4">Pay Installment</h2>
+                                                        <form id="paymentForm" method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <input type="hidden" name="installment_number"
+                                                                id="installmentNumber">
+
+                                                            <div class="mb-2">
+                                                                <label class="block text-sm font-medium">Amount</label>
+                                                                <input type="number" name="amount" id="installmentAmount"
+                                                                    class="w-full border px-2 py-1 rounded" required>
+                                                            </div>
+
+                                                            <!-- Expected Date -->
+                                                            <div class="mb-4" id="expectedDateContainer">
+                                                                <label class="block text-sm font-medium">Expected
+                                                                    Date</label>
+                                                                <input type="text" id="expectedDate"
+                                                                    class="w-full border px-2 py-1 rounded bg-gray-100"
+                                                                    readonly>
+                                                            </div>
+
+                                                            <!-- Overdue Days (hide for Payment 1) -->
+                                                            <div class="mb-4" id="overdueContainer">
+                                                                <label class="block text-sm font-medium">Overdue
+                                                                    Days</label>
+                                                                <input type="number" name="overdue_days" id="overdueDays"
+                                                                    class="w-full border px-2 py-1 rounded" value="0"
+                                                                    min="0">
+                                                                <div class="text-xs text-gray-500 mt-1"
+                                                                    id="overdueAmountText">Overdue Amount: LKR 0</div>
+                                                            </div>
+
+                                                            <div class="mb-4">
+                                                                <div class="text-xs text-gray-500 mt-1"
+                                                                    id="totalPaymentText">Total Payment: LKR 0</div>
+                                                            </div>
+
+                                                            <div class="flex justify-end gap-2">
+                                                                <button type="button" onclick="closePaymentModal()"
+                                                                    class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+                                                                <button type="submit"
+                                                                    class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">
+                                                                    Pay
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Payment Modal -->
+                                                <div id="paymentModal"
+                                                    class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                                    <div class="bg-white rounded-lg p-6 w-96 relative">
+                                                        <h2 class="text-lg font-semibold mb-4">Pay Installment</h2>
+                                                        <form id="paymentForm" method="POST">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <input type="hidden" name="installment_number"
+                                                                id="installmentNumber">
+
+                                                            <div class="mb-2">
+                                                                <label class="block text-sm font-medium">Amount</label>
+                                                                <input type="number" name="amount"
+                                                                    id="installmentAmount"
+                                                                    class="w-full border px-2 py-1 rounded" required>
+                                                            </div>
+
+                                                            <div class="mb-4">
+                                                                <label class="block text-sm font-medium">Overdue
+                                                                    Days</label>
+                                                                <input type="number" name="overdue_days"
+                                                                    id="overdueDays"
+                                                                    class="w-full border px-2 py-1 rounded" value="0"
+                                                                    min="0">
+                                                                <div class="text-xs text-gray-500 mt-1"
+                                                                    id="overdueAmountText">Overdue Amount: LKR 0</div>
+                                                            </div>
+
+                                                            <div class="mb-4">
+                                                                <div class="text-xs text-gray-500 mt-1"
+                                                                    id="totalPaymentText">Total Payment: LKR 0</div>
+                                                            </div>
+
+                                                            <div class="flex justify-end gap-2">
+                                                                <button type="button" onclick="closePaymentModal()"
+                                                                    class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+                                                                <button type="submit"
+                                                                    class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">
+                                                                    Pay
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
 
                                                 <!-- Note -->
                                                 <td class="px-4 py-3 text-xs text-center whitespace-normal break-words">
@@ -615,6 +701,65 @@
         function toggleReportForm() {
             const form = document.getElementById('reportFormContainer');
             form.classList.toggle('hidden');
+        }
+    </script>
+    <script>
+        function openPaymentModal(orderId, installmentNumber, installmentRemaining, expectedDate = null) {
+            const modal = document.getElementById('paymentModal');
+            modal.classList.remove('hidden');
+
+            const form = document.getElementById('paymentForm');
+            form.action = `/finance/payInstallment/${orderId}/${installmentNumber}`;
+
+            const amountInput = document.getElementById('installmentAmount');
+            const overdueInput = document.getElementById('overdueDays');
+            const overdueText = document.getElementById('overdueAmountText');
+            const totalText = document.getElementById('totalPaymentText');
+            const expectedInput = document.getElementById('expectedDate');
+            const expectedContainer = document.getElementById('expectedDateContainer');
+            const overdueContainer = document.getElementById('overdueContainer');
+
+            document.getElementById('installmentNumber').value = installmentNumber;
+            amountInput.value = installmentRemaining;
+
+            // Show expected date if provided
+            if (expectedDate) {
+                expectedInput.value = expectedDate;
+                expectedContainer.style.display = 'block';
+            } else {
+                expectedContainer.style.display = 'none';
+            }
+
+            // Hide overdue input for Payment 1
+            if (installmentNumber === 1) {
+                overdueContainer.style.display = 'none';
+            } else {
+                overdueContainer.style.display = 'block';
+                overdueInput.value = 0;
+            }
+
+            // Remove old listeners
+            amountInput.oninput = null;
+            overdueInput.oninput = null;
+
+            function updatePayment() {
+                const days = parseInt(overdueInput.value) || 0;
+                const rate = installmentNumber === 2 ? 200 : (installmentNumber === 3 ? 500 : 0);
+                const overdueAmount = days * rate;
+
+                overdueText.innerText = `Overdue Amount: LKR ${overdueAmount.toLocaleString()}`;
+                const total = parseFloat(amountInput.value) + overdueAmount;
+                totalText.innerText = `Total Payment: LKR ${total.toLocaleString()}`;
+            }
+
+            overdueInput.addEventListener('input', updatePayment);
+            amountInput.addEventListener('input', updatePayment);
+
+            updatePayment();
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
         }
     </script>
 @endsection

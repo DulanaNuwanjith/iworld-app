@@ -24,7 +24,7 @@
 
                 {{-- Sample Preparation R&D Tab: visible to Sample Developers, Admin, Superadmin --}}
                 <a href="{{ route('nearestPayments.index') }}"
-                   class="pb-2 px-3 font-semibold {{ request()->routeIs('nearestPayments.*') ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600' }}">
+                   class="pb-2 px-3 font-semibold {{ request()->routeIs('nearestPayments.*') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
                     Nearest Expected Payments 
                 </a>
 
