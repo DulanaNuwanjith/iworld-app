@@ -8,6 +8,7 @@ use App\Models\FinancePayment;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class FinanceOrderController extends Controller
 {
@@ -189,5 +190,24 @@ class FinanceOrderController extends Controller
 
         return view('finance.payments.index', compact('order', 'payments'));
     }
+
+    public function nearestPayments()
+    {
+        // Get finance orders that have at least one unpaid payment
+        $financeOrders = FinanceOrder::select('finance_orders.*')
+            ->join('finance_payments', function($join) {
+                $join->on('finance_payments.finance_order_id', '=', 'finance_orders.id')
+                    ->whereNull('finance_payments.paid_at');
+            })
+            ->with(['payments' => function($query) {
+                $query->whereNull('paid_at')->orderBy('installment_number');
+            }])
+            ->orderBy('finance_payments.expected_date', 'asc') // earliest unpaid date first
+            ->distinct()
+            ->paginate(20);
+
+        return view('finance-plc.nearestPayments', compact('financeOrders'));
+    }
+
 
 }

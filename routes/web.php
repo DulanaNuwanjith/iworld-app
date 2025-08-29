@@ -16,10 +16,6 @@ Route::get('finance', function () {
         return view('finance-plc.finance');
     })->name('finance.index');
 
-Route::get('nearestPayments', function () {
-        return view('finance-plc.nearestPayments');
-    })->name('nearestPayments.index');
-
 Route::get('financeReport', function () {
         return view('report.financeReport');
     })->name('financeReport.index');
@@ -36,5 +32,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::get('/finance/nearest-payments', [FinanceOrderController::class, 'nearestPayments'])
+    ->name('finance.nearestPayments');
 
 require __DIR__.'/auth.php';

@@ -17,15 +17,18 @@
             <div class="sticky top-0 z-50 flex space-x-4 border-b border-gray-300 bg-white p-5">
                 {{-- Inquiry Details Tab: visible to Customer Coordinator, Admin, Superadmin --}}
 
+                {{-- Finance Tab --}}
                 <a href="{{ route('finance.index') }}"
-                    class="pb-2 px-3 font-semibold {{ request()->routeIs('finance.*') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
+                    class="pb-2 px-3 font-semibold 
+       {{ request()->routeIs('finance.index') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
                     Finance
                 </a>
 
-                {{-- Sample Preparation R&D Tab: visible to Sample Developers, Admin, Superadmin --}}
-                <a href="{{ route('nearestPayments.index') }}"
-                   class="pb-2 px-3 font-semibold {{ request()->routeIs('nearestPayments.*') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
-                    Nearest Expected Payments 
+                {{-- Nearest Expected Payments Tab --}}
+                <a href="{{ route('finance.nearestPayments') }}"
+                    class="pb-2 px-3 font-semibold 
+       {{ request()->routeIs('finance.nearestPayments') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
+                    Nearest Expected Payments
                 </a>
 
                 {{-- Sample Preparation Production Tab: visible to Production Officer, Admin, Superadmin --}}
