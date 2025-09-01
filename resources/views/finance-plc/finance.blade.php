@@ -146,21 +146,195 @@
                                     <img src="{{ asset('icons/filter.png') }}" class="w-6 h-6" alt="Filter Icon">
                                     Filters
                                 </button>
-                                <button onclick="toggleReportForm()"
+                                <button onclick="toggleCalForm()"
                                     class="bg-white border border-gray-500 text-gray-500 hover:text-gray-600 hover:border-gray-600 font-semibold py-1 px-3 rounded shadow flex items-center gap-2 mb-6 ml-2">
-                                    Generate Report
+                                    Pricing Calculator
                                 </button>
                             </div>
 
-                            <div id="filterFormContainer" class="hidden mt-4">
+                            <div id="filterFormContainerFinance" class="mt-4 hidden">
+                                <form id="filterFormFinance" method="GET" action="{{ route('finance.index') }}"
+                                    class="mb-6 flex gap-6 items-center">
 
+                                    <div class="flex items-center gap-4 flex-wrap">
+
+                                        {{-- Order Number Dropdown --}}
+                                        <div class="relative inline-block text-left w-48">
+                                            <label for="orderDropdownFinance"
+                                                class="block text-sm font-medium text-gray-700 mb-1">Order No</label>
+                                            <input type="hidden" name="order_number" id="orderInputFinance"
+                                                value="{{ request('order_number') }}">
+                                            <button id="orderDropdownFinance" type="button"
+                                                class="inline-flex w-full justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 h-10"
+                                                onclick="toggleOrderDropdownFinance(event)">
+                                                <span
+                                                    id="selectedOrderNoFinance">{{ request('order_number') ?? 'Select Order No' }}</span>
+                                                <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20"
+                                                    fill="currentColor">
+                                                    <path fill-rule="evenodd"
+                                                        d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
+
+                                            <div id="orderDropdownMenuFinance"
+                                                class="absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg hidden max-h-48 overflow-y-auto p-2">
+                                                <input type="text" id="orderSearchInputFinance"
+                                                    onkeyup="filterOrdersFinance()" placeholder="Search..."
+                                                    class="w-full px-2 py-1 text-sm border rounded-md" autocomplete="off">
+                                                <div onclick="selectOrderFinance('')"
+                                                    class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">All Orders
+                                                </div>
+                                                @foreach ($orderNumbers as $order)
+                                                    <div onclick="selectOrderFinance('{{ $order }}')" tabindex="0"
+                                                        class="order-option-finance px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                        {{ $order }}
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                        {{-- Buyer Name Dropdown --}}
+                                        <div class="relative inline-block text-left w-56">
+                                            <label for="buyerNameDropdownFinance"
+                                                class="block text-sm font-medium text-gray-700 mb-1">Buyer Name</label>
+                                            <input type="hidden" name="buyer_name" id="buyerNameInputFinance"
+                                                value="{{ request('buyer_name') }}">
+                                            <button id="buyerNameDropdownFinance" type="button"
+                                                class="inline-flex w-full justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 h-10"
+                                                onclick="toggleBuyerNameDropdownFinance(event)">
+                                                <span
+                                                    id="selectedBuyerNameFinance">{{ request('buyer_name') ?? 'Select Buyer' }}</span>
+                                                <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20"
+                                                    fill="currentColor">
+                                                    <path fill-rule="evenodd"
+                                                        d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
+
+                                            <div id="buyerNameDropdownMenuFinance"
+                                                class="absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg hidden max-h-48 overflow-y-auto p-2">
+                                                <input type="text" id="buyerNameSearchInputFinance"
+                                                    onkeyup="filterBuyerNamesFinance()" placeholder="Search..."
+                                                    class="w-full px-2 py-1 text-sm border rounded-md" autocomplete="off">
+                                                <div onclick="selectBuyerNameFinance('')"
+                                                    class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">All Buyers
+                                                </div>
+                                                @foreach ($buyerNames as $buyer)
+                                                    <div onclick="selectBuyerNameFinance('{{ $buyer }}')"
+                                                        tabindex="0"
+                                                        class="buyer-option-finance px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                        {{ $buyer }}
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                        {{-- Buyer ID Dropdown --}}
+                                        <div class="relative inline-block text-left w-56">
+                                            <label for="buyerIdDropdownFinance"
+                                                class="block text-sm font-medium text-gray-700 mb-1">Buyer ID</label>
+                                            <input type="hidden" name="buyer_id" id="buyerIdInputFinance"
+                                                value="{{ request('buyer_id') }}">
+                                            <button id="buyerIdDropdownFinance" type="button"
+                                                class="inline-flex w-full justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 h-10"
+                                                onclick="toggleBuyerIdDropdownFinance(event)">
+                                                <span
+                                                    id="selectedBuyerIdFinance">{{ request('buyer_id') ?? 'Select Buyer ID' }}</span>
+                                                <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20"
+                                                    fill="currentColor">
+                                                    <path fill-rule="evenodd"
+                                                        d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
+
+                                            <div id="buyerIdDropdownMenuFinance"
+                                                class="absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg hidden max-h-48 overflow-y-auto p-2">
+                                                <input type="text" id="buyerIdSearchInputFinance"
+                                                    onkeyup="filterBuyerIdsFinance()" placeholder="Search..."
+                                                    class="w-full px-2 py-1 text-sm border rounded-md" autocomplete="off">
+                                                <div onclick="selectBuyerIdFinance('')"
+                                                    class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">All Buyer
+                                                    IDs</div>
+                                                @foreach ($buyerIds as $id)
+                                                    <div onclick="selectBuyerIdFinance('{{ $id }}')"
+                                                        tabindex="0"
+                                                        class="buyerid-option-finance px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                        {{ $id }}
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                        {{-- Item Created Date --}}
+                                        <div class="inline-block text-left w-48">
+                                            <label for="itemCreatedDateFinance"
+                                                class="block text-sm font-medium text-gray-700">Item Date</label>
+                                            <input type="date" name="item_created_date" id="itemCreatedDateFinance"
+                                                value="{{ request('item_created_date') }}"
+                                                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm">
+                                        </div>
+
+                                        {{-- Filter Buttons --}}
+                                        <div class="flex items-end space-x-2 mt-2">
+                                            <button type="submit"
+                                                class="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                                                Apply Filters
+                                            </button>
+                                            <button type="button" id="clearFiltersBtnFinance"
+                                                class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">
+                                                Clear
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </form>
                             </div>
 
-                            {{-- Generate Reports for Customer Coordinator --}}
-                            <div class="flex-1">
-                                <div id="reportFormContainer" class="hidden mt-4">
+                            <div id="pricingCalculatorContainer" class="hidden">
+                                <div class="flex-1 overflow-y-auto bg-white p-6">
+
+                                    <div class="max-w-md bg-gray-50 p-6 rounded-lg shadow">
+                                        {{-- Amount Input --}}
+                                        <label for="amount" class="block text-sm font-medium text-gray-700 mb-2">Enter
+                                            Amount</label>
+                                        <input type="number" id="amount"
+                                            class="w-full px-4 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition"
+                                            placeholder="Enter amount">
+
+                                        {{-- 18% Value --}}
+                                        <div class="mt-6 bg-indigo-50 p-3 rounded-lg">
+                                            <p class="text-gray-700">18% of Amount:
+                                                <span id="tax" class="font-semibold text-indigo-700">0.00</span>
+                                            </p>
+                                        </div>
+
+                                        {{-- Total --}}
+                                        <div class="mt-3 bg-green-50 p-3 rounded-lg">
+                                            <p class="text-gray-700">Total (Amount + 18%):
+                                                <span id="total" class="font-semibold text-green-700">0.00</span>
+                                            </p>
+                                        </div>
+                                    </div>
 
                                 </div>
+
+                                <script>
+                                    document.getElementById('amount').addEventListener('input', function() {
+                                        let amount = parseFloat(this.value) || 0;
+                                        let tax = (amount * 0.18).toFixed(2);
+                                        let total = (amount + parseFloat(tax)).toFixed(2);
+
+                                        document.getElementById('tax').textContent = tax;
+                                        document.getElementById('total').textContent = total;
+                                    });
+                                </script>
+                            </div>
+
+
+                            <div class="flex-1">
 
                                 <div class="flex justify-between items-center mb-6">
                                     <h1 class="text-2xl font-bold text-gray-800">Finance PLC Records
@@ -403,7 +577,8 @@
 
                                                             <div class="mb-2">
                                                                 <label class="block text-sm font-medium">Amount</label>
-                                                                <input type="number" name="amount" id="installmentAmount"
+                                                                <input type="number" name="amount"
+                                                                    id="installmentAmount"
                                                                     class="w-full border px-2 py-1 rounded" required>
                                                             </div>
 
@@ -666,12 +841,12 @@
 
     <script>
         function toggleFilterForm() {
-            const form = document.getElementById('filterFormContainer');
+            const form = document.getElementById('filterFormContainerFinance');
             form.classList.toggle('hidden');
         }
 
-        function toggleReportForm() {
-            const form = document.getElementById('reportFormContainer');
+        function toggleCalForm() {
+            const form = document.getElementById('pricingCalculatorContainer');
             form.classList.toggle('hidden');
         }
     </script>
@@ -737,5 +912,96 @@
         function closePaymentModal() {
             document.getElementById('paymentModal').classList.add('hidden');
         }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            // ---- ORDER NUMBER ----
+            const orderMenu = document.getElementById("orderDropdownMenuFinance");
+            orderMenu.addEventListener("click", e => e.stopPropagation());
+
+            window.toggleOrderDropdownFinance = function(e) {
+                e.stopPropagation();
+                closeAllDropdowns();
+                orderMenu.classList.toggle("hidden");
+            };
+
+            window.selectOrderFinance = function(val) {
+                document.getElementById("orderInputFinance").value = val;
+                document.getElementById("selectedOrderNoFinance").textContent = val || "Select Order No";
+                closeAllDropdowns();
+            };
+
+            window.filterOrdersFinance = function() {
+                const filter = document.getElementById("orderSearchInputFinance").value.toLowerCase();
+                document.querySelectorAll(".order-option-finance").forEach(option => {
+                    option.style.display = option.textContent.toLowerCase().includes(filter) ? "block" :
+                        "none";
+                });
+            };
+
+            // ---- BUYER NAME ----
+            const buyerMenu = document.getElementById("buyerNameDropdownMenuFinance");
+            buyerMenu.addEventListener("click", e => e.stopPropagation());
+
+            window.toggleBuyerNameDropdownFinance = function(e) {
+                e.stopPropagation();
+                closeAllDropdowns();
+                buyerMenu.classList.toggle("hidden");
+            };
+
+            window.selectBuyerNameFinance = function(val) {
+                document.getElementById("buyerNameInputFinance").value = val;
+                document.getElementById("selectedBuyerNameFinance").textContent = val || "Select Buyer";
+                closeAllDropdowns();
+            };
+
+            window.filterBuyerNamesFinance = function() {
+                const filter = document.getElementById("buyerNameSearchInputFinance").value.toLowerCase();
+                document.querySelectorAll(".buyer-option-finance").forEach(option => {
+                    option.style.display = option.textContent.toLowerCase().includes(filter) ? "block" :
+                        "none";
+                });
+            };
+
+            // ---- BUYER ID ----
+            const buyerIdMenu = document.getElementById("buyerIdDropdownMenuFinance");
+            buyerIdMenu.addEventListener("click", e => e.stopPropagation());
+
+            window.toggleBuyerIdDropdownFinance = function(e) {
+                e.stopPropagation();
+                closeAllDropdowns();
+                buyerIdMenu.classList.toggle("hidden");
+            };
+
+            window.selectBuyerIdFinance = function(val) {
+                document.getElementById("buyerIdInputFinance").value = val;
+                document.getElementById("selectedBuyerIdFinance").textContent = val || "Select Buyer ID";
+                closeAllDropdowns();
+            };
+
+            window.filterBuyerIdsFinance = function() {
+                const filter = document.getElementById("buyerIdSearchInputFinance").value.toLowerCase();
+                document.querySelectorAll(".buyerid-option-finance").forEach(option => {
+                    option.style.display = option.textContent.toLowerCase().includes(filter) ? "block" :
+                        "none";
+                });
+            };
+
+            // ---- Close all dropdowns when clicking outside ----
+            function closeAllDropdowns() {
+                orderMenu.classList.add("hidden");
+                buyerMenu.classList.add("hidden");
+                buyerIdMenu.classList.add("hidden");
+            }
+
+            document.addEventListener("click", closeAllDropdowns);
+
+            // ---- Clear Filters Button ----
+            document.getElementById("clearFiltersBtnFinance").addEventListener("click", function() {
+                window.location.href = window.location.pathname;
+            });
+
+        });
     </script>
 @endsection

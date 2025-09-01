@@ -12,14 +12,40 @@ use Illuminate\Support\Facades\DB;
 
 class FinanceOrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Fetch all finance orders from the database
-        $financeOrders = FinanceOrder::orderBy('id', 'desc')->paginate(10);
+        $financeOrdersQuery = FinanceOrder::query();
 
-        // Pass it to the view
-        return view('finance-plc.finance', compact('financeOrders'));
+        // Filters
+        if ($request->filled('order_number')) {
+            $financeOrdersQuery->where('order_number', $request->order_number);
+        }
+
+        if ($request->filled('buyer_name')) {
+            $financeOrdersQuery->where('buyer_name', 'like', '%' . $request->buyer_name . '%');
+        }
+
+        if ($request->filled('buyer_id')) {
+            $financeOrdersQuery->where('buyer_id', 'like', '%' . $request->buyer_id . '%');
+        }
+
+        if ($request->filled('item_created_date')) {
+            $financeOrdersQuery->whereDate('item_created_date', $request->item_created_date);
+        }
+
+        // Pagination with filters
+        $financeOrders = $financeOrdersQuery->orderBy('id', 'desc')
+                            ->paginate(10)
+                            ->appends($request->query());
+
+        // Dropdown data
+        $orderNumbers = FinanceOrder::select('order_number')->distinct()->pluck('order_number');
+        $buyerNames = FinanceOrder::select('buyer_name')->distinct()->pluck('buyer_name');
+        $buyerIds = FinanceOrder::select('buyer_id')->distinct()->pluck('buyer_id');
+
+        return view('finance-plc.finance', compact('financeOrders', 'orderNumbers', 'buyerNames', 'buyerIds'));
     }
+
 
     public function store(Request $request)
     {

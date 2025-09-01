@@ -31,13 +31,10 @@
                     Nearest Expected Payments
                 </a>
 
-                {{-- Sample Preparation Production Tab: visible to Production Officer, Admin, Superadmin --}}
-                {{-- @if (in_array($role, ['PRODUCTIONOFFICER', 'ADMIN', 'SUPERADMIN']))
-                <a href="{{ route('sample-preparation-production.index') }}"
-                   class="pb-2 px-3 font-semibold {{ request()->routeIs('sample-preparation-production.*') ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600' }}">
-                    Sample Production Development
+                <a href="{{ route('financeCal.index') }}"
+                   class="pb-2 px-3 font-semibold {{ request()->routeIs('financeCal.index') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
+                    Pricing Calculator
                 </a>
-            @endif --}}
             </div>
 
             <!-- ✅ PAGE CONTENT -->
