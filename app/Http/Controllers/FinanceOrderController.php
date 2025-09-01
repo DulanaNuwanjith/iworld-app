@@ -15,7 +15,7 @@ class FinanceOrderController extends Controller
     public function index()
     {
         // Fetch all finance orders from the database
-        $financeOrders = FinanceOrder::paginate(10);
+        $financeOrders = FinanceOrder::orderBy('id', 'desc')->paginate(10);
 
         // Pass it to the view
         return view('finance-plc.finance', compact('financeOrders'));
@@ -44,7 +44,7 @@ class FinanceOrderController extends Controller
             'price' => 'required|numeric|min:0',
         ]);
 
-        // 🔹 Generate sequential order number
+        // Generate sequential order number correctly
         $lastOrder = FinanceOrder::orderBy('id', 'desc')->first();
         $nextNumber = $lastOrder ? ((int) str_replace('FO-', '', $lastOrder->order_number)) + 1 : 1;
         $orderNumber = 'FO-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
