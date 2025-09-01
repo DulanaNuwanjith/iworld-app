@@ -234,13 +234,19 @@
                                                     <div>Phone 2: {{ $order->phone_2 }}</div>
                                                     <div class="mt-1 flex gap-1">
                                                         @if ($order->id_photo)
-                                                            <img src="{{ asset('storage/' . $order->id_photo) }}"
-                                                                alt="ID Photo" class="w-16 h-16 object-cover rounded">
+                                                            <a href="{{ asset('storage/' . $order->id_photo) }}"
+                                                                target="_blank">
+                                                                <img src="{{ asset('storage/' . $order->id_photo) }}"
+                                                                    alt="ID Photo" class="w-16 h-16 object-cover rounded">
+                                                            </a>
                                                         @endif
                                                         @if ($order->electricity_bill_photo)
-                                                            <img src="{{ asset('storage/' . $order->electricity_bill_photo) }}"
-                                                                alt="Electricity Bill"
-                                                                class="w-16 h-16 object-cover rounded">
+                                                            <a href="{{ asset('storage/' . $order->electricity_bill_photo) }}"
+                                                                target="_blank">
+                                                                <img src="{{ asset('storage/' . $order->electricity_bill_photo) }}"
+                                                                    alt="Electricity Bill"
+                                                                    class="w-16 h-16 object-cover rounded">
+                                                            </a>
                                                         @endif
                                                     </div>
                                                 </td>
@@ -252,16 +258,26 @@
                                                     <div>Colour: {{ $order->colour }}</div>
                                                     <div class="mt-1 flex gap-1">
                                                         @if ($order->photo_1)
-                                                            <img src="{{ asset('storage/' . $order->photo_1) }}"
-                                                                alt="Photo 1" class="w-16 h-16 object-cover rounded">
+                                                            <a href="{{ asset('storage/' . $order->photo_1) }}"
+                                                                target="_blank">
+                                                                <img src="{{ asset('storage/' . $order->photo_1) }}"
+                                                                    alt="Photo 1" class="w-16 h-16 object-cover rounded">
+                                                            </a>
                                                         @endif
                                                         @if ($order->photo_2)
-                                                            <img src="{{ asset('storage/' . $order->photo_2) }}"
-                                                                alt="Photo 2" class="w-16 h-16 object-cover rounded">
+                                                            <a href="{{ asset('storage/' . $order->photo_2) }}"
+                                                                target="_blank">
+                                                                <img src="{{ asset('storage/' . $order->photo_2) }}"
+                                                                    alt="Photo 2" class="w-16 h-16 object-cover rounded">
+                                                            </a>
                                                         @endif
                                                         @if ($order->photo_about)
-                                                            <img src="{{ asset('storage/' . $order->photo_about) }}"
-                                                                alt="About Photo" class="w-16 h-16 object-cover rounded">
+                                                            <a href="{{ asset('storage/' . $order->photo_about) }}"
+                                                                target="_blank">
+                                                                <img src="{{ asset('storage/' . $order->photo_about) }}"
+                                                                    alt="About Photo"
+                                                                    class="w-16 h-16 object-cover rounded">
+                                                            </a>
                                                         @endif
                                                     </div>
                                                 </td>
@@ -270,7 +286,7 @@
                                                 <td class="px-4 py-3 text-xs text-left">
                                                     <div>iCloud: {{ $order->icloud_mail }}</div>
                                                     <div>Password: {{ $order->icloud_password }}</div>
-                                                    <div>Screen Lock: {{ $order->screen_lock_password }}</div>
+                                                    <div>Screen Time Lock: {{ $order->screen_lock_password }}</div>
                                                 </td>
 
                                                 @php
@@ -294,10 +310,12 @@
                                                             $paidInstallments = $order->payments
                                                                 ->pluck('installment_number')
                                                                 ->toArray();
-                                                            $totalPaid = $order->payments->sum('amount');
-                                                            $totalOverdue = $order->payments->sum('overdue_amount');
-                                                            $actualPaid = $totalPaid - $totalOverdue;
-                                                            $balance = max($order->price - $actualPaid, 0);
+                                                            $totalPaid = $order->payments->sum('amount'); // includes overdue
+                                                            $totalOverdue = $order->payments->sum('overdue_amount'); // sum of all overdue
+                                                            $balance = max(
+                                                                $order->price + $totalOverdue - $totalPaid,
+                                                                0,
+                                                            ); // ✅ balance includes overdue
                                                             $installmentAmount = round($order->price / 3, 2); // equal installments
                                                         @endphp
 
@@ -309,10 +327,18 @@
                                                                 $paidAmount = $payment->amount ?? 0;
                                                                 $overdueAmount = $payment->overdue_amount ?? 0;
                                                                 $expectedDate = $payment->expected_date ?? null;
-                                                                $installmentRemaining = max(
-                                                                    $installmentAmount - ($paidAmount - $overdueAmount),
-                                                                    0,
-                                                                );
+
+                                                                // For normal installments (1 & 2), allow partials.
+                                                                // For final installment (3), require full remaining balance.
+                                                                $installmentRemaining =
+                                                                    $i == 3
+                                                                        ? $balance
+                                                                        : max(
+                                                                            $installmentAmount -
+                                                                                ($paidAmount - $overdueAmount),
+                                                                            0,
+                                                                        );
+
                                                                 $canPay =
                                                                     $i == 1 ||
                                                                     ($i == 2 && in_array(1, $paidInstallments)) ||
@@ -350,23 +376,14 @@
                                                             @endif
                                                         @endfor
 
-                                                        <!-- Remaining Balance (excluding overdue amounts) -->
-                                                        @php
-                                                            $totalPaid = $order->payments->sum('amount'); // includes overdue
-                                                            $totalOverdue = $order->payments->sum('overdue_amount'); // sum of all overdue
-                                                            $balance = max(
-                                                                $order->price - ($totalPaid - $totalOverdue),
-                                                                0,
-                                                            ); // excludes overdue
-                                                        @endphp
-
+                                                        <!-- Remaining Balance (with overdue included) -->
                                                         <div class="mt-2 text-red-600 font-medium">
                                                             Balance: LKR {{ number_format($balance, 2) }}
                                                         </div>
 
                                                         @if ($totalOverdue > 0)
                                                             <div class="mt-1 text-orange-600 text-xs font-medium">
-                                                                Total Overdue Paid: LKR
+                                                                Total Overdue Charged: LKR
                                                                 {{ number_format($totalOverdue, 2) }}
                                                             </div>
                                                         @endif
@@ -403,51 +420,6 @@
                                                             <div class="mb-4" id="overdueContainer">
                                                                 <label class="block text-sm font-medium">Overdue
                                                                     Days</label>
-                                                                <input type="number" name="overdue_days" id="overdueDays"
-                                                                    class="w-full border px-2 py-1 rounded" value="0"
-                                                                    min="0">
-                                                                <div class="text-xs text-gray-500 mt-1"
-                                                                    id="overdueAmountText">Overdue Amount: LKR 0</div>
-                                                            </div>
-
-                                                            <div class="mb-4">
-                                                                <div class="text-xs text-gray-500 mt-1"
-                                                                    id="totalPaymentText">Total Payment: LKR 0</div>
-                                                            </div>
-
-                                                            <div class="flex justify-end gap-2">
-                                                                <button type="button" onclick="closePaymentModal()"
-                                                                    class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
-                                                                <button type="submit"
-                                                                    class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">
-                                                                    Pay
-                                                                </button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Payment Modal -->
-                                                <div id="paymentModal"
-                                                    class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50">
-                                                    <div class="bg-white rounded-lg p-6 w-96 relative">
-                                                        <h2 class="text-lg font-semibold mb-4">Pay Installment</h2>
-                                                        <form id="paymentForm" method="POST">
-                                                            @csrf
-                                                            @method('PATCH')
-                                                            <input type="hidden" name="installment_number"
-                                                                id="installmentNumber">
-
-                                                            <div class="mb-2">
-                                                                <label class="block text-sm font-medium">Amount</label>
-                                                                <input type="number" name="amount"
-                                                                    id="installmentAmount"
-                                                                    class="w-full border px-2 py-1 rounded" required>
-                                                            </div>
-
-                                                            <div class="mb-4">
-                                                                <label class="block text-sm font-medium">Overdue
-                                                                    Days</label>
                                                                 <input type="number" name="overdue_days"
                                                                     id="overdueDays"
                                                                     class="w-full border px-2 py-1 rounded" value="0"
@@ -457,7 +429,7 @@
                                                             </div>
 
                                                             <div class="mb-4">
-                                                                <div class="text-xs text-gray-500 mt-1"
+                                                                <div class="text-lg text-gray-500 mt-1"
                                                                     id="totalPaymentText">Total Payment: LKR 0</div>
                                                             </div>
 
@@ -660,7 +632,7 @@
                                                     </div>
                                                     <div class="w-1/3">
                                                         <label class="block text-sm font-medium text-gray-700">Screen
-                                                            Lock Password</label>
+                                                            Time Password</label>
                                                         <input type="text" name="screen_lock_password" required
                                                             class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
                                                     </div>
@@ -720,7 +692,15 @@
             const overdueContainer = document.getElementById('overdueContainer');
 
             document.getElementById('installmentNumber').value = installmentNumber;
-            amountInput.value = installmentRemaining;
+
+            // Final installment = must pay all remaining balance
+            if (installmentNumber === 3) {
+                amountInput.value = installmentRemaining;
+                amountInput.readOnly = true; // lock final balance
+            } else {
+                amountInput.value = installmentRemaining;
+                amountInput.readOnly = false;
+            }
 
             // Show expected date if provided
             if (expectedDate) {
@@ -737,10 +717,6 @@
                 overdueContainer.style.display = 'block';
                 overdueInput.value = 0;
             }
-
-            // Remove old listeners
-            amountInput.oninput = null;
-            overdueInput.oninput = null;
 
             function updatePayment() {
                 const days = parseInt(overdueInput.value) || 0;

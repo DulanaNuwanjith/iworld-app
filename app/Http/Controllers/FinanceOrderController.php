@@ -44,7 +44,7 @@ class FinanceOrderController extends Controller
             'price' => 'required|numeric|min:0',
         ]);
 
-        // Generate sequential order number correctly
+        // Generate sequential order number
         $lastOrder = FinanceOrder::orderBy('id', 'desc')->first();
         $nextNumber = $lastOrder ? ((int) str_replace('FO-', '', $lastOrder->order_number)) + 1 : 1;
         $orderNumber = 'FO-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
@@ -57,14 +57,21 @@ class FinanceOrderController extends Controller
 
         $data['order_number'] = $orderNumber;
 
-        // Format price
-        $data['price'] = $request->price;
+        // Handle file uploads with custom naming
+        $fileFields = [
+            'id_photo',
+            'electricity_bill_photo',
+            'photo_1',
+            'photo_2',
+            'photo_about'
+        ];
 
-        // Handle file uploads
-        $fileFields = ['id_photo', 'electricity_bill_photo', 'photo_1', 'photo_2', 'photo_about'];
         foreach ($fileFields as $field) {
             if ($request->hasFile($field)) {
-                $data[$field] = $request->file($field)->store('finance_orders', 'public');
+                $extension = $request->file($field)->getClientOriginalExtension();
+                $fileName = $orderNumber . '_' . $field . '.' . $extension;
+                $path = $request->file($field)->storeAs('finance_orders', $fileName, 'public');
+                $data[$field] = $path; // save relative path in DB
             } else {
                 $data[$field] = null;
             }
@@ -90,7 +97,6 @@ class FinanceOrderController extends Controller
 
         return redirect()->back()->with('success', 'Note updated successfully.');
     }
-
 
     // Delete a finance order
     public function destroy($id)
@@ -122,17 +128,25 @@ class FinanceOrderController extends Controller
             'overdue_days' => 'nullable|integer|min:0',
         ]);
 
-        // Calculate overdue charges
+        // ✅ Calculate overdue charges
         $overdueAmount = 0;
         if (($installmentNumber == 2 || $installmentNumber == 3) && $request->overdue_days) {
             $rate = $installmentNumber == 2 ? 200 : 500;
             $overdueAmount = $rate * $request->overdue_days;
         }
 
-        // Total payment including overdue
+        // ✅ Include overdue charges with principal
         $totalPayment = $request->amount + $overdueAmount;
 
-        // Create or update current payment
+        // ✅ If this is the final installment, force full balance clearance
+        $remainingBalance = $this->remainingBalance($order->id);
+        if ($installmentNumber == 3 && $totalPayment < $remainingBalance) {
+            return redirect()->back()->withErrors([
+                'amount' => "Final installment must clear the full remaining balance (LKR {$remainingBalance})."
+            ]);
+        }
+
+        // ✅ Create or update payment record
         $payment = FinancePayment::firstOrNew([
             'finance_order_id' => $order->id,
             'installment_number' => $installmentNumber,
@@ -140,11 +154,11 @@ class FinanceOrderController extends Controller
 
         $payment->amount = ($payment->amount ?? 0) + $totalPayment;
         $payment->overdue_days = $request->overdue_days ?? 0;
-        $payment->overdue_amount = $overdueAmount;
+        $payment->overdue_amount = ($payment->overdue_amount ?? 0) + $overdueAmount; // ✅ accumulate overdue
         $payment->paid_at = now();
         $payment->save();
 
-        // 🔹 Set expected dates for future installments after first payment
+        // ✅ Set expected dates for future installments after first payment
         if ($installmentNumber == 1) {
             $firstPaymentDate = $payment->paid_at;
 
@@ -176,8 +190,12 @@ class FinanceOrderController extends Controller
     public function remainingBalance($orderId)
     {
         $order = FinanceOrder::findOrFail($orderId);
-        $paidAmount = $order->payments()->whereNotNull('paid_at')->sum('amount');
-        return $order->price - $paidAmount;
+
+        $totalPaid = $order->payments()->whereNotNull('paid_at')->sum('amount'); // includes overdue
+        $totalOverdue = $order->payments()->sum('overdue_amount');
+
+        // ✅ Balance includes overdue charges
+        return max(($order->price + $totalOverdue) - $totalPaid, 0);
     }
 
     /**
@@ -193,21 +211,22 @@ class FinanceOrderController extends Controller
 
     public function nearestPayments()
     {
-        // Get finance orders that have at least one unpaid payment
-        $financeOrders = FinanceOrder::select('finance_orders.*')
-            ->join('finance_payments', function($join) {
-                $join->on('finance_payments.finance_order_id', '=', 'finance_orders.id')
-                    ->whereNull('finance_payments.paid_at');
+        $financeOrders = FinanceOrder::whereHas('payments', function ($query) {
+                $query->whereNull('paid_at');
             })
-            ->with(['payments' => function($query) {
-                $query->whereNull('paid_at')->orderBy('installment_number');
+            ->with(['payments' => function ($query) {
+                $query->whereNull('paid_at')
+                    ->orderBy('installment_number');
             }])
-            ->orderBy('finance_payments.expected_date', 'asc') // earliest unpaid date first
-            ->distinct()
+            ->with(['payments' => function ($query) {
+                $query->whereNull('paid_at')
+                    ->orderBy('expected_date', 'asc');
+            }])
             ->paginate(20);
 
         return view('finance-plc.nearestPayments', compact('financeOrders'));
     }
+
 
 
 }
