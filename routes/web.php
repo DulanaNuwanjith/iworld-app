@@ -23,6 +23,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('finance-orders/{id}/update-note', [FinanceOrderController::class, 'updateNote'])->name('finance.update-note');
     Route::get('/finance/nearest-payments', [FinanceOrderController::class, 'nearestPayments'])
         ->name('finance.nearestPayments');
+    Route::get('/finance/invoice/{id}', [FinanceOrderController::class, 'printInvoice'])->name('finance.print-invoice');
 
     // Finance Report page
     Route::get('/financeReport', function () {

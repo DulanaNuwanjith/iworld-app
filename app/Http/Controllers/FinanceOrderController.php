@@ -253,6 +253,10 @@ class FinanceOrderController extends Controller
         return view('finance-plc.nearestPayments', compact('financeOrders'));
     }
 
-
+    public function printInvoice($id)
+    {
+        $order = FinanceOrder::with('payments')->findOrFail($id);
+        return view('finance-plc.invoice', compact('order'));
+    }
 
 }

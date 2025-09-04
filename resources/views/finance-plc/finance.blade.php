@@ -381,10 +381,10 @@
                                                 class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-56 text-xs text-gray-600 uppercase whitespace-normal break-words">
                                                 Note
                                             </th>
-                                            {{-- <th
+                                            <th
                                                 class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-36 text-xs text-gray-600 uppercase whitespace-normal break-words">
                                                 Action
-                                            </th> --}}
+                                            </th>
                                         </tr>
                                     </thead>
 
@@ -637,10 +637,10 @@
                                                 </td>
 
                                                 <!-- Actions -->
-                                                {{-- <td class="px-4 py-3 text-xs text-center">
+                                                <td class="px-4 py-3 text-xs text-center">
                                                     <form id="delete-form-{{ $order->id }}"
-                                                        action="{{ route('finance.destroy', $order->id) }}" method="POST"
-                                                        class="flex justify-center">
+                                                        action="{{ route('finance.destroy', $order->id) }}"
+                                                        method="POST" class="flex justify-center">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="button"
@@ -649,7 +649,12 @@
                                                             Delete
                                                         </button>
                                                     </form>
-                                                </td> --}}
+
+                                                    <button onclick="printInvoice({{ $order->id }})"
+                                                        class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs">
+                                                        Print Invoice
+                                                    </button>
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -831,7 +836,6 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -1004,4 +1008,13 @@
 
         });
     </script>
+    <script>
+        function printInvoice(orderId) {
+            const url = `/finance/invoice/${orderId}`;
+            const printWindow = window.open(url, '_blank', 'width=800,height=600');
+            printWindow.focus();
+            printWindow.print();
+        }
+    </script>
+
 @endsection
