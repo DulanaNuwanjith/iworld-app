@@ -638,17 +638,19 @@
 
                                                 <!-- Actions -->
                                                 <td class="px-4 py-3 text-xs text-center">
-                                                    <form id="delete-form-{{ $order->id }}"
-                                                        action="{{ route('finance.destroy', $order->id) }}"
-                                                        method="POST" class="flex justify-center">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button"
-                                                            onclick="confirmDelete('{{ $order->id }}')"
-                                                            class="bg-red-600 h-10 mt-1 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
-                                                            Delete
-                                                        </button>
-                                                    </form>
+                                                    @if (auth()->user() && auth()->user()->role === 'SUPERADMIN')
+                                                        <form id="delete-form-{{ $order->id }}"
+                                                            action="{{ route('finance.destroy', $order->id) }}"
+                                                            method="POST" class="flex justify-center">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="button"
+                                                                onclick="confirmDelete('{{ $order->id }}')"
+                                                                class="bg-red-600 h-10 mt-1 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
+                                                                Delete
+                                                            </button>
+                                                        </form>
+                                                    @endif
 
                                                     <button onclick="printInvoice({{ $order->id }})"
                                                         class="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs">
