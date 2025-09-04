@@ -75,13 +75,14 @@
         <!-- Header -->
         <div class="header">
             <div class="logo">
-                <img src="{{ asset('images/invoicelogo.png') }}" alt="Iworld Logo">
+                <span style="font-weight: bold; font-size: 3rem;">Iworld</span>
             </div>
             <div class="shop-details">
                 <strong>Iworld</strong> - Mobile Selling Shop<br>
                 Tel: +076 411 28 49 | 077 20 87 649<br>
                 Email: iworldgampaha@gmail.com<br>
-                Main Office: #No. 169, 5th Floor, Ward City Shopping Complex, Gampaha<br>
+                Main Office: #No. 169, 5th Floor,<br>
+                Ward City Shopping Complex, Gampaha<br>
                 Branch: No. 03, Ja-Ela Road, Gampaha
             </div>
         </div>
