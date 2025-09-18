@@ -36,7 +36,7 @@ class FinanceOrderController extends Controller
         // Pagination with filters
         $financeOrders = $financeOrdersQuery->orderBy('id', 'desc')
                             ->paginate(10)
-                            ->appends($request->query());
+                            ->withQueryString();
 
         // Dropdown data
         $orderNumbers = FinanceOrder::select('order_number')->distinct()->pluck('order_number');
