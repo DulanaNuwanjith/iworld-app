@@ -26,13 +26,13 @@
                             $nextPayment = $order->payments->whereNull('paid_at')->sortBy('installment_number')->first();
                         @endphp
                         <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200  text-left">
-                            <td class="text-center px-4 py-3 font-bold">{{ $order->order_number }}</td>
-                            <td class="px-4 py-3">{{ $order->buyer_name }}</td>
-                            <td class="px-4 py-3">{{ $order->buyer_id }}</td>
-                            <td class="px-4 py-3">{{ $order->buyer_address }}</td>
-                            <td class="px-4 py-3">{{ $order->phone_1 }}</td>
-                            <td class="px-4 py-3">{{ $order->phone_2 }}</td>
-                            <td class="px-4 py-3">
+                            <td class="text-center px-4 py-3 font-bold break-words">{{ $order->order_number }}</td>
+                            <td class="px-4 py-3 break-words">{{ $order->buyer_name }}</td>
+                            <td class="px-4 py-3 break-words">{{ $order->buyer_id }}</td>
+                            <td class="px-4 py-3 break-words">{{ $order->buyer_address }}</td>
+                            <td class="px-4 py-3 break-words">{{ $order->phone_1 }}</td>
+                            <td class="px-4 py-3 break-words">{{ $order->phone_2 }}</td>
+                            <td class="px-4 py-3 break-words">
                                 {{ $nextPayment ? \Carbon\Carbon::parse($nextPayment->expected_date)->format('d M Y') : 'Paid' }}
                             </td>
                         </tr>

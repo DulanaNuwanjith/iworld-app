@@ -400,7 +400,7 @@
                                                 </td>
 
                                                 <!-- Buyer Details -->
-                                                <td class="px-4 py-3 text-xs text-left">
+                                                <td class="px-4 py-3 text-xs text-left break-words">
                                                     <div>Name: {{ $order->buyer_name }}</div>
                                                     <div>ID: {{ $order->buyer_id }}</div>
                                                     <div>Address: {{ $order->buyer_address }}</div>
@@ -426,7 +426,7 @@
                                                 </td>
 
                                                 <!-- Item Details -->
-                                                <td class="px-4 py-3 text-xs text-left">
+                                                <td class="px-4 py-3 text-xs text-left break-words">
                                                     <div>Item: {{ $order->item_name }}</div>
                                                     <div>EMI: {{ $order->emi_number }}</div>
                                                     <div>Colour: {{ $order->colour }}</div>
@@ -457,7 +457,7 @@
                                                 </td>
 
                                                 <!-- Mails & Passwords -->
-                                                <td class="px-4 py-3 text-xs text-left">
+                                                <td class="px-4 py-3 text-xs text-left break-words">
                                                     <div>iCloud: {{ $order->icloud_mail }}</div>
                                                     <div>Password: {{ $order->icloud_password }}</div>
                                                     <div>Screen Time Lock: {{ $order->screen_lock_password }}</div>
@@ -476,7 +476,7 @@
                                                         : null;
                                                 @endphp
 
-                                                <td class="px-4 py-3 text-xs text-center">
+                                                <td class="px-4 py-3 text-xs text-center break-words">
                                                     <div>Full amount: LKR {{ number_format($order->price, 2) }}</div>
 
                                                     <div class="mt-2">
@@ -637,7 +637,7 @@
                                                 </td>
 
                                                 <!-- Actions -->
-                                                <td class="px-4 py-3 text-xs text-center">
+                                                <td class="px-4 py-3 text-xs text-center break-words">
                                                     @if (auth()->user() && auth()->user()->role === 'SUPERADMIN')
                                                         <form id="delete-form-{{ $order->id }}"
                                                             action="{{ route('finance.destroy', $order->id) }}"
