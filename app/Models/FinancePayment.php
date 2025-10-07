@@ -15,6 +15,7 @@ class FinancePayment extends Model
         'finance_order_id',
         'installment_number',
         'amount',
+        'paid_amount',
         'paid_at',
         'overdue_amount',
         'overdue_days',

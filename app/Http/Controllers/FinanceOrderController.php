@@ -49,81 +49,69 @@ class FinanceOrderController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'item_created_date' => 'required|date',
-            'coordinator_name' => 'required|string|max:255',
+            'coordinator_name' => 'nullable|string|max:255',
             'buyer_name' => 'required|string|max:255',
             'buyer_id' => 'required|string|max:255',
             'buyer_address' => 'required|string',
             'phone_1' => 'required|string|max:20',
             'phone_2' => 'nullable|string|max:20',
-            'id_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'electricity_bill_photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'item_name' => 'required|string|max:255',
             'emi_number' => 'required|string|max:255',
             'colour' => 'required|string|max:255',
-            'photo_1' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'photo_2' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'photo_about' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'icloud_mail' => 'required|email',
             'icloud_password' => 'required|string|max:255',
             'screen_lock_password' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
-            'down_payment' => 'nullable|numeric|min:0',
             'rate' => 'required|numeric|min:0',
-            'amount_of_installments' => 'required|numeric|min:1',
+            'amount_of_installments' => 'required|integer|min:1',
+            'over_due_payment_fullamount' => 'nullable|numeric|min:0',
+            'paid_amount_fullamount' => 'nullable|numeric|min:0',
+            'remaining_amount' => 'nullable|numeric|min:0',
+            'note' => 'nullable|string',
         ]);
 
-        // ✅ Generate sequential order number
-        $lastOrder = FinanceOrder::orderBy('id', 'desc')->first();
-        $nextNumber = $lastOrder ? ((int) str_replace('FO-', '', $lastOrder->order_number)) + 1 : 1;
-        $orderNumber = 'FO-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        // ✅ Calculate due payment = price + (price * rate / 100)
+        $price = $validated['price'];
+        $rate = $validated['rate'];
+        $due = $price + ($price * $rate / 100);
+        $validated['due_payment'] = $due;
 
-        // ✅ Extract form data
-        $data = $request->only([
-            'item_created_date', 'coordinator_name', 'buyer_name', 'buyer_id', 'buyer_address',
-            'phone_1', 'phone_2', 'item_name', 'emi_number', 'colour',
-            'icloud_mail', 'icloud_password', 'screen_lock_password',
-            'price', 'rate', 'amount_of_installments', 'down_payment'
-        ]);
+        // ✅ Auto-generate order number
+        $maxNumber = FinanceOrder::selectRaw("MAX(CAST(SUBSTR(order_number, 4) AS INTEGER)) as max_number")
+            ->value('max_number');
 
-        $data['order_number'] = $orderNumber;
+        $nextNumber = $maxNumber ? $maxNumber + 1 : 1;
+        $validated['order_number'] = 'FO-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-        // ✅ Backend auto-calculations (matches frontend)
-        $price = $data['price'];
-        $downPayment = $data['down_payment'] ?? 0;
-        $rate = $data['rate'];
+        // ✅ Create FinanceOrder
+        $order = FinanceOrder::create($validated);
 
-        // Financed Amount = Price - Down Payment
-        $data['financed_amount'] = $price - $downPayment;
+        // ✅ Create FinancePayment records (amount_of_installments wise)
+        $installmentAmount = round($due / $validated['amount_of_installments'], 2);
+        $startDate = Carbon::parse($validated['item_created_date']);
 
-        // Due Payment = Financed Amount + (Financed Amount * Rate / 100)
-        $data['due_payment'] = $data['financed_amount'] + ($data['financed_amount'] * $rate / 100);
+        for ($i = 1; $i <= $validated['amount_of_installments']; $i++) {
+            // 1st installment: same as item_created_date
+            // 2nd installment: +30 days, 3rd: +60 days, ...
+            $expectedDate = $startDate->copy()->addDays(30 * ($i - 1));
 
-        // ✅ Handle file uploads
-        $fileFields = [
-            'id_photo',
-            'electricity_bill_photo',
-            'photo_1',
-            'photo_2',
-            'photo_about'
-        ];
-
-        foreach ($fileFields as $field) {
-            if ($request->hasFile($field)) {
-                $extension = $request->file($field)->getClientOriginalExtension();
-                $fileName = $orderNumber . '_' . $field . '.' . $extension;
-                $path = $request->file($field)->storeAs('finance_orders', $fileName, 'public');
-                $data[$field] = $path;
-            } else {
-                $data[$field] = null;
+            // Adjust last installment for rounding differences
+            if ($i == $validated['amount_of_installments']) {
+                $installmentAmount = $due - $installmentAmount * ($validated['amount_of_installments'] - 1);
             }
+
+            FinancePayment::create([
+                'finance_order_id' => $order->id,
+                'installment_number' => $i,
+                'amount' => $installmentAmount,
+                'expected_date' => $expectedDate,
+            ]);
         }
 
-        // ✅ Create finance order
-        FinanceOrder::create($data);
 
-        return redirect()->route('finance.index')->with('success', 'Finance Order Created Successfully!');
+        return redirect()->back()->with('success', 'Finance order and installments created successfully.');
     }
 
     /**
@@ -164,6 +152,114 @@ class FinanceOrderController extends Controller
     {
         $order = FinanceOrder::with('payments')->findOrFail($id);
         return view('finance-plc.invoice', compact('order'));
+    }
+
+    /**
+     * Fetch installment list for modal popup
+     */
+    public function getInstallments($orderId)
+    {
+        $order = FinanceOrder::with(['payments' => function($q) {
+            $q->orderBy('installment_number');
+        }])->findOrFail($orderId);
+
+        return view('finance-plc.modal-installments', compact('order'));
+    }
+
+    public function payInstallment(Request $request, $id)
+    {
+        $payment = FinancePayment::findOrFail($id);
+        $order = FinanceOrder::findOrFail($payment->finance_order_id);
+
+        $overdueChargePerDay = 200;
+        $overdueDays = (int) ($request->overdue_days ?? 0);
+        $overdueAmount = $overdueDays * $overdueChargePerDay;
+
+        // Prevent paying future installments if previous unpaid
+        if ($payment->installment_number > 1) {
+            $previous = FinancePayment::where('finance_order_id', $payment->finance_order_id)
+                ->where('installment_number', $payment->installment_number - 1)
+                ->first();
+
+            if ($previous && !$previous->paid_at) {
+                return redirect()->back()->with('error', "You must pay installment #{$previous->installment_number} first.");
+            }
+        }
+
+        if ($payment->paid_at) {
+            return redirect()->back()->with('error', 'Installment already paid.');
+        }
+
+        // Get all payments
+        $payments = $order->payments()->orderBy('installment_number')->get();
+        $lastPayment = $payments->whereNull('paid_at')->last();
+
+        // Determine amount to pay
+        if ($payment->id === optional($lastPayment)->id) {
+            // Last unpaid installment
+            $totalPaidSoFar = $payments->whereNotNull('paid_at')->sum('paid_amount');
+            $totalOverduePaid = $payments->whereNotNull('paid_at')->sum('overdue_amount');
+
+            $remainingBalance = $order->due_payment - ($totalPaidSoFar - $totalOverduePaid);
+
+            $unpaidOverdue = $payments->whereNull('paid_at')
+                ->where('id', '<>', $payment->id)
+                ->sum('overdue_amount');
+
+            $amountToPay = max($remainingBalance + $unpaidOverdue + $overdueAmount, 0);
+        } else {
+            $amountToPay = $payment->amount + $overdueAmount;
+        }
+
+        // Validation
+        $request->validate([
+            'paid_amount' => "required|numeric|min:$amountToPay",
+            'overdue_days' => 'nullable|integer|min:0',
+        ]);
+
+        // Save payment
+        $payment->paid_at = now();
+        $payment->paid_amount = $request->paid_amount;
+        $payment->overdue_days = $overdueDays;
+        $payment->overdue_amount = $overdueAmount;
+        $payment->save();
+
+        // Update totals
+        $totalOverdue = $order->payments()->sum('overdue_amount');
+        $totalPaidFull = $order->payments()->sum('paid_amount');
+        $paidInitialAmount = $totalPaidFull - $totalOverdue;
+        $remainingAmount = $order->due_payment - $paidInitialAmount;
+
+        $order->over_due_payment_fullamount = $totalOverdue;
+        $order->paid_amount_fullamount = $totalPaidFull;
+        $order->remaining_amount = max($remainingAmount, 0);
+        $order->save();
+
+        // Remove future unpaid installments if fully paid
+        if ($remainingAmount <= 0) {
+            FinancePayment::where('finance_order_id', $order->id)
+                ->whereNull('paid_at')
+                ->delete();
+        }
+
+        return redirect()->back()->with('success', "Installment #{$payment->installment_number} successfully paid. Totals updated.");
+    }
+
+    public function nearestPayments()
+    {
+        // Get finance orders with unpaid payments
+        $financeOrders = FinanceOrder::with(['payments' => function ($query) {
+            $query->whereNull('paid_at')
+                ->orderBy('expected_date', 'asc'); // sort unpaid installments by expected_date
+        }])
+        ->get()
+        ->sortBy(function ($order) {
+            // Get nearest unpaid expected date for each order
+            $nextPayment = $order->payments->first();
+            return $nextPayment ? $nextPayment->expected_date : now();
+        });
+
+        return view('finance-plc.nearestPayments', compact('financeOrders'));
     }
 
 }

@@ -18,12 +18,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/finance', [FinanceOrderController::class, 'index'])->name('finance.index');
     Route::post('/finance/store', [FinanceOrderController::class, 'store'])->name('financeOrders.store');
     Route::delete('/finance/{id}', [FinanceOrderController::class, 'destroy'])->name('finance.destroy');
-    Route::patch('/finance/payInstallment/{order}/{installment}', [FinanceOrderController::class, 'payInstallment'])
-        ->name('finance.payInstallment');
     Route::patch('finance-orders/{id}/update-note', [FinanceOrderController::class, 'updateNote'])->name('finance.update-note');
     Route::get('/finance/nearest-payments', [FinanceOrderController::class, 'nearestPayments'])
         ->name('finance.nearestPayments');
     Route::get('/finance/invoice/{id}', [FinanceOrderController::class, 'printInvoice'])->name('finance.print-invoice');
+    // Installment modal & payment
+    Route::get('/finance/{id}/installments', [FinanceOrderController::class, 'getInstallments'])
+        ->name('finance.installments');
+    Route::post('/finance/payment/{id}/pay', [FinanceOrderController::class, 'payInstallment'])
+        ->name('finance.pay.installment');
+    Route::get('/finance/nearest-payments', [FinanceOrderController::class, 'nearestPayments'])->name('finance.nearestPayments');
+
 
     // Finance Report page
     Route::get('/financeReport', function () {

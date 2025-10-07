@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('finance_order_id')->constrained('finance_orders')->onDelete('cascade');
             $table->tinyInteger('installment_number');
             $table->decimal('amount', 12, 2);
+            $table->decimal('paid_amount', 12, 2)->nullable();
             $table->date('paid_at')->nullable();
             $table->integer('overdue_days')->default(0);
             $table->decimal('overdue_amount', 10, 2)->default(0);
