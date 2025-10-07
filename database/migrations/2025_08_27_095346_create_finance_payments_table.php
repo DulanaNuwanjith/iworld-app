@@ -17,6 +17,9 @@ return new class extends Migration
             $table->tinyInteger('installment_number'); // 1, 2, 3
             $table->decimal('amount', 12, 2);
             $table->date('paid_at')->nullable();
+            $table->integer('overdue_days')->default(0);
+            $table->decimal('overdue_amount', 10, 2)->default(0);
+            $table->date('expected_date')->nullable();
             $table->timestamps();
         });
 

@@ -489,7 +489,7 @@
                                                         : null;
                                                 @endphp
 
-                                                <td class="px-4 py-3 text-xs text-center break-words">
+                                                <td class="px-4 py-3 text-xs text-left break-words">
                                                     <div class="font-bold">Full amount: LKR <span class="font-normal">
                                                             {{ number_format($order->price, 2) }}</span></div>
                                                     <div class="font-bold">Rate: <span
@@ -504,10 +504,9 @@
                                                     </div>
 
                                                     <button onclick=""
-                                                        class="px-2 py-1 mt-3 bg-green-500 text-white rounded text-xs hover:bg-green-600">
+                                                        class="px-2 py-1 text-center mt-3 bg-green-500 text-white rounded text-xs hover:bg-green-600">
                                                         Pay
                                                     </button>
-
                                                 </td>
 
                                                 <!-- Note -->
