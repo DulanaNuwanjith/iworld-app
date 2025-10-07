@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('finance_payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('finance_order_id')->constrained('finance_orders')->onDelete('cascade');
-            $table->tinyInteger('installment_number'); // 1, 2, 3
+            $table->tinyInteger('installment_number');
             $table->decimal('amount', 12, 2);
             $table->date('paid_at')->nullable();
             $table->integer('overdue_days')->default(0);

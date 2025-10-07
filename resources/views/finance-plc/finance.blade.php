@@ -374,7 +374,7 @@
                                                 Mails & Passwords
                                             </th>
                                             <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-56 text-xs text-gray-600 uppercase whitespace-normal break-words">
+                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-60 text-xs text-gray-600 uppercase whitespace-normal break-words">
                                                 Price & Payment
                                             </th>
                                             <th
@@ -490,8 +490,12 @@
                                                 @endphp
 
                                                 <td class="px-4 py-3 text-xs text-left break-words">
-                                                    <div class="font-bold">Full amount: LKR <span class="font-normal">
+                                                    <div class="font-bold">Phone Price: LKR <span class="font-normal">
                                                             {{ number_format($order->price, 2) }}</span></div>
+                                                    <div class="font-bold">Down Payment: LKR <span class="font-normal">
+                                                            {{ number_format($order->down_payment, 2) }}</span></div>
+                                                    <div class="font-bold">Financed Amount: LKR <span class="font-normal">
+                                                            {{ number_format($order->financed_amount, 2) }}</span></div>
                                                     <div class="font-bold">Rate: <span
                                                             class="font-normal">{{ number_format($order->rate) }}%</span>
                                                     </div>
@@ -682,7 +686,27 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="flex gap-4">
+                                                <div class="flex gap-4 mt-4">
+                                                    <div class="w-1/2">
+                                                        <label class="block text-sm font-medium text-gray-700">Down Payment
+                                                            (LKR)</label>
+                                                        <input type="number" name="down_payment" id="down_payment"
+                                                            required step="0.01" min="0"
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                                            placeholder="Enter amount in LKR">
+                                                    </div>
+
+                                                    <div class="w-1/2">
+                                                        <label class="block text-sm font-medium text-gray-700">Financed
+                                                            Price (LKR)</label>
+                                                        <input type="number" name="financed_amount" id="financed_amount"
+                                                            readonly step="0.01" min="0"
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 cursor-not-allowed"
+                                                            placeholder="Auto calculated">
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex gap-4 mt-4">
                                                     <div class="w-1/2">
                                                         <label class="block text-sm font-medium text-gray-700">Rate
                                                             (%)</label>
@@ -902,23 +926,31 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const priceInput = document.getElementById('price');
+            const downPaymentInput = document.getElementById('down_payment');
             const rateInput = document.getElementById('rate');
+            const financedAmountInput = document.getElementById('financed_amount');
             const dueDisplay = document.getElementById('due_payment_display');
             const dueHidden = document.getElementById('due_payment');
 
-            function calculateDuePayment() {
+            function calculateValues() {
                 const price = parseFloat(priceInput.value) || 0;
+                const downPayment = parseFloat(downPaymentInput.value) || 0;
                 const rate = parseFloat(rateInput.value) || 0;
 
-                // ✅ New formula: total = price + (price * rate / 100)
-                const due = price + (price * rate / 100);
+                // ✅ Calculate financed amount
+                const financedAmount = price - downPayment;
+                financedAmountInput.value = financedAmount.toFixed(2);
 
+                // ✅ Calculate due payment = financed + (financed * rate / 100)
+                const due = financedAmount + (financedAmount * rate / 100);
                 dueDisplay.value = due.toFixed(2);
                 dueHidden.value = due.toFixed(2);
             }
 
-            priceInput.addEventListener('input', calculateDuePayment);
-            rateInput.addEventListener('input', calculateDuePayment);
+            // Listen for input changes
+            [priceInput, downPaymentInput, rateInput].forEach(input => {
+                input.addEventListener('input', calculateValues);
+            });
         });
     </script>
 @endsection

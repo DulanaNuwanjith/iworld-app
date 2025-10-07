@@ -69,25 +69,38 @@ class FinanceOrderController extends Controller
             'icloud_password' => 'required|string|max:255',
             'screen_lock_password' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
+            'down_payment' => 'nullable|numeric|min:0',
             'rate' => 'required|numeric|min:0',
-            'amount_of_installments' => 'required|numeric|min:0',
-            'due_payment' => 'required|numeric|min:0',
+            'amount_of_installments' => 'required|numeric|min:1',
         ]);
 
-        // Generate sequential order number
+        // ✅ Generate sequential order number
         $lastOrder = FinanceOrder::orderBy('id', 'desc')->first();
         $nextNumber = $lastOrder ? ((int) str_replace('FO-', '', $lastOrder->order_number)) + 1 : 1;
         $orderNumber = 'FO-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
+        // ✅ Extract form data
         $data = $request->only([
             'item_created_date', 'coordinator_name', 'buyer_name', 'buyer_id', 'buyer_address',
             'phone_1', 'phone_2', 'item_name', 'emi_number', 'colour',
-            'icloud_mail', 'icloud_password', 'screen_lock_password', 'price', 'rate', 'amount_of_installments', 'due_payment'
+            'icloud_mail', 'icloud_password', 'screen_lock_password',
+            'price', 'rate', 'amount_of_installments', 'down_payment'
         ]);
 
         $data['order_number'] = $orderNumber;
 
-        // Handle file uploads with custom naming
+        // ✅ Backend auto-calculations (matches frontend)
+        $price = $data['price'];
+        $downPayment = $data['down_payment'] ?? 0;
+        $rate = $data['rate'];
+
+        // Financed Amount = Price - Down Payment
+        $data['financed_amount'] = $price - $downPayment;
+
+        // Due Payment = Financed Amount + (Financed Amount * Rate / 100)
+        $data['due_payment'] = $data['financed_amount'] + ($data['financed_amount'] * $rate / 100);
+
+        // ✅ Handle file uploads
         $fileFields = [
             'id_photo',
             'electricity_bill_photo',
@@ -101,12 +114,13 @@ class FinanceOrderController extends Controller
                 $extension = $request->file($field)->getClientOriginalExtension();
                 $fileName = $orderNumber . '_' . $field . '.' . $extension;
                 $path = $request->file($field)->storeAs('finance_orders', $fileName, 'public');
-                $data[$field] = $path; // save relative path in DB
+                $data[$field] = $path;
             } else {
                 $data[$field] = null;
             }
         }
 
+        // ✅ Create finance order
         FinanceOrder::create($data);
 
         return redirect()->route('finance.index')->with('success', 'Finance Order Created Successfully!');

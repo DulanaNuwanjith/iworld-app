@@ -21,32 +21,28 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    @forelse ($financeOrders as $order)
-                        @php
-                            $nextPayment = $order->payments->whereNull('paid_at')->sortBy('installment_number')->first();
-                        @endphp
                         <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200  text-left">
-                            <td class="text-center px-4 py-3 font-bold break-words">{{ $order->order_number }}</td>
-                            <td class="px-4 py-3 break-words">{{ $order->buyer_name }}</td>
-                            <td class="px-4 py-3 break-words">{{ $order->buyer_id }}</td>
-                            <td class="px-4 py-3 break-words">{{ $order->buyer_address }}</td>
-                            <td class="px-4 py-3 break-words">{{ $order->phone_1 }}</td>
-                            <td class="px-4 py-3 break-words">{{ $order->phone_2 }}</td>
+                            <td class="text-center px-4 py-3 font-bold break-words"></td>
+                            <td class="px-4 py-3 break-words"></td>
+                            <td class="px-4 py-3 break-words"></td>
+                            <td class="px-4 py-3 break-words"></td>
+                            <td class="px-4 py-3 break-words"></td>
+                            <td class="px-4 py-3 break-words"></td>
                             <td class="px-4 py-3 break-words">
-                                {{ $nextPayment ? \Carbon\Carbon::parse($nextPayment->expected_date)->format('d M Y') : 'Paid' }}
+                                
                             </td>
                         </tr>
-                    @empty
+
                         <tr>
                             <td colspan="7" class="px-4 py-3 text-center text-gray-500">No finance orders found.</td>
                         </tr>
-                    @endforelse
+
                 </tbody>
             </table>
         </div>
 
         <div class="py-4 flex justify-center">
-            {{ $financeOrders->links() }}
+            
         </div>
 
 </div>

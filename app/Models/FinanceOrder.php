@@ -30,6 +30,8 @@ class FinanceOrder extends Model
         'icloud_password',
         'screen_lock_password',
         'price',
+        'down_payment',
+        'financed_amount',
         'rate',
         'amount_of_installments',
         'due_payment',
