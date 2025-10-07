@@ -358,7 +358,7 @@
                                     <thead class="bg-gray-200 text-left">
                                         <tr class="text-center">
                                             <th
-                                                class="font-bold sticky top-0 bg-gray-200  px-4 py-3 w-32 text-xs text-gray-600  uppercase whitespace-normal break-words">
+                                                class="font-bold sticky top-0 bg-gray-200  px-4 py-3 w-40 text-xs text-gray-600  uppercase whitespace-normal break-words">
                                                 Order No
                                             </th>
                                             <th
@@ -366,11 +366,11 @@
                                                 Buyer Details
                                             </th>
                                             <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-48 text-xs text-gray-600 uppercase whitespace-normal break-words">
+                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-56 text-xs text-gray-600 uppercase whitespace-normal break-words">
                                                 Item Details
                                             </th>
                                             <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-48 text-xs text-gray-600 uppercase whitespace-normal break-words">
+                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-56 text-xs text-gray-600 uppercase whitespace-normal break-words">
                                                 Mails & Passwords
                                             </th>
                                             <th
@@ -397,15 +397,21 @@
                                                     <div class="text-xs">
                                                         {{ \Carbon\Carbon::parse($order->item_created_date)->format('Y-m-d') }}
                                                     </div>
+                                                    <div class="text-xs">({{ $order->coordinator_name }})</div>
                                                 </td>
 
                                                 <!-- Buyer Details -->
                                                 <td class="px-4 py-3 text-xs text-left break-words">
-                                                    <div>Name: {{ $order->buyer_name }}</div>
-                                                    <div>ID: {{ $order->buyer_id }}</div>
-                                                    <div>Address: {{ $order->buyer_address }}</div>
-                                                    <div>Phone 1: {{ $order->phone_1 }}</div>
-                                                    <div>Phone 2: {{ $order->phone_2 }}</div>
+                                                    <div class="font-bold">Name: <span
+                                                            class="font-normal">{{ $order->buyer_name }}</span></div>
+                                                    <div class="font-bold">ID: <span
+                                                            class="font-normal">{{ $order->buyer_id }}</span></div>
+                                                    <div class="font-bold">Address: <span
+                                                            class="font-normal">{{ $order->buyer_address }}</span></div>
+                                                    <div class="font-bold">Phone 1: <span
+                                                            class="font-normal">{{ $order->phone_1 }}</span></div>
+                                                    <div class="font-bold">Phone 2: <span
+                                                            class="font-normal">{{ $order->phone_2 }}</span></div>
                                                     <div class="mt-1 flex gap-1">
                                                         @if ($order->id_photo)
                                                             <a href="{{ asset('storage/' . $order->id_photo) }}"
@@ -427,9 +433,12 @@
 
                                                 <!-- Item Details -->
                                                 <td class="px-4 py-3 text-xs text-left break-words">
-                                                    <div>Item: {{ $order->item_name }}</div>
-                                                    <div>EMI: {{ $order->emi_number }}</div>
-                                                    <div>Colour: {{ $order->colour }}</div>
+                                                    <div class="font-bold">Item: <span
+                                                            class="font-normal">{{ $order->item_name }}</span></div>
+                                                    <div class="font-bold">EMI: <span
+                                                            class="font-normal">{{ $order->emi_number }}</span></div>
+                                                    <div class="font-bold">Colour: <span
+                                                            class="font-normal">{{ $order->colour }}</span></div>
                                                     <div class="mt-1 flex gap-1">
                                                         @if ($order->photo_1)
                                                             <a href="{{ asset('storage/' . $order->photo_1) }}"
@@ -458,9 +467,13 @@
 
                                                 <!-- Mails & Passwords -->
                                                 <td class="px-4 py-3 text-xs text-left break-words">
-                                                    <div>iCloud: {{ $order->icloud_mail }}</div>
-                                                    <div>Password: {{ $order->icloud_password }}</div>
-                                                    <div>Screen Time Lock: {{ $order->screen_lock_password }}</div>
+                                                    <div class="font-bold">iCloud: <span
+                                                            class="font-normal">{{ $order->icloud_mail }}</span></div>
+                                                    <div class="font-bold">Password: <span
+                                                            class="font-normal">{{ $order->icloud_password }}</span></div>
+                                                    <div class="font-bold">Screen Time Lock: <span
+                                                            class="font-normal">{{ $order->screen_lock_password }}</span>
+                                                    </div>
                                                 </td>
 
                                                 @php
@@ -477,148 +490,25 @@
                                                 @endphp
 
                                                 <td class="px-4 py-3 text-xs text-center break-words">
-                                                    <div>Full amount: LKR {{ number_format($order->price, 2) }}</div>
-
-                                                    <div class="mt-2">
-                                                        @php
-                                                            $paidInstallments = $order->payments
-                                                                ->pluck('installment_number')
-                                                                ->toArray();
-                                                            $totalPaid = $order->payments->sum('amount'); // includes overdue
-                                                            $totalOverdue = $order->payments->sum('overdue_amount'); // sum of all overdue
-                                                            $balance = max(
-                                                                $order->price + $totalOverdue - $totalPaid,
-                                                                0,
-                                                            ); // ✅ balance includes overdue
-                                                            $installmentAmount = round($order->price / 3, 2); // equal installments
-                                                        @endphp
-
-                                                        @for ($i = 1; $i <= 3; $i++)
-                                                            @php
-                                                                $payment = $order->payments
-                                                                    ->where('installment_number', $i)
-                                                                    ->first();
-                                                                $paidAmount = $payment->amount ?? 0;
-                                                                $overdueAmount = $payment->overdue_amount ?? 0;
-                                                                $expectedDate = $payment->expected_date ?? null;
-
-                                                                // For normal installments (1 & 2), allow partials.
-                                                                // For final installment (3), require full remaining balance.
-                                                                $installmentRemaining =
-                                                                    $i == 3
-                                                                        ? $balance
-                                                                        : max(
-                                                                            $installmentAmount -
-                                                                                ($paidAmount - $overdueAmount),
-                                                                            0,
-                                                                        );
-
-                                                                $canPay =
-                                                                    $i == 1 ||
-                                                                    ($i == 2 && in_array(1, $paidInstallments)) ||
-                                                                    ($i == 3 && in_array(2, $paidInstallments));
-                                                            @endphp
-
-                                                            @if ($paidAmount > 0)
-                                                                <div class="text-green-600 text-xs mt-1">
-                                                                    Payment {{ $i }}: LKR
-                                                                    {{ number_format($paidAmount - $overdueAmount, 2) }}
-                                                                    @if ($overdueAmount > 0)
-                                                                        (Overdue: LKR
-                                                                        {{ number_format($overdueAmount, 2) }})
-                                                                    @endif
-                                                                    @if ($payment->paid_at)
-                                                                        ({{ \Carbon\Carbon::parse($payment->paid_at)->format('Y-m-d') }})
-                                                                    @endif
-                                                                </div>
-                                                            @elseif ($installmentRemaining > 0)
-                                                                <div class="text-blue-600 text-xs mt-1">
-                                                                    Payment {{ $i }}: Pending
-                                                                    @if ($expectedDate)
-                                                                        (expected date:
-                                                                        {{ \Carbon\Carbon::parse($expectedDate)->format('Y-m-d') }})
-                                                                    @endif
-                                                                </div>
-
-                                                                @if ($canPay)
-                                                                    <button
-                                                                        onclick="openPaymentModal({{ $order->id }}, {{ $i }}, {{ $installmentRemaining }}, '{{ $expectedDate }}')"
-                                                                        class="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600">
-                                                                        Pay
-                                                                    </button>
-                                                                @endif
-                                                            @endif
-                                                        @endfor
-
-                                                        <!-- Remaining Balance (with overdue included) -->
-                                                        <div class="mt-2 text-red-600 font-medium">
-                                                            Balance: LKR {{ number_format($balance, 2) }}
-                                                        </div>
-
-                                                        @if ($totalOverdue > 0)
-                                                            <div class="mt-1 text-orange-600 text-xs font-medium">
-                                                                Total Overdue Charged: LKR
-                                                                {{ number_format($totalOverdue, 2) }}
-                                                            </div>
-                                                        @endif
+                                                    <div class="font-bold">Full amount: LKR <span class="font-normal">
+                                                            {{ number_format($order->price, 2) }}</span></div>
+                                                    <div class="font-bold">Rate: <span
+                                                            class="font-normal">{{ number_format($order->rate) }}%</span>
                                                     </div>
+                                                    <div class="font-bold">Amount of Installments:
+                                                        <span
+                                                            class="font-normal">{{ number_format($order->amount_of_installments) }}</span>
+                                                    </div>
+                                                    <div class="font-bold">Due Payment: LKR <span
+                                                            class="font-normal">{{ number_format($order->due_payment, 2) }}</span>
+                                                    </div>
+
+                                                    <button onclick=""
+                                                        class="px-2 py-1 mt-3 bg-green-500 text-white rounded text-xs hover:bg-green-600">
+                                                        Pay
+                                                    </button>
+
                                                 </td>
-
-                                                <!-- Payment Modal -->
-                                                <div id="paymentModal"
-                                                    class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50">
-                                                    <div class="bg-white rounded-lg p-6 w-96 relative">
-                                                        <h2 class="text-lg font-semibold mb-4">Pay Installment</h2>
-                                                        <form id="paymentForm" method="POST">
-                                                            @csrf
-                                                            @method('PATCH')
-                                                            <input type="hidden" name="installment_number"
-                                                                id="installmentNumber">
-
-                                                            <div class="mb-2">
-                                                                <label class="block text-sm font-medium">Amount</label>
-                                                                <input type="number" name="amount"
-                                                                    id="installmentAmount"
-                                                                    class="w-full border px-2 py-1 rounded" required>
-                                                            </div>
-
-                                                            <!-- Expected Date -->
-                                                            <div class="mb-4" id="expectedDateContainer">
-                                                                <label class="block text-sm font-medium">Expected
-                                                                    Date</label>
-                                                                <input type="text" id="expectedDate"
-                                                                    class="w-full border px-2 py-1 rounded bg-gray-100"
-                                                                    readonly>
-                                                            </div>
-
-                                                            <!-- Overdue Days (hide for Payment 1) -->
-                                                            <div class="mb-4" id="overdueContainer">
-                                                                <label class="block text-sm font-medium">Overdue
-                                                                    Days</label>
-                                                                <input type="number" name="overdue_days"
-                                                                    id="overdueDays"
-                                                                    class="w-full border px-2 py-1 rounded" value="0"
-                                                                    min="0">
-                                                                <div class="text-xs text-gray-500 mt-1"
-                                                                    id="overdueAmountText">Overdue Amount: LKR 0</div>
-                                                            </div>
-
-                                                            <div class="mb-4">
-                                                                <div class="text-lg text-gray-500 mt-1"
-                                                                    id="totalPaymentText">Total Payment: LKR 0</div>
-                                                            </div>
-
-                                                            <div class="flex justify-end gap-2">
-                                                                <button type="button" onclick="closePaymentModal()"
-                                                                    class="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
-                                                                <button type="submit"
-                                                                    class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">
-                                                                    Pay
-                                                                </button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
 
                                                 <!-- Note -->
                                                 <td class="px-4 py-3 text-xs text-center whitespace-normal break-words">
@@ -682,12 +572,24 @@
                                             <div class="space-y-4">
 
                                                 <!-- Item Created Date -->
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-700 ">Item
-                                                        Created Date</label>
-                                                    <input type="date" name="item_created_date" required
-                                                        class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                                <div class="flex gap-4">
+                                                    <div class="w-1/2">
+                                                        <label class="block text-sm font-medium text-gray-700 ">Item
+                                                            Created Date</label>
+                                                        <input type="date" name="item_created_date" required
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                                    </div>
+                                                    <div class="w-1/2">
+                                                        <label class="block text-sm font-medium text-gray-700 ">Coordinator
+                                                            Name</label>
+                                                        <input type="text" name="coordinator_name" required
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                                    </div>
                                                 </div>
+
+                                                <h2 class="text-xl font-semibold mb-8 text-gray-900 mt-4 text-left">
+                                                    Buyer Details
+                                                </h2>
 
                                                 <!-- Buyer Info -->
                                                 <div class="flex gap-4">
@@ -734,13 +636,17 @@
                                                         <input type="file" name="id_photo" accept="image/*"
                                                             class="w-full mt-1 text-sm">
                                                     </div>
-                                                    <div class="w-1/2">
+                                                    <div class="w-1/2 mb-8">
                                                         <label class="block text-sm font-medium text-gray-700">House
                                                             Electricity Bill</label>
                                                         <input type="file" name="electricity_bill_photo"
                                                             accept="image/*" class="w-full mt-1 text-sm">
                                                     </div>
                                                 </div>
+
+                                                <h2 class="text-xl font-semibold mb-8 text-gray-900 mt-4 text-left">
+                                                    Phone Details
+                                                </h2>
 
                                                 <!-- Item Details -->
                                                 <div class="flex gap-4">
@@ -766,13 +672,47 @@
                                                         <input type="text" name="colour" required
                                                             class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
                                                     </div>
+
                                                     <div class="w-1/2">
-                                                        <label
-                                                            class="block text-sm font-medium text-gray-700">Price</label>
-                                                        <input type="number" name="price" required step="0.01"
-                                                            min="0"
+                                                        <label class="block text-sm font-medium text-gray-700">Price
+                                                            (LKR)</label>
+                                                        <input type="number" name="price" id="price" required
+                                                            step="0.01" min="0"
                                                             class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
                                                             placeholder="Enter amount in LKR">
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex gap-4">
+                                                    <div class="w-1/2">
+                                                        <label class="block text-sm font-medium text-gray-700">Rate
+                                                            (%)</label>
+                                                        <input type="number" name="rate" id="rate" required
+                                                            step="0.01" min="0"
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                                            placeholder="Enter rate">
+                                                    </div>
+
+                                                    <div class="w-1/2">
+                                                        <label class="block text-sm font-medium text-gray-700">Amount of
+                                                            Installments</label>
+                                                        <input type="number" name="amount_of_installments" required
+                                                            min="1"
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                                            placeholder="Enter number of installments">
+                                                    </div>
+
+                                                    <div class="w-1/2">
+                                                        <label class="block text-sm font-medium text-gray-700">Due Payment
+                                                            (LKR)</label>
+                                                        <!-- Disabled visible field -->
+                                                        <input type="number" id="due_payment_display" step="0.01"
+                                                            min="0" disabled
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 cursor-not-allowed"
+                                                            placeholder="Auto calculated">
+
+                                                        <!-- Hidden input to submit value -->
+                                                        <input type="hidden" name="due_payment" id="due_payment">
                                                     </div>
                                                 </div>
 
@@ -790,13 +730,17 @@
                                                         <input type="file" name="photo_2" accept="image/*"
                                                             class="w-full mt-1 text-sm">
                                                     </div>
-                                                    <div class="w-1/3">
+                                                    <div class="w-1/3 mb-8">
                                                         <label class="block text-sm font-medium text-gray-700">Photo
                                                             About</label>
                                                         <input type="file" name="photo_about" accept="image/*"
                                                             class="w-full mt-1 text-sm">
                                                     </div>
                                                 </div>
+
+                                                <h2 class="text-xl font-semibold mb-8 text-gray-900 mt-4 text-left">
+                                                    Security Details
+                                                </h2>
 
                                                 <!-- iCloud Details -->
                                                 <div class="flex gap-4">
@@ -856,69 +800,7 @@
             form.classList.toggle('hidden');
         }
     </script>
-    <script>
-        function openPaymentModal(orderId, installmentNumber, installmentRemaining, expectedDate = null) {
-            const modal = document.getElementById('paymentModal');
-            modal.classList.remove('hidden');
 
-            const form = document.getElementById('paymentForm');
-            form.action = `/finance/payInstallment/${orderId}/${installmentNumber}`;
-
-            const amountInput = document.getElementById('installmentAmount');
-            const overdueInput = document.getElementById('overdueDays');
-            const overdueText = document.getElementById('overdueAmountText');
-            const totalText = document.getElementById('totalPaymentText');
-            const expectedInput = document.getElementById('expectedDate');
-            const expectedContainer = document.getElementById('expectedDateContainer');
-            const overdueContainer = document.getElementById('overdueContainer');
-
-            document.getElementById('installmentNumber').value = installmentNumber;
-
-            // Final installment = must pay all remaining balance
-            if (installmentNumber === 3) {
-                amountInput.value = installmentRemaining;
-                amountInput.readOnly = true; // lock final balance
-            } else {
-                amountInput.value = installmentRemaining;
-                amountInput.readOnly = false;
-            }
-
-            // Show expected date if provided
-            if (expectedDate) {
-                expectedInput.value = expectedDate;
-                expectedContainer.style.display = 'block';
-            } else {
-                expectedContainer.style.display = 'none';
-            }
-
-            // Hide overdue input for Payment 1
-            if (installmentNumber === 1) {
-                overdueContainer.style.display = 'none';
-            } else {
-                overdueContainer.style.display = 'block';
-                overdueInput.value = 0;
-            }
-
-            function updatePayment() {
-                const days = parseInt(overdueInput.value) || 0;
-                const rate = installmentNumber === 2 ? 200 : (installmentNumber === 3 ? 500 : 0);
-                const overdueAmount = days * rate;
-
-                overdueText.innerText = `Overdue Amount: LKR ${overdueAmount.toLocaleString()}`;
-                const total = parseFloat(amountInput.value) + overdueAmount;
-                totalText.innerText = `Total Payment: LKR ${total.toLocaleString()}`;
-            }
-
-            overdueInput.addEventListener('input', updatePayment);
-            amountInput.addEventListener('input', updatePayment);
-
-            updatePayment();
-        }
-
-        function closePaymentModal() {
-            document.getElementById('paymentModal').classList.add('hidden');
-        }
-    </script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
 
@@ -1018,5 +900,26 @@
             printWindow.print();
         }
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const priceInput = document.getElementById('price');
+            const rateInput = document.getElementById('rate');
+            const dueDisplay = document.getElementById('due_payment_display');
+            const dueHidden = document.getElementById('due_payment');
 
+            function calculateDuePayment() {
+                const price = parseFloat(priceInput.value) || 0;
+                const rate = parseFloat(rateInput.value) || 0;
+
+                // ✅ New formula: total = price + (price * rate / 100)
+                const due = price + (price * rate / 100);
+
+                dueDisplay.value = due.toFixed(2);
+                dueHidden.value = due.toFixed(2);
+            }
+
+            priceInput.addEventListener('input', calculateDuePayment);
+            rateInput.addEventListener('input', calculateDuePayment);
+        });
+    </script>
 @endsection

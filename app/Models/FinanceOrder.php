@@ -12,6 +12,7 @@ class FinanceOrder extends Model
     protected $fillable = [
         'order_number',
         'item_created_date',
+        'coordinator_name',
         'buyer_name',
         'buyer_id',
         'buyer_address',
@@ -29,6 +30,9 @@ class FinanceOrder extends Model
         'icloud_password',
         'screen_lock_password',
         'price',
+        'rate',
+        'amount_of_installments',
+        'due_payment',
         'note'
     ];
 

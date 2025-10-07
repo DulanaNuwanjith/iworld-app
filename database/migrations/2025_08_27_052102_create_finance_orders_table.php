@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('order_number')->unique();
             $table->date('item_created_date');
+            $table->string('coordinator_name')->nullable();
             $table->string('buyer_name');
             $table->string('buyer_id');
             $table->text('buyer_address');
@@ -24,10 +25,13 @@ return new class extends Migration {
             $table->string('photo_1')->nullable();
             $table->string('photo_2')->nullable();
             $table->string('photo_about')->nullable();
-            $table->string('icloud_mail');
-            $table->string('icloud_password');
-            $table->string('screen_lock_password');
-            $table->string('price')->nullable();
+            $table->string('icloud_mail')->nullable();;
+            $table->string('icloud_password')->nullable();;
+            $table->string('screen_lock_password')->nullable();;
+            $table->string('price');
+            $table->string('rate');
+            $table->string('amount_of_installments');
+            $table->string('due_payment');
             $table->string('note')->nullable();
             $table->timestamps();
         });

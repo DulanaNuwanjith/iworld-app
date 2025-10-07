@@ -51,6 +51,7 @@ class FinanceOrderController extends Controller
     {
         $request->validate([
             'item_created_date' => 'required|date',
+            'coordinator_name' => 'required|string|max:255',
             'buyer_name' => 'required|string|max:255',
             'buyer_id' => 'required|string|max:255',
             'buyer_address' => 'required|string',
@@ -68,6 +69,9 @@ class FinanceOrderController extends Controller
             'icloud_password' => 'required|string|max:255',
             'screen_lock_password' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
+            'rate' => 'required|numeric|min:0',
+            'amount_of_installments' => 'required|numeric|min:0',
+            'due_payment' => 'required|numeric|min:0',
         ]);
 
         // Generate sequential order number
@@ -76,9 +80,9 @@ class FinanceOrderController extends Controller
         $orderNumber = 'FO-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
         $data = $request->only([
-            'item_created_date', 'buyer_name', 'buyer_id', 'buyer_address',
+            'item_created_date', 'coordinator_name', 'buyer_name', 'buyer_id', 'buyer_address',
             'phone_1', 'phone_2', 'item_name', 'emi_number', 'colour',
-            'icloud_mail', 'icloud_password', 'screen_lock_password', 'price'
+            'icloud_mail', 'icloud_password', 'screen_lock_password', 'price', 'rate', 'amount_of_installments', 'due_payment'
         ]);
 
         $data['order_number'] = $orderNumber;
