@@ -34,10 +34,14 @@ class FinanceOrderController extends Controller
             $financeOrdersQuery->whereDate('item_created_date', $request->item_created_date);
         }
 
-        // Pagination with filters
-        $financeOrders = $financeOrdersQuery->orderBy('id', 'desc')
-                            ->paginate(10)
-                            ->withQueryString();
+        $financeOrders = FinanceOrder::orderByRaw('
+                CASE 
+                    WHEN remaining_amount = 0 THEN 1 
+                    ELSE 0 
+                END ASC, id DESC
+            ')
+            ->paginate(10)
+            ->withQueryString();
 
         // Dropdown data
         $orderNumbers = FinanceOrder::select('order_number')->distinct()->pluck('order_number');

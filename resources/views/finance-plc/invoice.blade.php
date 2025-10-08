@@ -4,191 +4,142 @@
 <head>
     <meta charset="UTF-8">
     <title>Invoice #{{ $order->order_number }}</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-
-        .invoice-box {
-            max-width: 800px;
-            margin: auto;
-            padding: 30px;
-            border: 1px solid #eee;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .header img {
-            max-height: 80px;
-        }
-
-        .header .shop-details {
-            text-align: right;
-            font-size: 14px;
-        }
-
-        h2,
-        h4 {
-            margin: 5px 0;
-        }
-
-        table {
-            width: 100%;
-            line-height: inherit;
-            text-align: left;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        table td {
-            padding: 5px;
-            vertical-align: top;
-        }
-
-        table tr.heading td {
-            background: #eee;
-            border-bottom: 1px solid #ddd;
-            font-weight: bold;
-        }
-
-        .total {
-            font-weight: bold;
-            margin-top: 20px;
-        }
-
-        .note {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #d9534f;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
-<body>
-    <div class="invoice-box">
+<body class="bg-gray-100 font-sans p-6">
+    <div class="invoice-box max-w-3xl mx-auto bg-white p-8 border border-gray-200">
         <!-- Header -->
-        <div class="header">
-            <div class="logo">
-                <span style="font-weight: bold; font-size: 3rem;">Iworld</span>
+        <div class="flex justify-between items-center mb-6">
+            <div class="logo text-4xl font-bold text-gray-800">
+                Iworld
             </div>
-            <div class="shop-details">
+            <div class="shop-details text-right text-sm text-gray-600 leading-relaxed">
                 <strong>Iworld</strong> - Mobile Selling Shop<br>
-                Tel: +076 411 28 49 | 077 20 87 649<br>
+                Tel: 076 411 28 49 | 077 20 87 649<br>
                 Email: iworldgampaha@gmail.com<br>
-                Main Office: #No. 169, 5th Floor,<br>
+                Main Office: No. 169, 5th Floor,<br>
                 Ward City Shopping Complex, Gampaha<br>
                 Branch: No. 03, Ja-Ela Road, Gampaha
             </div>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <!-- Left: Date -->
-            <div>
+        <!-- Invoice Date and Number -->
+        <div class="flex justify-between items-center mb-6">
+            <div class="text-gray-700">
                 <p>Date: {{ \Carbon\Carbon::now()->format('Y-m-d') }}</p>
             </div>
-
-            <!-- Right: Invoice Number -->
-            <div>
-                <h2>Invoice {{ $order->order_number }}</h2>
+            <div class="text-right">
+                <h2 class="text-xl font-semibold text-gray-800">Invoice {{ $order->order_number }}</h2>
             </div>
         </div>
 
-        <h4>Buyer Details:</h4>
-        <table>
-            <tr>
-                <td style="width: 150px;">Name:</td>
-                <td>{{ $order->buyer_name }}</td>
-            </tr>
-            <tr>
-                <td>ID:</td>
-                <td>{{ $order->buyer_id }}</td>
-            </tr>
-            <tr>
-                <td>Address:</td>
-                <td>{{ $order->buyer_address }}</td>
-            </tr>
-            <tr>
-                <td>Phone:</td>
-                <td>{{ $order->phone_1 }} {{ $order->phone_2 }}</td>
-            </tr>
-        </table>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6 text-sm">
+            <!-- Buyer Details -->
+            <div>
+                <h4 class="text-gray-800 font-semibold mb-2">Buyer Details:</h4>
+                <div class="space-y-2">
+                    <div class="flex">
+                        <span class="font-semibold w-28">Name:</span>
+                        <span>{{ $order->buyer_name }}</span>
+                    </div>
+                    <div class="flex">
+                        <span class="font-semibold w-28">ID:</span>
+                        <span>{{ $order->buyer_id }}</span>
+                    </div>
+                    <div class="flex">
+                        <span class="font-semibold w-28">Address:</span>
+                        <span>{{ $order->buyer_address }}</span>
+                    </div>
+                    <div class="flex">
+                        <span class="font-semibold w-28">Phone:</span>
+                        <span>{{ $order->phone_1 }} <br> {{ $order->phone_2 }}</span>
+                    </div>
+                </div>
+            </div>
 
-        <h4 style="margin-top: 2rem;">Item Details:</h4>
-        <table>
-            <tr>
-                <td style="width: 150px;">Item:</td>
-                <td>{{ $order->item_name }}</td>
-            </tr>
-            <tr>
-                <td>Colour:</td>
-                <td>{{ $order->colour }}</td>
-            </tr>
-            <tr>
-                <td>EMI:</td>
-                <td>{{ $order->emi_number }}</td>
-            </tr>
-            <tr>
-                <td>Price:</td>
-                <td>LKR {{ number_format($order->price, 2) }}</td>
-            </tr>
-        </table>
+            <!-- Item Details -->
+            <div>
+                <h4 class="text-gray-800 font-semibold mb-2">Item Details:</h4>
+                <div class="space-y-2">
+                    <div class="flex">
+                        <span class="font-semibold w-28">Item:</span>
+                        <span>{{ $order->item_name }}</span>
+                    </div>
+                    <div class="flex">
+                        <span class="font-semibold w-28">Colour:</span>
+                        <span>{{ $order->colour }}</span>
+                    </div>
+                    <div class="flex">
+                        <span class="font-semibold w-28">EMI:</span>
+                        <span>{{ $order->emi_number }}</span>
+                    </div>
+                    <div class="flex">
+                        <span class="font-semibold w-28">Price:</span>
+                        <span>LKR {{ number_format($order->price, 2) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <h4 style="margin-top: 2rem;">Installments:</h4>
-        @php
-            $firstPayment = $order->payments->where('installment_number', 1)->first();
-            $firstPaidAt = $firstPayment ? \Carbon\Carbon::parse($firstPayment->paid_at) : null;
-            $firstPaidAmount = $firstPayment ? $firstPayment->amount - $firstPayment->overdue_amount : 0;
+        <!-- Minimum Payment Info -->
+        <div class="text-right text-gray-700 font-medium mt-4 mb-4">
+            @php
+                $min_payment =
+                    $order->amount_of_installments > 0 ? $order->due_payment / $order->amount_of_installments : 0;
+            @endphp
+            Minimum payment to be paid per installment:
+            <span class="text-blue-600 font-semibold">
+                LKR {{ number_format($min_payment, 2) }}
+            </span>
+        </div>
 
-            $secondExpected = $firstPaidAt ? $firstPaidAt->copy()->addMonth() : null;
-            $thirdExpected = $firstPaidAt ? $firstPaidAt->copy()->addMonths(2) : null;
-
-            $installments = [
-                [
-                    'number' => 1,
-                    'date' => $firstPaidAt ? $firstPaidAt->format('Y-m-d') : '-',
-                    'amount' => $firstPaidAmount,
-                ],
-                ['number' => 2, 'date' => $secondExpected ? $secondExpected->format('Y-m-d') : '-', 'amount' => null],
-                ['number' => 3, 'date' => $thirdExpected ? $thirdExpected->format('Y-m-d') : '-', 'amount' => null],
-            ];
-        @endphp
-
-        <table style="border-collapse: separate; border-spacing: 0 10px;">
-            <tr class="heading">
-                <td>Installment</td>
-                <td>Expected Date</td>
-                <td>Amount Paid</td>
-            </tr>
-            @foreach ($installments as $installment)
-                <tr>
-                    <td>{{ $installment['number'] }}</td>
-                    <td>{{ $installment['date'] }}</td>
-                    <td>
-                        @if ($installment['amount'])
-                            LKR {{ number_format($installment['amount'], 2) }}
-                        @else
-                            -
-                        @endif
-                    </td>
+        <!-- Installments -->
+        <h4 class="text-gray-800 font-semibold mb-2">Installments:</h4>
+        <table class="w-full table-auto text-sm border border-gray-300 mb-6">
+            <thead>
+                <tr class="bg-gray-100 font-semibold text-gray-800">
+                    <th class="px-3 py-2 border">Installment</th>
+                    <th class="px-3 py-2 border">Expected Date</th>
+                    <th class="px-3 py-2 border">Overdue Days</th>
+                    <th class="px-3 py-2 border">Overdue Amount</th>
+                    <th class="px-3 py-2 border">Amount Paid</th>
+                    <th class="px-3 py-2 border">Paid Date</th>
                 </tr>
-            @endforeach
+            </thead>
+            <tbody>
+                @foreach ($order->payments as $payment)
+                    <tr class="text-center">
+                        <td class="py-2 border text-sm">{{ $payment->installment_number }}</td>
+                        <td class="py-2 border text-sm">
+                            {{ \Carbon\Carbon::parse($payment->expected_date)->format('Y-m-d') }}</td>
+                        <td class="py-2 border text-sm">{{ $payment->overdue_days ?? 0 }}</td>
+                        <td class="py-2 border text-sm">
+                            {{ $payment->overdue_amount ? 'LKR ' . number_format($payment->overdue_amount, 2) : 0 }}
+                        </td>
+                        <td class="py-2 border text-sm">
+                            {{ $payment->paid_amount ? 'LKR ' . number_format($payment->paid_amount, 2) : '-' }}</td>
+                        <td class="py-2 border text-sm">
+                            {{ $payment->paid_at ? \Carbon\Carbon::parse($payment->paid_at)->format('Y-m-d') : '-' }}
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
         </table>
 
-        <h3 class="total">
-            Balance: LKR
-            {{ number_format(max($order->price + $order->payments->sum('overdue_amount') - $order->payments->sum('amount'), 0), 2) }}
-        </h3>
+        <!-- Totals -->
+        <div class="text-right space-y-1 mb-4">
+            <p class="text-green-600 font-semibold">Total Paid: LKR
+                {{ number_format($order->paid_amount_fullamount, 2) }}</p>
+            <p class="text-yellow-500 font-semibold">Total Overdue Amount: LKR
+                {{ number_format($order->over_due_payment_fullamount, 2) }}</p>
+            <p class="text-red-600 font-semibold">Balance: LKR {{ number_format($order->remaining_amount, 2) }}</p>
+        </div>
 
-        <div class="note">
+        <!-- Notes -->
+        <div class="text-sm text-red-600">
             <p>Note:</p>
             <p>- If you are overdue on an expected installment date, a charge of LKR 200 per day will apply.</p>
-            <p>- If you are overdue on your last installment payment, a charge of LKR 500 per day will apply.</p>
         </div>
     </div>
 </body>

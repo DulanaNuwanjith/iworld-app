@@ -28,13 +28,13 @@ return new class extends Migration {
             $table->string('icloud_mail')->nullable();;
             $table->string('icloud_password')->nullable();;
             $table->string('screen_lock_password')->nullable();;
-            $table->string('price');
+            $table->decimal('price');
             $table->string('rate');
             $table->string('amount_of_installments');
-            $table->string('due_payment');
-            $table->string('over_due_payment_fullamount')->nullable();;
-            $table->string('paid_amount_fullamount')->nullable();;
-            $table->string('remaining_amount')->nullable();;
+            $table->decimal('due_payment');
+            $table->decimal('over_due_payment_fullamount')->nullable();;
+            $table->decimal('paid_amount_fullamount')->nullable();;
+            $table->decimal('remaining_amount')->nullable();;
             $table->string('note')->nullable();
             $table->timestamps();
         });

@@ -352,8 +352,7 @@
                             </div>
 
                             {{-- Main Table --}}
-                            <div id="sampleInquiryRecordsScroll"
-                                class="overflow-x-auto bg-white shadow rounded-lg">
+                            <div id="sampleInquiryRecordsScroll" class="overflow-x-auto bg-white shadow rounded-lg">
                                 <table class="table-fixed w-full text-sm divide-y divide-gray-200">
                                     <thead class="bg-gray-200 text-left">
                                         <tr class="text-center">
@@ -393,7 +392,10 @@
                                             <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200  text-left">
                                                 <!-- Order No -->
                                                 <td class="text-center px-4 py-3">
-                                                    <div class="font-bold">{{ $order->order_number }}</div>
+                                                    <div
+                                                        class="font-bold {{ $order->remaining_amount === 0 ? 'text-blue-600' : 'text-black' }}">
+                                                        {{ $order->order_number }}
+                                                    </div>
                                                     <div class="text-xs">
                                                         {{ \Carbon\Carbon::parse($order->item_created_date)->format('Y-m-d') }}
                                                     </div>
@@ -613,9 +615,11 @@
                                                         @endphp
 
                                                         <tr class="border-b">
-                                                            <td class="px-4 py-2">{{ $payment->installment_number }}</td>
-                                                            <td class="px-4 py-2">{{ number_format($payment->amount, 2) }}</td>
-                                                            <td class="px-4 py-2">{{ \Carbon\Carbon::parse($payment->expected_date)->format('Y-m-d') }}
+                                                            <td class="px-4 py-4">{{ $payment->installment_number }}</td>
+                                                            <td class="px-4 py-2">{{ number_format($payment->amount, 2) }}
+                                                            </td>
+                                                            <td class="px-4 py-2">
+                                                                {{ \Carbon\Carbon::parse($payment->expected_date)->format('Y-m-d') }}
                                                             </td>
 
                                                             <td class="px-4 py-2">
@@ -642,7 +646,8 @@
                                                             <td class="px-4 py-2"><span
                                                                     id="amount-to-pay-{{ $payment->id }}">{{ number_format($amountToPay, 2) }}</span>
                                                             </td>
-                                                            <td class="px-4 py-2">{{ $payment->paid_at ? \Carbon\Carbon::parse($payment->paid_at)->format('Y-m-d') : 'No' }}
+                                                            <td class="px-4 py-2">
+                                                                {{ $payment->paid_at ? \Carbon\Carbon::parse($payment->paid_at)->format('Y-m-d') : 'No' }}
                                                             </td>
 
                                                             <td class="px-4 py-2">
@@ -654,7 +659,7 @@
                                                                         @csrf
                                                                         <input type="number" name="paid_amount"
                                                                             step="0.01" min="{{ $amountToPay }}"
-                                                                            class="w-20 px-2 py-1 border rounded text-xs text-right paid-amount bg-gray-200"
+                                                                            class="w-20 mt-3 px-2 py-1 border rounded text-xs text-right paid-amount bg-gray-200"
                                                                             value="{{ $amountToPay }}" required>
                                                                     @else
                                                                         <span
