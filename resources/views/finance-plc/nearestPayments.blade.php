@@ -31,8 +31,8 @@
                             <td class="px-4 py-3 break-words">{{ $order->buyer_name }}</td>
                             <td class="px-4 py-3 break-words">{{ $order->buyer_id }}</td>
                             <td class="px-4 py-3 break-words">{{ $order->buyer_address }}</td>
-                            <td class="px-4 py-3 break-words">{{ $order->phone1 }}</td>
-                            <td class="px-4 py-3 break-words">{{ $order->phone2 }}</td>
+                            <td class="px-4 py-3 break-words">{{ $order->phone_1 }}</td>
+                            <td class="px-4 py-3 break-words">{{ $order->phone_2 }}</td>
                             <td class="px-4 py-3 break-words">
                                 @if ($nextPayment)
                                     <div>
