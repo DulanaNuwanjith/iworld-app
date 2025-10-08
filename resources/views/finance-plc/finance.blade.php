@@ -977,7 +977,7 @@
                                                     class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-300">
                                                     Cancel
                                                 </button>
-                                                <button type="submit"
+                                                <button type="submit" id="createFinanceBtn"
                                                     class="px-4 py-2 bg-gray-500 text-white text-sm rounded hover:bg-gray-600">
                                                     Create Finance Order
                                                 </button>
@@ -1138,5 +1138,16 @@
             document.getElementById(`payModal-${orderId}`).classList.add('hidden');
             document.getElementById(`payModal-${orderId}`).classList.remove('flex');
         }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.querySelector('#addFinanceModal form'); // Replace with your form ID
+            const submitBtn = document.getElementById('createFinanceBtn');
+
+            form.addEventListener('submit', function() {
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Submitting...';
+            });
+        });
     </script>
 @endsection
