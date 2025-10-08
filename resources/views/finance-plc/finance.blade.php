@@ -146,10 +146,10 @@
                                     <img src="{{ asset('icons/filter.png') }}" class="w-6 h-6" alt="Filter Icon">
                                     Filters
                                 </button>
-                                <button onclick="toggleCalForm()"
+                                {{-- <button onclick="toggleCalForm()"
                                     class="bg-white border border-gray-500 text-gray-500 hover:text-gray-600 hover:border-gray-600 font-semibold py-1 px-3 rounded shadow flex items-center gap-2 mb-6 ml-2">
                                     Pricing Calculator
-                                </button>
+                                </button> --}}
                             </div>
 
                             <div id="filterFormContainerFinance" class="mt-4 hidden">
@@ -353,7 +353,7 @@
 
                             {{-- Main Table --}}
                             <div id="sampleInquiryRecordsScroll"
-                                class="overflow-x-auto max-h-[1200px] bg-white shadow rounded-lg">
+                                class="overflow-x-auto bg-white shadow rounded-lg">
                                 <table class="table-fixed w-full text-sm divide-y divide-gray-200">
                                     <thead class="bg-gray-200 text-left">
                                         <tr class="text-center">
@@ -571,6 +571,7 @@
                                     $totalOverdue = 0;
                                     $payments = $order->payments->sortBy('installment_number');
                                     $lastPayment = $payments->whereNull('paid_at')->last();
+                                    $remainingAmount = $order->remaining_amount ?? 0;
                                 @endphp
 
                                 <!-- Pay Modal -->
@@ -580,19 +581,19 @@
                                         <h3 class="text-lg font-bold mb-4 text-center">Installments for
                                             {{ $order->order_number }}</h3>
 
-                                        <div class="overflow-x-auto">
+                                        <div class="overflow-x-auto max-h-72 overflow-y-auto">
                                             <table class="min-w-full border text-xs text-center">
                                                 <thead>
                                                     <tr class="bg-gray-100 border-b">
-                                                        <th>#</th>
-                                                        <th>Amount (LKR)</th>
-                                                        <th>Expected Date</th>
-                                                        <th>Overdue Days</th>
-                                                        <th>Overdue Amount (LKR)</th>
-                                                        <th>Amount to Pay</th>
-                                                        <th>Paid</th>
-                                                        <th>Paid Amount</th>
-                                                        <th>Action</th>
+                                                        <th class="px-4 py-2">#</th>
+                                                        <th class="px-4 py-2">Amount (LKR)</th>
+                                                        <th class="px-4 py-2 w-36">Expected Date</th>
+                                                        <th class="px-4 py-2">Overdue Days</th>
+                                                        <th class="px-4 py-2">Overdue Amount</th>
+                                                        <th class="px-4 py-2">Amount to Pay</th>
+                                                        <th class="px-4 py-2 w-36">Paid</th>
+                                                        <th class="px-4 py-2">Paid Amount</th>
+                                                        <th class="px-4 py-2">Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -602,41 +603,22 @@
                                                                 $payment->overdue_days * $overdueChargePerDay;
                                                             $totalPaid += $payment->paid_amount ?? 0;
                                                             $totalOverdue += $payment->overdue_amount ?? 0;
-
                                                             $isLastUnpaid = $payment->id === optional($lastPayment)->id;
 
-                                                            $amountToPay = $payment->amount + $overdueAmount;
-
                                                             if ($isLastUnpaid) {
-                                                                $paidSoFar = $payments
-                                                                    ->whereNotNull('paid_at')
-                                                                    ->sum('paid_amount');
-                                                                $totalOverduePaid = $payments
-                                                                    ->whereNotNull('paid_at')
-                                                                    ->sum('overdue_amount');
-                                                                $remainingBalance =
-                                                                    $order->due_payment -
-                                                                    ($paidSoFar - $totalOverduePaid);
-
-                                                                $unpaidOverdue = $payments
-                                                                    ->whereNull('paid_at')
-                                                                    ->where('id', '<>', $payment->id)
-                                                                    ->sum('overdue_amount');
-
-                                                                $amountToPay = max(
-                                                                    $remainingBalance + $unpaidOverdue + $overdueAmount,
-                                                                    0,
-                                                                );
+                                                                $amountToPay = $remainingAmount + $overdueAmount;
+                                                            } else {
+                                                                $amountToPay = $payment->amount + $overdueAmount;
                                                             }
                                                         @endphp
 
                                                         <tr class="border-b">
-                                                            <td>{{ $payment->installment_number }}</td>
-                                                            <td>{{ number_format($payment->amount, 2) }}</td>
-                                                            <td>{{ \Carbon\Carbon::parse($payment->expected_date)->format('Y-m-d') }}
+                                                            <td class="px-4 py-2">{{ $payment->installment_number }}</td>
+                                                            <td class="px-4 py-2">{{ number_format($payment->amount, 2) }}</td>
+                                                            <td class="px-4 py-2">{{ \Carbon\Carbon::parse($payment->expected_date)->format('Y-m-d') }}
                                                             </td>
 
-                                                            <td>
+                                                            <td class="px-4 py-2">
                                                                 @if (!$payment->paid_at)
                                                                     <input type="number" name="overdue_days"
                                                                         form="form-{{ $payment->id }}"
@@ -646,23 +628,24 @@
                                                                         data-amount="{{ $payment->amount }}"
                                                                         data-target="amount-to-pay-{{ $payment->id }}"
                                                                         data-overdue="overdue-amount-{{ $payment->id }}"
-                                                                        @if ($isLastUnpaid) readonly @endif>
+                                                                        data-last="{{ $isLastUnpaid ? 1 : 0 }}"
+                                                                        data-remaining="{{ $remainingAmount }}">
                                                                 @else
                                                                     <span
                                                                         class="text-gray-500 text-xs">{{ $payment->overdue_days }}</span>
                                                                 @endif
                                                             </td>
 
-                                                            <td><span
+                                                            <td class="px-4 py-2"><span
                                                                     id="overdue-amount-{{ $payment->id }}">{{ number_format($overdueAmount, 2) }}</span>
                                                             </td>
-                                                            <td><span
+                                                            <td class="px-4 py-2"><span
                                                                     id="amount-to-pay-{{ $payment->id }}">{{ number_format($amountToPay, 2) }}</span>
                                                             </td>
-                                                            <td>{{ $payment->paid_at ? \Carbon\Carbon::parse($payment->paid_at)->format('Y-m-d') : 'No' }}
+                                                            <td class="px-4 py-2">{{ $payment->paid_at ? \Carbon\Carbon::parse($payment->paid_at)->format('Y-m-d') : 'No' }}
                                                             </td>
 
-                                                            <td>
+                                                            <td class="px-4 py-2">
                                                                 @if (!$payment->paid_at)
                                                                     <form id="form-{{ $payment->id }}"
                                                                         action="{{ route('finance.pay.installment', $payment->id) }}"
@@ -672,16 +655,14 @@
                                                                         <input type="number" name="paid_amount"
                                                                             step="0.01" min="{{ $amountToPay }}"
                                                                             class="w-20 px-2 py-1 border rounded text-xs text-right paid-amount bg-gray-200"
-                                                                            value="{{ $amountToPay }}"
-                                                                            @if ($isLastUnpaid) readonly @endif
-                                                                            required>
+                                                                            value="{{ $amountToPay }}" required>
                                                                     @else
                                                                         <span
                                                                             class="text-gray-500 text-xs">{{ number_format($payment->paid_amount, 2) }}</span>
                                                                 @endif
                                                             </td>
 
-                                                            <td>
+                                                            <td class="px-4 py-2">
                                                                 @if (!$payment->paid_at)
                                                                     <button type="submit"
                                                                         class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs">Pay</button>
@@ -701,7 +682,7 @@
                                             $paidInitialAmount = $totalPaid - $totalOverdue;
                                             $remaining = $order->due_payment - $paidInitialAmount;
                                         @endphp
-                                        <div class="text-sm font-bold text-right mt-4 border-t pt-2">
+                                        <div class="text-sm font-bold text-right mt-8 border-t pt-2">
                                             <p>Total Due: <span class="font-bold">LKR
                                                     {{ number_format($order->due_payment, 2) }}</span></p>
                                             <p>Total Paid: <span class="font-bold text-green-600">LKR
@@ -727,11 +708,12 @@
                                         const summaryDiv = e.target.closest('div').querySelector('div.text-sm');
 
                                         const overdueDays = parseFloat(e.target.value) || 0;
-                                        const baseAmount = parseFloat(e.target.dataset.amount) || 0;
                                         const overdueChargePerDay = 200;
                                         const overdueAmount = overdueDays * overdueChargePerDay;
+
                                         const paidInput = row.querySelector('.paid-amount');
-                                        const isLast = paidInput.hasAttribute('readonly');
+                                        const isLast = e.target.dataset.last == 1;
+                                        const remainingAmount = parseFloat(e.target.dataset.remaining) || 0;
 
                                         // Update overdue
                                         const overdueId = e.target.dataset.overdue;
@@ -742,12 +724,11 @@
                                         // Update amount to pay
                                         const targetId = e.target.dataset.target;
                                         if (targetId && document.getElementById(targetId)) {
-                                            let newAmount = isLast ? parseFloat(paidInput.value) : baseAmount + overdueAmount;
+                                            let newAmount = isLast ? remainingAmount + overdueAmount : parseFloat(e.target.dataset.amount) +
+                                                overdueAmount;
                                             document.getElementById(targetId).textContent = newAmount.toFixed(2);
-                                            if (!isLast) {
-                                                paidInput.value = newAmount.toFixed(2);
-                                                paidInput.min = newAmount.toFixed(2);
-                                            }
+                                            paidInput.value = newAmount.toFixed(2);
+                                            paidInput.min = newAmount.toFixed(2);
                                         }
 
                                         // Update summary
@@ -772,6 +753,7 @@
                                     });
                                 </script>
                             @endforeach
+
 
                             <!-- Add Finance Modal -->
                             <div id="addFinanceModal"

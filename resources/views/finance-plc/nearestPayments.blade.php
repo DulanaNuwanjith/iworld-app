@@ -56,6 +56,11 @@
                 </tbody>
             </table>
         </div>
+        <!-- Pagination Links -->
+        <div class="py-6 flex justify-center">
+            {{ $financeOrders->links() }}
+        </div>
+
 
     </div>
 @endsection

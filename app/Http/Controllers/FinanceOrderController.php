@@ -7,6 +7,7 @@ use App\Models\FinanceOrder;
 use App\Models\FinancePayment;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -245,19 +246,26 @@ class FinanceOrderController extends Controller
         return redirect()->back()->with('success', "Installment #{$payment->installment_number} successfully paid. Totals updated.");
     }
 
-    public function nearestPayments()
+    public function nearestPayments(Request $request)
     {
-        // Get finance orders with unpaid payments
-        $financeOrders = FinanceOrder::with(['payments' => function ($query) {
-            $query->whereNull('paid_at')
-                ->orderBy('expected_date', 'asc'); // sort unpaid installments by expected_date
-        }])
-        ->get()
-        ->sortBy(function ($order) {
-            // Get nearest unpaid expected date for each order
-            $nextPayment = $order->payments->first();
-            return $nextPayment ? $nextPayment->expected_date : now();
-        });
+        $allOrders = FinanceOrder::with(['payments' => function ($query) {
+            $query->whereNull('paid_at')->orderBy('expected_date', 'asc');
+        }])->get()
+        ->filter(fn($order) => $order->payments->isNotEmpty())
+        ->sortBy(fn($order) => $order->payments->first()->expected_date);
+
+        $perPage = 15;
+        $page = $request->get('page', 1);
+        $total = $allOrders->count();
+        $results = $allOrders->slice(($page - 1) * $perPage, $perPage)->values();
+
+        $financeOrders = new LengthAwarePaginator(
+            $results,
+            $total,
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
 
         return view('finance-plc.nearestPayments', compact('financeOrders'));
     }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FinanceOrderController;
+use App\Http\Controllers\FinanceDashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -28,6 +29,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/finance/payment/{id}/pay', [FinanceOrderController::class, 'payInstallment'])
         ->name('finance.pay.installment');
     Route::get('/finance/nearest-payments', [FinanceOrderController::class, 'nearestPayments'])->name('finance.nearestPayments');
+
+    // Finance Dashboard
+    Route::get('/dashboard', [FinanceDashboardController::class, 'index'])->name('dashboard');
+
 
 
     // Finance Report page
