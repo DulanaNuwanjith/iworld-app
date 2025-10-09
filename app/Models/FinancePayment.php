@@ -58,4 +58,10 @@ class FinancePayment extends Model
     {
         return $this->paid_at ? Carbon::parse($this->paid_at)->format($format) : null;
     }
+
+    public function financeOrder()
+    {
+        return $this->belongsTo(FinanceOrder::class);
+    }
+
 }

@@ -218,3 +218,11 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    // Auto-reload the dashboard every 60 seconds
+    setTimeout(() => {
+        window.location.reload();
+    }, 30000);
+</script>

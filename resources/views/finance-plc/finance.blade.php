@@ -146,10 +146,14 @@
                                     <img src="{{ asset('icons/filter.png') }}" class="w-6 h-6" alt="Filter Icon">
                                     Filters
                                 </button>
-                                {{-- <button onclick="toggleCalForm()"
+                                <button onclick="toggleCalForm()"
                                     class="bg-white border border-gray-500 text-gray-500 hover:text-gray-600 hover:border-gray-600 font-semibold py-1 px-3 rounded shadow flex items-center gap-2 mb-6 ml-2">
                                     Pricing Calculator
-                                </button> --}}
+                                </button>
+                                <button onclick="toggleDailyReportForm()"
+                                    class="bg-white border border-gray-500 text-gray-500 hover:text-gray-600 hover:border-gray-600 font-semibold py-1 px-3 rounded shadow flex items-center gap-2 mb-6 ml-2">
+                                    Daily Report Generator
+                                </button>
                             </div>
 
                             <div id="filterFormContainerFinance" class="mt-4 hidden">
@@ -293,46 +297,87 @@
                                 </form>
                             </div>
 
+                            <div id="dailyReportContainer" class="hidden">
+                                <form method="GET" action="{{ route('finance.dailyReport') }}"
+                                    class="mb-6 flex gap-6 items-center">
+
+                                    <!-- Date input with default value -->
+                                    <input type="date" name="date"
+                                        value="{{ $date ?? \Carbon\Carbon::now()->toDateString() }}"
+                                        class="mt-4 block border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm">
+
+                                    <a href="{{ route('finance.dailyReport', ['date' => $date ?? \Carbon\Carbon::now()->toDateString()]) }}"
+                                        target="_blank"
+                                        class="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                                        View Daily Report
+                                    </a>
+                                </form>
+                            </div>
+
                             <div id="pricingCalculatorContainer" class="hidden">
-                                <div class="flex-1 overflow-y-auto bg-white p-6">
+                                <div class="flex justify-center items-start p-6">
 
-                                    <div class="max-w-md bg-gray-50 p-6 rounded-lg shadow">
+                                    <div class="w-full max-w-xl bg-gray-50 p-6 rounded-xl shadow-lg space-y-4">
+
                                         {{-- Amount Input --}}
-                                        <label for="amount" class="block text-sm font-medium text-gray-700 mb-2">Enter
-                                            Amount</label>
-                                        <input type="number" id="amount"
-                                            class="w-full px-4 py-2 border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition"
-                                            placeholder="Enter amount">
+                                        <div>
+                                            <label for="amount"
+                                                class="block text-sm font-medium text-gray-700 mb-1">Enter Amount</label>
+                                            <input type="number" id="amount" min="0"
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition"
+                                                placeholder="Enter amount">
+                                        </div>
 
-                                        {{-- 18% Value --}}
-                                        <div class="mt-6 bg-indigo-50 p-3 rounded-lg">
-                                            <p class="text-gray-700">18% of Amount:
+                                        {{-- Rate Input --}}
+                                        <div>
+                                            <label for="rate"
+                                                class="block text-sm font-medium text-gray-700 mb-1">Enter Rate (%)</label>
+                                            <input type="number" id="rate" min="0" value="18"
+                                                class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition"
+                                                placeholder="Enter rate in %">
+                                        </div>
+
+                                        {{-- Calculated Value --}}
+                                        <div class="bg-indigo-50 p-3 rounded-lg">
+                                            <p class="text-gray-700 text-sm">Calculated Value (<span id="rateDisplay"
+                                                    class="font-semibold">18</span>% of Amount):
                                                 <span id="tax" class="font-semibold text-indigo-700">0.00</span>
                                             </p>
                                         </div>
 
                                         {{-- Total --}}
-                                        <div class="mt-3 bg-green-50 p-3 rounded-lg">
-                                            <p class="text-gray-700">Total (Amount + 18%):
+                                        <div class="bg-green-50 p-3 rounded-lg">
+                                            <p class="text-gray-700 text-sm">Total (Amount + Value):
                                                 <span id="total" class="font-semibold text-green-700">0.00</span>
                                             </p>
                                         </div>
+
                                     </div>
 
                                 </div>
 
                                 <script>
-                                    document.getElementById('amount').addEventListener('input', function() {
-                                        let amount = parseFloat(this.value) || 0;
-                                        let tax = (amount * 0.18).toFixed(2);
+                                    const amountInput = document.getElementById('amount');
+                                    const rateInput = document.getElementById('rate');
+                                    const taxDisplay = document.getElementById('tax');
+                                    const totalDisplay = document.getElementById('total');
+                                    const rateDisplay = document.getElementById('rateDisplay');
+
+                                    function calculate() {
+                                        let amount = parseFloat(amountInput.value) || 0;
+                                        let rate = parseFloat(rateInput.value) || 0;
+                                        let tax = ((amount * rate) / 100).toFixed(2);
                                         let total = (amount + parseFloat(tax)).toFixed(2);
 
-                                        document.getElementById('tax').textContent = tax;
-                                        document.getElementById('total').textContent = total;
-                                    });
+                                        taxDisplay.textContent = tax;
+                                        totalDisplay.textContent = total;
+                                        rateDisplay.textContent = rate;
+                                    }
+
+                                    amountInput.addEventListener('input', calculate);
+                                    rateInput.addEventListener('input', calculate);
                                 </script>
                             </div>
-
 
                             <div class="flex-1">
 
@@ -996,6 +1041,11 @@
     <script>
         function toggleFilterForm() {
             const form = document.getElementById('filterFormContainerFinance');
+            form.classList.toggle('hidden');
+        }
+
+        function toggleDailyReportForm() {
+            const form = document.getElementById('dailyReportContainer');
             form.classList.toggle('hidden');
         }
 

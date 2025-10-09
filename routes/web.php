@@ -32,8 +32,11 @@ Route::middleware('auth')->group(function () {
 
     // Finance Dashboard
     Route::get('/dashboard', [FinanceDashboardController::class, 'index'])->name('dashboard');
-
-
+    // Daily Finance Report web view
+    Route::get('/finance/daily-report', [FinanceOrderController::class, 'dailyReport'])
+        ->name('finance.dailyReport');
+    // Daily Finance Report web view with date range
+    Route::get('/finance/report/date-range', [FinanceOrderController::class, 'dateRangeReport'])->name('finance.dateRangeReport');
 
     // Finance Report page
     Route::get('/financeReport', function () {

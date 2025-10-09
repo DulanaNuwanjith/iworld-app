@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class FinanceOrderController extends Controller
 {
@@ -272,6 +273,81 @@ class FinanceOrderController extends Controller
         );
 
         return view('finance-plc.nearestPayments', compact('financeOrders'));
+    }
+
+    public function dailyReport(Request $request)
+    {
+        $date = $request->input('date', now()->toDateString());
+
+        $newOrders = FinanceOrder::whereDate('item_created_date', $date)->get();
+        $payments = FinancePayment::with('financeOrder')
+            ->whereDate('paid_at', $date)
+            ->get();
+
+        $totalOrders = $newOrders->count();
+        $totalPayments = $payments->count();
+        $totalPaidAmount = $payments->sum('paid_amount');
+        $totalOverdueCollected = $payments->sum('overdue_amount');
+        $totalIncome = $totalPaidAmount + $totalOverdueCollected;
+        $remainingBalance = FinanceOrder::whereDate('item_created_date', '<=', $date)->sum('remaining_amount');
+        $totalInvestment = FinanceOrder::whereDate('item_created_date', $date)->sum('price');
+
+        // ✅ Total Profit = sum of (due_payment - price) for new orders
+        $totalProfit = $newOrders->sum(function($order) {
+            return $order->due_payment - $order->price;
+        });
+
+        return view('finance-plc.daily-report', compact(
+            'date',
+            'newOrders',
+            'payments',
+            'totalOrders',
+            'totalPayments',
+            'totalPaidAmount',
+            'totalOverdueCollected',
+            'totalIncome',
+            'remainingBalance',
+            'totalInvestment',
+            'totalProfit'
+        ));
+    }
+
+    public function dateRangeReport(Request $request)
+    {
+        $startDate = $request->input('start_date', now()->toDateString());
+        $endDate = $request->input('end_date', now()->toDateString());
+
+        $newOrders = FinanceOrder::whereBetween('item_created_date', [$startDate, $endDate])->get();
+        $payments = FinancePayment::with('financeOrder')
+            ->whereBetween('paid_at', [$startDate, $endDate])
+            ->get();
+
+        $totalOrders = $newOrders->count();
+        $totalPayments = $payments->count();
+        $totalPaidAmount = $payments->sum('paid_amount');
+        $totalOverdueCollected = $payments->sum('overdue_amount');
+        $totalIncome = $totalPaidAmount + $totalOverdueCollected;
+
+        $remainingBalance = FinanceOrder::whereDate('item_created_date', '<=', $endDate)->sum('remaining_amount');
+        $totalInvestment = $newOrders->sum('price');
+        $totalProfit = $newOrders->sum(function($order) {
+            return $order->due_payment - $order->price;
+        });
+
+        return view('report.templates.financeReportDateRange', compact(
+            'startDate',
+            'endDate',
+            'newOrders',
+            'payments',
+            'totalOrders',
+            'totalPayments',
+            'totalPaidAmount',
+            'totalOverdueCollected',
+            'totalIncome',
+            'remainingBalance',
+            'totalInvestment',
+            'totalProfit'
+        ));
     }
 
 }
