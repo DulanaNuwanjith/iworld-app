@@ -332,7 +332,7 @@
                                         <div>
                                             <label for="rate"
                                                 class="block text-sm font-medium text-gray-700 mb-1">Enter Rate (%)</label>
-                                            <input type="number" id="rate" min="0" value="18"
+                                            <input type="number" id="rate_cal" min="0" value="18"
                                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition"
                                                 placeholder="Enter rate in %">
                                         </div>
@@ -358,7 +358,7 @@
 
                                 <script>
                                     const amountInput = document.getElementById('amount');
-                                    const rateInput = document.getElementById('rate');
+                                    const rateInput = document.getElementById('rate_cal');
                                     const taxDisplay = document.getElementById('tax');
                                     const totalDisplay = document.getElementById('total');
                                     const rateDisplay = document.getElementById('rateDisplay');
@@ -625,18 +625,19 @@
                                 <div id="payModal-{{ $order->id }}"
                                     class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
                                     <div class="bg-white rounded shadow-lg w-[90%] max-w-4xl p-4 relative">
-                                        <h3 class="text-lg font-bold mb-4 text-center">Installments for
-                                            {{ $order->order_number }}</h3>
+                                        <h3 class="text-lg font-bold mb-4 text-center text-blue-700">
+                                            Installments for {{ $order->order_number }}
+                                        </h3>
 
                                         <div class="overflow-x-auto max-h-72 overflow-y-auto">
                                             <table class="min-w-full border text-xs text-center">
-                                                <thead>
-                                                    <tr class="bg-gray-100 border-b">
+                                                <thead class="bg-gray-100 border-b">
+                                                    <tr>
                                                         <th class="px-4 py-2">#</th>
                                                         <th class="px-4 py-2">Amount (LKR)</th>
                                                         <th class="px-4 py-2 w-36">Expected Date</th>
                                                         <th class="px-4 py-2">Overdue Days</th>
-                                                        <th class="px-4 py-2">Overdue Amount</th>
+                                                        <th class="px-4 py-2">Overdue Amount (LKR)</th>
                                                         <th class="px-4 py-2">Amount to Pay</th>
                                                         <th class="px-4 py-2 w-36">Paid</th>
                                                         <th class="px-4 py-2">Paid Amount</th>
@@ -651,16 +652,20 @@
                                                             $totalPaid += $payment->paid_amount ?? 0;
                                                             $totalOverdue += $payment->overdue_amount ?? 0;
                                                             $isLastUnpaid = $payment->id === optional($lastPayment)->id;
-
-                                                            if ($isLastUnpaid) {
-                                                                $amountToPay = $remainingAmount + $overdueAmount;
-                                                            } else {
-                                                                $amountToPay = $payment->amount + $overdueAmount;
-                                                            }
+                                                            $amountToPay = $isLastUnpaid
+                                                                ? $remainingAmount + $overdueAmount
+                                                                : $payment->amount + $overdueAmount;
                                                         @endphp
 
-                                                        <tr class="border-b">
-                                                            <td class="px-4 py-4">{{ $payment->installment_number }}</td>
+                                                        <tr class="border-b {{ $isLastUnpaid ? 'bg-yellow-50' : '' }}">
+                                                            @if ($isLastUnpaid)
+                                                                    <span class="block text-[10px] text-orange-600">
+                                                                        Final Installment (Full Payment Required)
+                                                                    </span>
+                                                                @endif
+                                                            <td class="px-4 py-2 font-semibold">
+                                                                {{ $payment->installment_number }}
+                                                            </td>
                                                             <td class="px-4 py-2">{{ number_format($payment->amount, 2) }}
                                                             </td>
                                                             <td class="px-4 py-2">
@@ -685,12 +690,18 @@
                                                                 @endif
                                                             </td>
 
-                                                            <td class="px-4 py-2"><span
-                                                                    id="overdue-amount-{{ $payment->id }}">{{ number_format($overdueAmount, 2) }}</span>
+                                                            <td class="px-4 py-2">
+                                                                <span id="overdue-amount-{{ $payment->id }}">
+                                                                    {{ number_format($overdueAmount, 2) }}
+                                                                </span>
                                                             </td>
-                                                            <td class="px-4 py-2"><span
-                                                                    id="amount-to-pay-{{ $payment->id }}">{{ number_format($amountToPay, 2) }}</span>
+                                                            <td class="px-4 py-2">
+                                                                <span id="amount-to-pay-{{ $payment->id }}"
+                                                                    class="font-semibold">
+                                                                    {{ number_format($amountToPay, 2) }}
+                                                                </span>
                                                             </td>
+
                                                             <td class="px-4 py-2">
                                                                 {{ $payment->paid_at ? \Carbon\Carbon::parse($payment->paid_at)->format('Y-m-d') : 'No' }}
                                                             </td>
@@ -703,19 +714,24 @@
                                                                         class="flex gap-1 items-center justify-center">
                                                                         @csrf
                                                                         <input type="number" name="paid_amount"
-                                                                            step="0.01" min="{{ $amountToPay }}"
-                                                                            class="w-20 mt-3 px-2 py-1 border rounded text-xs text-right paid-amount bg-gray-200"
-                                                                            value="{{ $amountToPay }}" required>
+                                                                            step="0.01"
+                                                                            class="w-20 mt-3 px-2 py-1 border rounded text-xs text-right bg-gray-200 paid-amount
+    {{ $isLastUnpaid ? 'bg-yellow-100 font-semibold' : '' }}"
+                                                                            value="{{ number_format($amountToPay, 2, '.', '') }}"
+                                                                            {{ $isLastUnpaid ? 'readonly' : '' }} required>
                                                                     @else
-                                                                        <span
-                                                                            class="text-gray-500 text-xs">{{ number_format($payment->paid_amount, 2) }}</span>
+                                                                        <span class="text-gray-500 text-xs">
+                                                                            {{ number_format($payment->paid_amount, 2) }}
+                                                                        </span>
                                                                 @endif
                                                             </td>
 
                                                             <td class="px-4 py-2">
                                                                 @if (!$payment->paid_at)
                                                                     <button type="submit"
-                                                                        class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs">Pay</button>
+                                                                        class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs">
+                                                                        Pay
+                                                                    </button>
                                                                     </form>
                                                                 @else
                                                                     <span class="text-gray-500 text-xs">Paid</span>
@@ -732,23 +748,34 @@
                                             $paidInitialAmount = $totalPaid - $totalOverdue;
                                             $remaining = $order->due_payment - $paidInitialAmount;
                                         @endphp
-                                        <div class="text-sm font-bold text-right mt-8 border-t pt-2">
-                                            <p>Total Due: <span class="font-bold">LKR
-                                                    {{ number_format($order->due_payment, 2) }}</span></p>
-                                            <p>Total Paid: <span class="font-bold text-green-600">LKR
-                                                    {{ number_format($totalPaid, 2) }}</span></p>
-                                            <p>Total Overdue: <span class="font-bold text-orange-500">LKR
-                                                    {{ number_format($totalOverdue, 2) }}</span></p>
-                                            <p>Remaining Balance: <span class="font-bold text-red-500">LKR
-                                                    {{ number_format(max($remaining, 0), 2) }}</span></p>
+
+                                        <div class="text-sm font-bold text-right mt-8 border-t pt-3 space-y-1">
+                                            <p>Total Due:
+                                                <span class="font-bold">LKR
+                                                    {{ number_format($order->due_payment, 2) }}</span>
+                                            </p>
+                                            <p>Total Paid:
+                                                <span class="font-bold text-green-600">LKR
+                                                    {{ number_format($totalPaid, 2) }}</span>
+                                            </p>
+                                            <p>Total Overdue:
+                                                <span class="font-bold text-orange-500">LKR
+                                                    {{ number_format($totalOverdue, 2) }}</span>
+                                            </p>
+                                            <p>Remaining Balance:
+                                                <span class="font-bold text-red-500">LKR
+                                                    {{ number_format(max($remaining, 0), 2) }}</span>
+                                            </p>
                                         </div>
 
                                         <button onclick="closeModal({{ $order->id }})"
-                                            class="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600">Close</button>
+                                            class="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600">
+                                            Close
+                                        </button>
                                     </div>
                                 </div>
 
-                                <!-- JS for live update -->
+                                <!-- JS for live overdue update -->
                                 <script>
                                     document.addEventListener('input', function(e) {
                                         if (!e.target.classList.contains('overdue-days')) return;
@@ -765,7 +792,7 @@
                                         const isLast = e.target.dataset.last == 1;
                                         const remainingAmount = parseFloat(e.target.dataset.remaining) || 0;
 
-                                        // Update overdue
+                                        // Update overdue amount
                                         const overdueId = e.target.dataset.overdue;
                                         if (overdueId && document.getElementById(overdueId)) {
                                             document.getElementById(overdueId).textContent = overdueAmount.toFixed(2);
@@ -774,14 +801,28 @@
                                         // Update amount to pay
                                         const targetId = e.target.dataset.target;
                                         if (targetId && document.getElementById(targetId)) {
-                                            let newAmount = isLast ? remainingAmount + overdueAmount : parseFloat(e.target.dataset.amount) +
-                                                overdueAmount;
+                                            let newAmount;
+                                            if (isLast) {
+                                                // Last installment = remaining balance + overdue
+                                                newAmount = remainingAmount + overdueAmount;
+                                                paidInput.value = newAmount.toFixed(2);
+                                                paidInput.setAttribute('readonly', true);
+                                                paidInput.min = newAmount.toFixed(2);
+                                                paidInput.classList.add('bg-yellow-100', 'font-semibold');
+                                            } else {
+                                                // Non-final installments = flexible
+                                                newAmount = parseFloat(e.target.dataset.amount) + overdueAmount;
+                                                paidInput.value = newAmount.toFixed(2);
+                                                paidInput.removeAttribute('readonly');
+                                                paidInput.min = 0; // allow partial payment
+                                                paidInput.classList.remove('bg-yellow-100', 'font-semibold');
+                                                paidInput.classList.add('bg-gray-200');
+                                            }
+
                                             document.getElementById(targetId).textContent = newAmount.toFixed(2);
-                                            paidInput.value = newAmount.toFixed(2);
-                                            paidInput.min = newAmount.toFixed(2);
                                         }
 
-                                        // Update summary
+                                        // Update summary totals
                                         let totalPaid = 0;
                                         let totalOverdue = 0;
                                         table.querySelectorAll('tr').forEach(r => {
@@ -803,7 +844,6 @@
                                     });
                                 </script>
                             @endforeach
-
 
                             <!-- Add Finance Modal -->
                             <div id="addFinanceModal"

@@ -181,7 +181,7 @@ class FinanceOrderController extends Controller
         $overdueDays = (int) ($request->overdue_days ?? 0);
         $overdueAmount = $overdueDays * $overdueChargePerDay;
 
-        // Prevent paying future installments if previous unpaid
+        // 🔒 Prevent paying future installments if previous unpaid
         if ($payment->installment_number > 1) {
             $previous = FinancePayment::where('finance_order_id', $payment->finance_order_id)
                 ->where('installment_number', $payment->installment_number - 1)
@@ -196,13 +196,13 @@ class FinanceOrderController extends Controller
             return redirect()->back()->with('error', 'Installment already paid.');
         }
 
-        // Get all payments
+        // 💰 Get all payments
         $payments = $order->payments()->orderBy('installment_number')->get();
-        $lastPayment = $payments->whereNull('paid_at')->last();
+        $lastUnpaid = $payments->whereNull('paid_at')->last();
 
-        // Determine amount to pay
-        if ($payment->id === optional($lastPayment)->id) {
-            // Last unpaid installment
+        // 🧮 Determine amount to pay
+        if ($payment->id === optional($lastUnpaid)->id) {
+            // ✅ Last unpaid installment → must pay full remaining balance
             $totalPaidSoFar = $payments->whereNotNull('paid_at')->sum('paid_amount');
             $totalOverduePaid = $payments->whereNotNull('paid_at')->sum('overdue_amount');
 
@@ -212,44 +212,52 @@ class FinanceOrderController extends Controller
                 ->where('id', '<>', $payment->id)
                 ->sum('overdue_amount');
 
+            // total remaining full amount to close the order
             $amountToPay = max($remainingBalance + $unpaidOverdue + $overdueAmount, 0);
+
+            $minAmount = $amountToPay; // enforce full payment
         } else {
+            // ✅ Other installments → can pay any positive amount (partial allowed)
             $amountToPay = $payment->amount + $overdueAmount;
+            $minAmount = 1; // only requires >0
         }
 
-        // Validation
+        // ✅ Validation
         $request->validate([
-            'paid_amount' => "required|numeric|min:$amountToPay",
+            'paid_amount' => "required|numeric|min:$minAmount",
             'overdue_days' => 'nullable|integer|min:0',
         ]);
 
-        // Save payment
-        $payment->paid_at = now();
-        $payment->paid_amount = $request->paid_amount;
-        $payment->overdue_days = $overdueDays;
-        $payment->overdue_amount = $overdueAmount;
-        $payment->save();
+        // 💾 Save payment
+        $payment->update([
+            'paid_at' => now(),
+            'paid_amount' => $request->paid_amount,
+            'overdue_days' => $overdueDays,
+            'overdue_amount' => $overdueAmount,
+        ]);
 
-        // Update totals
+        // 🔄 Update totals
         $totalOverdue = $order->payments()->sum('overdue_amount');
         $totalPaidFull = $order->payments()->sum('paid_amount');
         $paidInitialAmount = $totalPaidFull - $totalOverdue;
         $remainingAmount = $order->due_payment - $paidInitialAmount;
 
-        $order->over_due_payment_fullamount = $totalOverdue;
-        $order->paid_amount_fullamount = $totalPaidFull;
-        $order->remaining_amount = max($remainingAmount, 0);
-        $order->save();
+        $order->update([
+            'over_due_payment_fullamount' => $totalOverdue,
+            'paid_amount_fullamount' => $totalPaidFull,
+            'remaining_amount' => max($remainingAmount, 0),
+        ]);
 
-        // Remove future unpaid installments if fully paid
+        // 🧹 Remove future unpaid installments if fully paid
         if ($remainingAmount <= 0) {
             FinancePayment::where('finance_order_id', $order->id)
                 ->whereNull('paid_at')
                 ->delete();
         }
 
-        return redirect()->back()->with('success', "Installment #{$payment->installment_number} successfully paid. Totals updated.");
+        return redirect()->back()->with('success', "Installment #{$payment->installment_number} paid successfully. Totals updated.");
     }
+
 
     public function nearestPayments(Request $request)
     {
