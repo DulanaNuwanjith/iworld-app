@@ -258,7 +258,6 @@ class FinanceOrderController extends Controller
         return redirect()->back()->with('success', "Installment #{$payment->installment_number} paid successfully. Totals updated.");
     }
 
-
     public function nearestPayments(Request $request)
     {
         $allOrders = FinanceOrder::with(['payments' => function ($query) {
@@ -300,7 +299,7 @@ class FinanceOrderController extends Controller
         $remainingBalance = FinanceOrder::whereDate('item_created_date', '<=', $date)->sum('remaining_amount');
         $totalInvestment = FinanceOrder::whereDate('item_created_date', $date)->sum('price');
 
-        // ✅ Total Profit = sum of (due_payment - price) for new orders
+        // Total Profit = sum of (due_payment - price) for new orders
         $totalProfit = $newOrders->sum(function($order) {
             return $order->due_payment - $order->price;
         });

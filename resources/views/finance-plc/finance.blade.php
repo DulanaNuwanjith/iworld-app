@@ -298,19 +298,18 @@
                             </div>
 
                             <div id="dailyReportContainer" class="hidden">
-                                <form method="GET" action="{{ route('finance.dailyReport') }}"
-                                    class="mb-6 flex gap-6 items-center">
-
+                                <form id="dailyReportForm" method="GET" action="{{ route('finance.dailyReport') }}"
+                                    class="mb-6 flex gap-6 items-center" target="_blank">
                                     <!-- Date input with default value -->
                                     <input type="date" name="date"
                                         value="{{ $date ?? \Carbon\Carbon::now()->toDateString() }}"
-                                        class="mt-4 block border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm">
+                                        class="mt-4 block border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm"
+                                        id="reportDate">
 
-                                    <a href="{{ route('finance.dailyReport', ['date' => $date ?? \Carbon\Carbon::now()->toDateString()]) }}"
-                                        target="_blank"
+                                    <button type="submit"
                                         class="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
                                         View Daily Report
-                                    </a>
+                                    </button>
                                 </form>
                             </div>
 
@@ -659,10 +658,10 @@
 
                                                         <tr class="border-b {{ $isLastUnpaid ? 'bg-yellow-50' : '' }}">
                                                             @if ($isLastUnpaid)
-                                                                    <span class="block text-[10px] text-orange-600">
-                                                                        Final Installment (Full Payment Required)
-                                                                    </span>
-                                                                @endif
+                                                                <span class="block text-[10px] text-orange-600">
+                                                                    Final Installment (Full Payment Required)
+                                                                </span>
+                                                            @endif
                                                             <td class="px-4 py-2 font-semibold">
                                                                 {{ $payment->installment_number }}
                                                             </td>
