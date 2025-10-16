@@ -35,7 +35,9 @@ class FinanceOrderController extends Controller
             $financeOrdersQuery->whereDate('item_created_date', $request->item_created_date);
         }
 
-        $financeOrders = FinanceOrder::orderByRaw('
+        // ✅ Use filtered query for ordering & pagination
+        $financeOrders = $financeOrdersQuery
+            ->orderByRaw('
                 CASE 
                     WHEN remaining_amount = 0 THEN 1 
                     ELSE 0 
@@ -51,7 +53,6 @@ class FinanceOrderController extends Controller
 
         return view('finance-plc.finance', compact('financeOrders', 'orderNumbers', 'buyerNames', 'buyerIds'));
     }
-
 
     public function store(Request $request)
     {
