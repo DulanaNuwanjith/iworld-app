@@ -132,7 +132,7 @@
 
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                 <script>
-                    const labels = @json($monthlyStats->map(fn($s) => \Carbon\Carbon::create($s->year, $s->month)->format('M Y')));
+                    const labels = [...new Set(@json($monthlyStats->map(fn($s) => \Carbon\Carbon::create($s->year, $s->month)->format('M Y'))))];
                     const investment = @json($monthlyStats->pluck('total_investment'));
                     const paid = @json($monthlyStats->pluck('total_paid'));
                     const remaining = @json($monthlyStats->pluck('total_remaining'));
