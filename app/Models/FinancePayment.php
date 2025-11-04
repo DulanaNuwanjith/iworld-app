@@ -23,6 +23,7 @@ class FinancePayment extends Model
     ];
 
     protected $casts = [
+        'expected_date' => 'datetime',
         'paid_at' => 'datetime',
         'amount' => 'float',
     ];
