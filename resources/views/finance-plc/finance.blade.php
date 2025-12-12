@@ -477,8 +477,13 @@
                                                                     class="font-normal">{{ $order->phone_1 }}</span></div>
                                                             <div class="font-bold">Phone 2: <span
                                                                     class="font-normal">{{ $order->phone_2 }}</span></div>
-                                                            <button type="button" @click="edit = true"
-                                                                class="mt-2 px-2 py-1 bg-green-500 text-white rounded text-xs">Edit</button>
+                                                            <!-- Centered button -->
+                                                            <div class="mt-2 flex justify-center">
+                                                                <button type="button" @click="edit = true"
+                                                                    class="px-3 py-1 bg-green-500 text-white rounded text-xs">
+                                                                    Edit
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </template>
 
@@ -506,11 +511,11 @@
                                                                     class="border rounded px-2 py-1 w-full">
                                                             </div>
 
-                                                            <div class="flex gap-2 mt-2">
+                                                            <div class="flex gap-2 mt-2 justify-center">
                                                                 <button type="submit"
-                                                                    class="px-4 py-2 bg-blue-500 text-white rounded text-sm">Save</button>
+                                                                    class="px-3 py-1 bg-blue-500 text-white rounded text-sm">Save</button>
                                                                 <button type="button" @click="edit = false"
-                                                                    class="px-4 py-2 bg-gray-400 text-white rounded text-sm">Cancel</button>
+                                                                    class="px-3 py-1 bg-gray-400 text-white rounded text-sm">Cancel</button>
                                                             </div>
                                                         </form>
                                                     </template>
