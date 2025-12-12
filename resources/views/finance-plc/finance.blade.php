@@ -477,13 +477,18 @@
                                                                     class="font-normal">{{ $order->phone_1 }}</span></div>
                                                             <div class="font-bold">Phone 2: <span
                                                                     class="font-normal">{{ $order->phone_2 }}</span></div>
-                                                            <!-- Centered button -->
-                                                            <div class="mt-2 flex justify-center">
-                                                                <button type="button" @click="edit = true"
-                                                                    class="px-3 py-1 bg-green-500 text-white rounded text-xs">
-                                                                    Edit
-                                                                </button>
-                                                            </div>
+                                                            @php
+                                                                $userRole = auth()->user()->role;
+                                                            @endphp
+
+                                                            @if ($userRole === 'SUPERADMIN' || $userRole === 'ADMIN')
+                                                                <div class="mt-2 flex justify-center">
+                                                                    <button type="button" @click="edit = true"
+                                                                        class="px-3 py-1 bg-green-500 text-white rounded text-xs">
+                                                                        Edit
+                                                                    </button>
+                                                                </div>
+                                                            @endif
                                                         </div>
                                                     </template>
 
