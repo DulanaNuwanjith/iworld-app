@@ -121,6 +121,21 @@ class FinanceOrderController extends Controller
         return redirect()->back()->with('success', 'Finance order and installments created successfully.');
     }
 
+    public function updateBuyerBasic(Request $request, $id)
+    {
+        $order = FinanceOrder::findOrFail($id);
+
+        $validated = $request->validate([
+            'buyer_address' => 'required|string',
+            'phone_1' => 'required|string|max:20',
+            'phone_2' => 'nullable|string|max:20',
+        ]);
+
+        $order->update($validated);
+
+        return redirect()->back()->with('success', 'Buyer details updated successfully.');
+    }
+
     /**
      * Update finance order note
      */

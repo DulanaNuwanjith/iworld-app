@@ -460,17 +460,62 @@
                                                 </td>
 
                                                 <!-- Buyer Details -->
-                                                <td class="px-4 py-3 text-xs text-left break-words">
+                                                <td class="px-4 py-3 text-xs text-left break-words"
+                                                    x-data="{ edit: false }">
                                                     <div class="font-bold">Name: <span
                                                             class="font-normal">{{ $order->buyer_name }}</span></div>
                                                     <div class="font-bold">ID: <span
                                                             class="font-normal">{{ $order->buyer_id }}</span></div>
-                                                    <div class="font-bold">Address: <span
-                                                            class="font-normal">{{ $order->buyer_address }}</span></div>
-                                                    <div class="font-bold">Phone 1: <span
-                                                            class="font-normal">{{ $order->phone_1 }}</span></div>
-                                                    <div class="font-bold">Phone 2: <span
-                                                            class="font-normal">{{ $order->phone_2 }}</span></div>
+
+                                                    <!-- Static display -->
+                                                    <template x-if="!edit">
+                                                        <div>
+                                                            <div class="font-bold">Address: <span
+                                                                    class="font-normal">{{ $order->buyer_address }}</span>
+                                                            </div>
+                                                            <div class="font-bold">Phone 1: <span
+                                                                    class="font-normal">{{ $order->phone_1 }}</span></div>
+                                                            <div class="font-bold">Phone 2: <span
+                                                                    class="font-normal">{{ $order->phone_2 }}</span></div>
+                                                            <button type="button" @click="edit = true"
+                                                                class="mt-2 px-2 py-1 bg-green-500 text-white rounded text-xs">Edit</button>
+                                                        </div>
+                                                    </template>
+
+                                                    <!-- Edit form -->
+                                                    <template x-if="edit">
+                                                        <form action="{{ route('finance.updateBuyerBasic', $order->id) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            <div class="mt-2">
+                                                                <label class="font-bold">Address</label>
+                                                                <textarea name="buyer_address" class="border rounded px-2 py-1 w-full">{{ $order->buyer_address }}</textarea>
+                                                            </div>
+
+                                                            <div class="mt-2">
+                                                                <label class="font-bold">Phone 1</label>
+                                                                <input type="text" name="phone_1"
+                                                                    value="{{ $order->phone_1 }}"
+                                                                    class="border rounded px-2 py-1 w-full">
+                                                            </div>
+
+                                                            <div class="mt-2">
+                                                                <label class="font-bold">Phone 2</label>
+                                                                <input type="text" name="phone_2"
+                                                                    value="{{ $order->phone_2 }}"
+                                                                    class="border rounded px-2 py-1 w-full">
+                                                            </div>
+
+                                                            <div class="flex gap-2 mt-2">
+                                                                <button type="submit"
+                                                                    class="px-4 py-2 bg-blue-500 text-white rounded text-sm">Save</button>
+                                                                <button type="button" @click="edit = false"
+                                                                    class="px-4 py-2 bg-gray-400 text-white rounded text-sm">Cancel</button>
+                                                            </div>
+                                                        </form>
+                                                    </template>
+
+                                                    <!-- Photos -->
                                                     <div class="mt-1 flex gap-1">
                                                         @if ($order->id_photo)
                                                             <a href="{{ asset('storage/' . $order->id_photo) }}"

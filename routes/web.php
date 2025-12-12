@@ -18,6 +18,7 @@ Route::middleware('auth')->group(function () {
     // Finance pages
     Route::get('/finance', [FinanceOrderController::class, 'index'])->name('finance.index');
     Route::post('/finance/store', [FinanceOrderController::class, 'store'])->name('financeOrders.store');
+    Route::post('/finance/{id}/update-buyer-basic', [FinanceOrderController::class, 'updateBuyerBasic'])->name('finance.updateBuyerBasic');
     Route::delete('/finance/{id}', [FinanceOrderController::class, 'destroy'])->name('finance.destroy');
     Route::patch('finance-orders/{id}/update-note', [FinanceOrderController::class, 'updateNote'])->name('finance.update-note');
     Route::get('/finance/nearest-payments', [FinanceOrderController::class, 'nearestPayments'])
