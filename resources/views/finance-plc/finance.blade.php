@@ -501,6 +501,8 @@
                                                                 <label class="font-bold">Phone 1</label>
                                                                 <input type="text" name="phone_1"
                                                                     value="{{ $order->phone_1 }}"
+                                                                    pattern="^(07\d{8}|94\d{9}|03\d{8})$"
+                                                                    title="Enter 077XXXXXXX, 947XXXXXXX, or 03XXXXXXXX format only"
                                                                     class="border rounded px-2 py-1 w-full">
                                                             </div>
 
@@ -508,6 +510,8 @@
                                                                 <label class="font-bold">Phone 2</label>
                                                                 <input type="text" name="phone_2"
                                                                     value="{{ $order->phone_2 }}"
+                                                                    pattern="^(07\d{8}|94\d{9}|03\d{8})$"
+                                                                    title="Enter 077XXXXXXX, 947XXXXXXX, or 03XXXXXXXX format only"
                                                                     class="border rounded px-2 py-1 w-full">
                                                             </div>
 
@@ -969,12 +973,16 @@
                                                         <label class="block text-sm font-medium text-gray-700">Phone
                                                             1</label>
                                                         <input type="text" name="phone_1" required
+                                                            pattern="^(07\d{8}|94\d{9}|03\d{8})$"
+                                                            title="Enter 077XXXXXXX, 947XXXXXXX, or 03XXXXXXXX format only"
                                                             class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
                                                     </div>
                                                     <div class="w-1/2">
                                                         <label class="block text-sm font-medium text-gray-700">Phone
                                                             2</label>
                                                         <input type="text" name="phone_2"
+                                                            pattern="^(07\d{8}|94\d{9}|03\d{8})$"
+                                                            title="Enter 077XXXXXXX, 947XXXXXXX, or 03XXXXXXXX format only"
                                                             class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
                                                     </div>
                                                 </div>

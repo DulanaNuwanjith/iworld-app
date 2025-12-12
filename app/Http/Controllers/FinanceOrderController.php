@@ -62,8 +62,18 @@ class FinanceOrderController extends Controller
             'buyer_name' => 'required|string|max:255',
             'buyer_id' => 'required|string|max:255',
             'buyer_address' => 'required|string',
-            'phone_1' => 'required|string|max:20',
-            'phone_2' => 'nullable|string|max:20',
+            'phone_1' => [
+                'required',
+                'string',
+                'max:20',
+                'regex:/^(07\d{8}|94\d{9}|03\d{8})$/'
+            ],
+            'phone_2' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^(07\d{8}|94\d{9}|03\d{8})$/'
+            ],
             'item_name' => 'required|string|max:255',
             'emi_number' => 'required|string|max:255',
             'colour' => 'required|string|max:255',
@@ -77,6 +87,9 @@ class FinanceOrderController extends Controller
             'paid_amount_fullamount' => 'nullable|numeric|min:0',
             'remaining_amount' => 'nullable|numeric|min:0',
             'note' => 'nullable|string',
+        ], [
+            'phone_1.regex' => 'Phone 1 must be 077XXXXXXX, 947XXXXXXX, or 03XXXXXXXX format only.',
+            'phone_2.regex' => 'Phone 2 must be 077XXXXXXX, 947XXXXXXX, or 03XXXXXXXX format only.',
         ]);
 
         // ✅ Calculate due payment = price + (price * rate / 100)
@@ -127,8 +140,21 @@ class FinanceOrderController extends Controller
 
         $validated = $request->validate([
             'buyer_address' => 'required|string',
-            'phone_1' => 'required|string|max:20',
-            'phone_2' => 'nullable|string|max:20',
+            'phone_1' => [
+                'required',
+                'string',
+                'max:20',
+                'regex:/^(07\d{8}|94\d{9}|03\d{8})$/'
+            ],
+            'phone_2' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^(07\d{8}|94\d{9}|03\d{8})$/'
+            ],
+        ], [
+            'phone_1.regex' => 'Phone 1 must be 077XXXXXXX, 947XXXXXXX, or 03XXXXXXXX format only.',
+            'phone_2.regex' => 'Phone 2 must be 077XXXXXXX, 947XXXXXXX, or 03XXXXXXXX format only.',
         ]);
 
         $order->update($validated);
