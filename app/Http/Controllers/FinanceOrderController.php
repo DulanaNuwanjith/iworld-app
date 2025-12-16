@@ -11,6 +11,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Helpers\SmsHelper;
 
 class FinanceOrderController extends Controller
 {
@@ -284,6 +285,7 @@ class FinanceOrderController extends Controller
         $paidInitialAmount = $totalPaidFull - $totalOverdue;
         $remainingAmount = $order->due_payment - $paidInitialAmount;
 
+        // 🔄 Update totals
         $order->update([
             'over_due_payment_fullamount' => $totalOverdue,
             'paid_amount_fullamount' => $totalPaidFull,
@@ -297,7 +299,43 @@ class FinanceOrderController extends Controller
                 ->delete();
         }
 
-        return redirect()->back()->with('success', "Installment #{$payment->installment_number} paid successfully. Totals updated.");
+        /* ===============================
+        📩 SEND PAYMENT SUCCESS SMS
+        =============================== */
+        try {
+            if ($order->phone_1) {
+                $phone = preg_replace('/\D/', '', $order->phone_1);
+
+                if (str_starts_with($phone, '0')) {
+                    $phone = '94' . substr($phone, 1);
+                }
+
+                if (preg_match('/^94\d{9}$/', $phone)) {
+
+                    $amount = number_format($request->paid_amount, 2);
+                    $date   = now()->format('d M Y');
+
+                    $message = "Dear {$order->buyer_name}, your payment of Rs. {$amount} "
+                            . "for installment #{$payment->installment_number} "
+                            . "has been received on {$date}. "
+                            . "Thank you. - Iworld Finance";
+
+                    SmsHelper::sendSms($phone, $message);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Payment SMS failed', [
+                'order_id' => $order->id,
+                'payment_id' => $payment->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        // 🔚 Redirect response
+        return redirect()->back()->with(
+            'success',
+            "Installment #{$payment->installment_number} paid successfully. Totals updated."
+        );
     }
 
     public function nearestPayments(Request $request)
