@@ -28,54 +28,62 @@ class SendPaymentReminder extends Command
      */
     public function handle()
     {
-        // Get today's date and target date (3 days before due)
         $today = Carbon::today();
-        $targetDate = $today->addDays(3);
 
-        // Fetch payments due in 3 days
-        $payments = FinancePayment::whereDate('expected_date', $targetDate)->get();
+        // Reminder days
+        $reminderDays = [7, 3];
 
-        if ($payments->isEmpty()) {
-            $this->info("No payments found due in 3 days.");
-            return;
-        }
+        foreach ($reminderDays as $daysBefore) {
 
-        foreach ($payments as $payment) {
-            $order = $payment->financeOrder;
+            $targetDate = $today->copy()->addDays($daysBefore);
 
-            // Safety check
-            if (!$order || !$order->phone_1) {
-                $this->warn("Skipping payment ID {$payment->id} — missing related order or phone number.");
+            $payments = FinancePayment::whereDate('expected_date', $targetDate)->get();
+
+            if ($payments->isEmpty()) {
+                $this->info("No payments found due in {$daysBefore} days.");
                 continue;
             }
 
-            // Clean and format the phone number before sending
-            $phone = preg_replace('/\D/', '', $order->phone_1); // remove non-digits
+            foreach ($payments as $payment) {
 
-            if (str_starts_with($phone, '0')) {
-                $phone = '94' . substr($phone, 1);
-            }
+                $order = $payment->financeOrder;
 
-            $message = "Dear {$order->buyer_name},\n\n"
-                . "This is a reminder that your installment #{$payment->installment_number} "
-                . "amounting to Rs. {$payment->amount} is due on "
-                . "{$payment->expected_date->format('Y-m-d')}.\n\n"
-                . "Kindly make the payment on or before the due date to avoid overdue charges.\n\n"
-                . "For further assistance, please contact us:\n"
-                . "Tel: 076 411 28 49 | 077 20 87 649\n\n"
-                . "Thank you.\n"
-                . "Iworld Finance";
+                // Safety check
+                if (!$order || !$order->phone_1) {
+                    $this->warn("Skipping payment ID {$payment->id} — missing order or phone.");
+                    continue;
+                }
 
-            // Send SMS using Notify.lk helper
-            $response = SmsHelper::sendSms($phone, $message);
+                // Clean phone number
+                $phone = preg_replace('/\D/', '', $order->phone_1);
 
-            // Log output
-            if (isset($response['status']) && $response['status'] === 'success') {
-                $this->info("✅ SMS sent successfully to {$order->buyer_name} ({$phone})");
-            } else {
-                $this->error("❌ Failed to send SMS to {$order->buyer_name} ({$phone})");
-                $this->line("Response: " . json_encode($response));
+                if (str_starts_with($phone, '0')) {
+                    $phone = '94' . substr($phone, 1);
+                }
+
+                // SMS message
+                $message = "Dear {$order->buyer_name},\n\n"
+                    . "This is a reminder that your installment #{$payment->installment_number} "
+                    . "amounting to Rs. {$payment->amount} is due on "
+                    . "{$payment->expected_date->format('Y-m-d')} "
+                    . "(in {$daysBefore} days).\n\n"
+                    . "Kindly make the payment on or before the due date to avoid overdue charges.\n\n"
+                    . "For further assistance:\n"
+                    . "Tel: 076 411 28 49 | 077 20 87 649\n\n"
+                    . "Thank you.\n"
+                    . "Iworld Finance";
+
+                // Send SMS
+                $response = SmsHelper::sendSms($phone, $message);
+
+                if (isset($response['status']) && $response['status'] === 'success') {
+                    $this->info("✅ {$daysBefore}-day reminder sent to {$order->buyer_name} ({$phone})");
+                } else {
+                    $this->error("❌ Failed to send {$daysBefore}-day reminder to {$order->buyer_name}");
+                    $this->line("Response: " . json_encode($response));
+                }
             }
         }
     }
+
 }
