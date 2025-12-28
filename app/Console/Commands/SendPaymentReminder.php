@@ -56,10 +56,15 @@ class SendPaymentReminder extends Command
                 $phone = '94' . substr($phone, 1);
             }
 
-            // Format message
-            $message = "Dear {$order->buyer_name}, your installment #{$payment->installment_number} "
-                     . "of Rs. {$payment->amount} is due on {$payment->expected_date->format('Y-m-d')}. "
-                     . "Please make the payment to avoid overdue charges. - Iworld Finance";
+            $message = "Dear {$order->buyer_name},\n\n"
+                . "This is a reminder that your installment #{$payment->installment_number} "
+                . "amounting to Rs. {$payment->amount} is due on "
+                . "{$payment->expected_date->format('Y-m-d')}.\n\n"
+                . "Kindly make the payment on or before the due date to avoid overdue charges.\n\n"
+                . "For further assistance, please contact us:\n"
+                . "Tel: 076 411 28 49 | 077 20 87 649\n\n"
+                . "Thank you.\n"
+                . "Iworld Finance";
 
             // Send SMS using Notify.lk helper
             $response = SmsHelper::sendSms($phone, $message);

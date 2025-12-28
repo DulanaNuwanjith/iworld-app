@@ -315,10 +315,13 @@ class FinanceOrderController extends Controller
                     $amount = number_format($request->paid_amount, 2);
                     $date   = now()->format('d M Y');
 
-                    $message = "Dear {$order->buyer_name}, your payment of Rs. {$amount} "
-                            . "for installment #{$payment->installment_number} "
-                            . "has been received on {$date}. "
-                            . "Thank you. - Iworld Finance";
+                   $message = "Dear {$order->buyer_name},\n\n"
+                        . "We confirm receipt of your payment of Rs. {$amount} "
+                        . "for installment #{$payment->installment_number} on {$date}.\n\n"
+                        . "Thank you for your prompt payment.\n\n"
+                        . "For inquiries:\n"
+                        . "Tel: 076 411 28 49 | 077 20 87 649\n\n"
+                        . "Iworld Finance";
 
                     SmsHelper::sendSms($phone, $message);
                 }
