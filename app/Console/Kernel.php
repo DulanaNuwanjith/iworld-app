@@ -13,7 +13,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // Run the payment reminder command every day at 9:00 AM
-        $schedule->command('reminder:payments')->dailyAt('09:00');
+        $schedule->command('reminder:payments')
+            ->dailyAt('09:00')
+            ->timezone('Asia/Colombo');
     }
 
     /**
