@@ -75,6 +75,7 @@ class InventoryController extends Controller
                 'emi' => $item['emi'],
                 'cost' => $item['cost'],
                 'note' => $item['note'] ?? null,
+                'status' => 0,
             ]);
         }
 
@@ -134,10 +135,12 @@ class InventoryController extends Controller
 
     public function getByEmi($emi)
     {
-        $phone = PhoneInventory::where('emi', $emi)->first();
+        $phone = PhoneInventory::where('emi', $emi)
+                    ->where('status', 0) // only unsold
+                    ->first();
 
         if (!$phone) {
-            return response()->json(['error' => 'Phone not found'], 404);
+            return response()->json(['error' => 'Phone not found or already sold'], 404);
         }
 
         return response()->json([
@@ -146,5 +149,6 @@ class InventoryController extends Controller
             'capacity' => $phone->capacity,
         ]);
     }
+
 
 }

@@ -24,6 +24,7 @@ class PhoneInventory extends Model
         'cost',
         'note',
         'stock_type',
+        'status',
     ];
 
     // Field type casting

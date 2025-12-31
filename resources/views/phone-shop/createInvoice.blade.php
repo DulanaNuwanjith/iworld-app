@@ -414,8 +414,15 @@
                                                 <td class="px-4 py-2 text-center font-bold">LKR
                                                     {{ number_format($invoice->total_amount, 2) }}</td>
 
-                                                <!-- Action -->
                                                 <td class="px-4 py-2 flex justify-center gap-2">
+                                                    <!-- Print Invoice Button -->
+                                                    <button type="button"
+                                                        class="bg-blue-500 h-10 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                                                        onclick="printInvoice({{ $invoice->id }})">
+                                                        Print
+                                                    </button>
+
+                                                    <!-- Delete Invoice -->
                                                     <form id="delete-form-{{ $invoice->id }}"
                                                         action="{{ route('invoices.destroy', $invoice->id) }}"
                                                         method="POST">
@@ -473,5 +480,14 @@
                 submitBtn.innerText = 'Submitting...';
             });
         });
+    </script>
+
+    <script>
+        function printInvoice(invoiceId) {
+            const url = `/phone-shop/invoice-print/${invoiceId}`;
+            const printWindow = window.open(url, '_blank', 'width=800,height=600');
+            printWindow.focus();
+            printWindow.print();
+        }
     </script>
 @endsection

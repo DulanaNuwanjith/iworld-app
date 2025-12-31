@@ -12,7 +12,10 @@ class InvoiceController extends Controller
     public function index()
     {
         $invoices = Invoice::latest()->paginate(15);
-        $emis = PhoneInventory::select('emi', 'phone_type', 'colour', 'capacity')->get();
+        // Only get phones with status = 0
+        $emis = PhoneInventory::where('status', 0)
+                    ->select('emi', 'phone_type', 'colour', 'capacity')
+                    ->get();
 
         return view('phone-shop.createInvoice', compact('invoices', 'emis'));
     }
@@ -72,6 +75,12 @@ class InvoiceController extends Controller
 
         $invoice->save();
 
+        // Update phone status to 1
+        if ($phone) {
+            $phone->status = 1;
+            $phone->save();
+        }
+
         return redirect()->route('invoices.index')->with('success', 'Invoice created successfully!');
     }
 
@@ -83,4 +92,11 @@ class InvoiceController extends Controller
 
         return redirect()->route('invoices.index')->with('success', 'Invoice deleted successfully!');
     }
+
+    public function printInvoice($id)
+    {
+        $invoice = Invoice::findOrFail($id);
+        return view('phone-shop.invoice-print', compact('invoice'));
+    }
+
 }
