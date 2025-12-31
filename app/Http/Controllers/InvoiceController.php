@@ -8,22 +8,15 @@ use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
-    // Show all invoices
+
     public function index()
     {
-        $invoices = Invoice::latest()->get(); // get all invoices
+        $invoices = Invoice::latest()->paginate(1);
         $emis = PhoneInventory::select('emi', 'phone_type', 'colour', 'capacity')->get();
+
         return view('phone-shop.createInvoice', compact('invoices', 'emis'));
     }
 
-    // Show create form (if separate page needed)
-    public function create()
-    {
-        $emis = PhoneInventory::select('emi', 'phone_type', 'colour', 'capacity')->get();
-        return view('phone-shop.createInvoice', compact('emis'));
-    }
-
-    // Store a new invoice
     public function store(Request $request)
     {
         $request->validate([
@@ -43,7 +36,7 @@ class InvoiceController extends Controller
 
         $invoice = new Invoice($request->all());
 
-        // Fill phone details from PhoneInventory
+        // Fill phone details
         $phone = PhoneInventory::where('emi', $request->emi)->first();
         if ($phone) {
             $invoice->phone_type = $phone->phone_type;
@@ -51,8 +44,19 @@ class InvoiceController extends Controller
             $invoice->capacity = $phone->capacity;
         }
 
-        // Generate unique invoice number
-        $invoice->invoice_number = 'INV-' . time() . rand(100, 999);
+        // Generate unique invoice number (INV-GAM-00001, 00002, ...)
+        $lastInvoiceNumber = Invoice::where('invoice_number', 'like', 'INV-GAM-%')
+            ->orderBy('id', 'desc')
+            ->value('invoice_number');
+
+        if ($lastInvoiceNumber) {
+            $lastNumber = (int)substr($lastInvoiceNumber, 8); // get numeric part
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        $invoice->invoice_number = 'INV-GAM-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
         // Calculate total amount
         $invoice->total_amount = (

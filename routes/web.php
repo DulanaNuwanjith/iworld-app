@@ -74,6 +74,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/phone-inventory/{emi}', [PhoneInventoryController::class, 'getByEmi']);
 
+    Route::delete('/invoices/{id}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
+
 });
 
 require __DIR__.'/auth.php';

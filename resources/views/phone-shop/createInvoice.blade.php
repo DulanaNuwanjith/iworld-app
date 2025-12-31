@@ -319,27 +319,23 @@
                                         <tr class="text-center">
                                             <th
                                                 class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-48 text-xs text-gray-600 uppercase break-words">
-                                                EMI Number
+                                                Invoice No
                                             </th>
                                             <th
                                                 class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-56 text-xs text-gray-600 uppercase break-words">
-                                                Model Details
+                                                Customer Details
                                             </th>
                                             <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-40 text-xs text-gray-600 uppercase break-words">
-                                                Supplier
+                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-56 text-xs text-gray-600 uppercase break-words">
+                                                Phone Details
+                                            </th>
+                                            <th
+                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-56 text-xs text-gray-600 uppercase break-words">
+                                                Prices
                                             </th>
                                             <th
                                                 class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-36 text-xs text-gray-600 uppercase break-words">
-                                                Stock Type
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-40 text-xs text-gray-600 uppercase break-words">
-                                                Cost
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-56 text-xs text-gray-600 uppercase break-words">
-                                                Note
+                                                Total Price
                                             </th>
                                             <th
                                                 class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-36 text-xs text-gray-600 uppercase break-words">
@@ -348,26 +344,86 @@
                                         </tr>
                                     </thead>
 
-                                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                    <tbody class="bg-white divide-y divide-gray-200 text-left">
                                         @forelse($invoices as $invoice)
                                             <tr class="text-center">
-                                                <td class="px-4 py-2">{{ $invoice->emi }}</td>
+                                                <!-- Invoice No with updated date -->
                                                 <td class="px-4 py-2">
-                                                    {{ $invoice->phone_type }} <br>
-                                                    {{ $invoice->colour }} - {{ $invoice->capacity }}
+                                                    <span class="font-semibold">{{ $invoice->invoice_number }}</span><br>
+                                                    <span
+                                                        class="text-xs text-gray-500">{{ $invoice->updated_at->format('d-m-Y') }}</span>
                                                 </td>
-                                                <td class="px-4 py-2">{{ $invoice->customer_name }}</td>
-                                                <td class="px-4 py-2">Invoice</td>
-                                                <td class="px-4 py-2">
-                                                    {{ $invoice->selling_price ?? $invoice->total_amount }}</td>
-                                                <td class="px-4 py-2">{{ $invoice->created_at->format('Y-m-d') }}</td>
-                                                <td class="px-4 py-2">
-                                                    <form action=""
+
+                                                <!-- Customer Details -->
+                                                <td class="px-4 py-2 text-left">
+                                                    <span class="font-semibold">Name:</span>
+                                                    {{ $invoice->customer_name }}<br>
+                                                    <span class="font-semibold">Phone:</span>
+                                                    {{ $invoice->customer_phone }}<br>
+                                                    <span class="font-semibold">Address:</span>
+                                                    {{ $invoice->customer_address ?? '-' }}
+                                                </td>
+
+                                                <!-- Phone Details -->
+                                                <td class="px-4 py-2 text-left">
+                                                    <span class="font-semibold">EMI:</span> {{ $invoice->emi }}<br>
+                                                    <span class="font-semibold">Model:</span>
+                                                    {{ $invoice->phone_type }}<br>
+                                                    <span class="font-semibold">Capacity:</span>
+                                                    {{ $invoice->capacity }}<br>
+                                                    <span class="font-semibold">Colour:</span> {{ $invoice->colour }}
+                                                </td>
+
+                                                <!-- Prices -->
+                                                <td class="px-4 py-2 text-left">
+                                                    @if ($invoice->selling_price > 0)
+                                                        <span class="font-semibold">Phone Price:</span> LKR
+                                                        {{ number_format($invoice->selling_price, 2) }}<br>
+                                                    @endif
+                                                    @if ($invoice->tempered > 0)
+                                                        <span class="font-semibold">Tempered:</span> LKR
+                                                        {{ number_format($invoice->tempered, 2) }}<br>
+                                                    @endif
+                                                    @if ($invoice->back_cover > 0)
+                                                        <span class="font-semibold">Back Cover:</span> LKR
+                                                        {{ number_format($invoice->back_cover, 2) }}<br>
+                                                    @endif
+                                                    @if ($invoice->charger > 0)
+                                                        <span class="font-semibold">Charger:</span> LKR
+                                                        {{ number_format($invoice->charger, 2) }}<br>
+                                                    @endif
+                                                    @if ($invoice->data_cable > 0)
+                                                        <span class="font-semibold">Data Cable:</span> LKR
+                                                        {{ number_format($invoice->data_cable, 2) }}<br>
+                                                    @endif
+                                                    @if ($invoice->hand_free > 0)
+                                                        <span class="font-semibold">Hand Free:</span> LKR
+                                                        {{ number_format($invoice->hand_free, 2) }}<br>
+                                                    @endif
+                                                    @if ($invoice->airpods > 0)
+                                                        <span class="font-semibold">AirPods:</span> LKR
+                                                        {{ number_format($invoice->airpods, 2) }}<br>
+                                                    @endif
+                                                    @if ($invoice->power_bank > 0)
+                                                        <span class="font-semibold">Power Bank:</span> LKR
+                                                        {{ number_format($invoice->power_bank, 2) }}<br>
+                                                    @endif
+                                                </td>
+
+                                                <!-- Total Price -->
+                                                <td class="px-4 py-2 text-center font-bold">LKR
+                                                    {{ number_format($invoice->total_amount, 2) }}</td>
+
+                                                <!-- Action -->
+                                                <td class="px-4 py-2 flex justify-center gap-2">
+                                                    <form id="delete-form-{{ $invoice->id }}"
+                                                        action="{{ route('invoices.destroy', $invoice->id) }}"
                                                         method="POST">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button
-                                                            class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs">
+                                                        <button type="button"
+                                                            class="bg-red-600 h-10 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
+                                                            onclick="confirmDelete('{{ $invoice->id }}')">
                                                             Delete
                                                         </button>
                                                     </form>
@@ -375,16 +431,15 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="7" class="px-4 py-2 text-center text-gray-500">No invoices
+                                                <td colspan="6" class="px-4 py-2 text-center text-gray-500">No invoices
                                                     found.</td>
                                             </tr>
                                         @endforelse
                                     </tbody>
-
                                 </table>
                             </div>
                             <div class="py-6 flex justify-center">
-
+                                {{ $invoices->links() }}
                             </div>
 
                         </div>
