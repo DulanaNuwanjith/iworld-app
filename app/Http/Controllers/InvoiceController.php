@@ -11,7 +11,7 @@ class InvoiceController extends Controller
 
     public function index()
     {
-        $invoices = Invoice::latest()->paginate(1);
+        $invoices = Invoice::latest()->paginate(15);
         $emis = PhoneInventory::select('emi', 'phone_type', 'colour', 'capacity')->get();
 
         return view('phone-shop.createInvoice', compact('invoices', 'emis'));

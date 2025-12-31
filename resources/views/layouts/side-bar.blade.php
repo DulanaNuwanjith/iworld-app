@@ -70,7 +70,7 @@
                     <a href="{{ route('invoices.index') }}"
                         class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('invoices.*') ? 'bg-gray-200' : '' }}">
                         <img src="{{ asset('images/invoice.png') }}" alt="" class="w-6 h-6 mr-5" />
-                        <span x-show="initialized && !collapsed">Create Invoice</span>
+                        <span x-show="initialized && !collapsed">Invoice</span>
                     </a>
                 </li>
 
@@ -78,7 +78,7 @@
                     <a href="{{ route('inventory.index') }}"
                         class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('inventory.*') ? 'bg-gray-200' : '' }}">
                         <img src="{{ asset('images/iphone.png') }}" alt="" class="w-6 h-6 mr-5" />
-                        <span x-show="initialized && !collapsed">Phone Inventory</span>
+                        <span x-show="initialized && !collapsed">Inventory</span>
                     </a>
                 </li>
 

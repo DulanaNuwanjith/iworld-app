@@ -318,7 +318,7 @@
                                     <thead class="bg-gray-200 text-left">
                                         <tr class="text-center">
                                             <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-48 text-xs text-gray-600 uppercase break-words">
+                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-36 text-xs text-gray-600 uppercase break-words">
                                                 Invoice No
                                             </th>
                                             <th
