@@ -69,6 +69,22 @@
                 </li>
 
                 <li>
+                    <a href="{{ route('createInvoice.index') }}"
+                        class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('createInvoice.*') ? 'bg-gray-200' : '' }}">
+                        <img src="{{ asset('images/invoice.png') }}" alt="" class="w-6 h-6 mr-5" />
+                        <span x-show="initialized && !collapsed">Create Invoice</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('inventory.index') }}"
+                        class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('inventory.*') ? 'bg-gray-200' : '' }}">
+                        <img src="{{ asset('images/iphone.png') }}" alt="" class="w-6 h-6 mr-5" />
+                        <span x-show="initialized && !collapsed">Phone Inventory</span>
+                    </a>
+                </li>
+
+                <li>
                     <a href="{{ route('finance.index') }}"
                         class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('finance.*') ? 'bg-gray-200' : '' }}">
                         <img src="{{ asset('images/acquisition.png') }}" alt="" class="w-6 h-6 mr-5" />

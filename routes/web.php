@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FinanceOrderController;
 use App\Http\Controllers\FinanceDashboardController;
+use App\Http\Controllers\InventoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -48,6 +49,27 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+
+    Route::get('/createInvoice', function () {
+        return view('phone-shop.createInvoice');
+    })->name('createInvoice.index');
+
+    // Store new phone inventory
+    Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store');
+
+    // Display all inventory items
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+
+    // Delete an item
+    Route::delete('/inventory/{inventory}', [InventoryController::class, 'destroy'])->name('inventory.destroy');
+
+    Route::post('/inventory/{inventory}/repair', [InventoryController::class, 'storeRepair'])
+    ->name('inventory.repair.store');
+
+    Route::get('/inventory/{inventory}/repairs', [InventoryController::class, 'getRepairs'])
+    ->name('inventory.repairs');
+
 });
 
 require __DIR__.'/auth.php';
