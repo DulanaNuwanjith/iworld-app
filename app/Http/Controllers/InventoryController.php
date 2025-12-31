@@ -12,34 +12,60 @@ class InventoryController extends Controller
 
     public function index(Request $request)
     {
-        $inventoriesQuery = PhoneInventory::query();
+        // Base query → ONLY unsold phones
+        $inventoriesQuery = PhoneInventory::where('status', 0);
 
         // Filters
         if ($request->filled('phone_type')) {
             $inventoriesQuery->where('phone_type', $request->phone_type);
         }
+
         if ($request->filled('emi')) {
             $inventoriesQuery->where('emi', $request->emi);
         }
+
         if ($request->filled('supplier')) {
             $inventoriesQuery->where('supplier', $request->supplier);
         }
+
         if ($request->filled('stock_type')) {
             $inventoriesQuery->where('stock_type', $request->stock_type);
         }
+
         if ($request->filled('date')) {
             $inventoriesQuery->whereDate('date', $request->date);
         }
 
-        $inventories = $inventoriesQuery->latest()->paginate(20)->withQueryString();
+        $inventories = $inventoriesQuery
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
 
-        // Dropdown data
-        $phoneTypes = PhoneInventory::select('phone_type')->distinct()->pluck('phone_type');
-        $emis = PhoneInventory::select('emi')->distinct()->pluck('emi');
-        $suppliers = PhoneInventory::select('supplier')->distinct()->pluck('supplier');
-        $stockTypes = PhoneInventory::select('stock_type')->distinct()->pluck('stock_type');
+        // Dropdown data → ONLY unsold phones
+        $phoneTypes = PhoneInventory::where('status', 0)
+            ->select('phone_type')
+            ->distinct()
+            ->pluck('phone_type');
 
-        return view('phone-shop.phoneInventory', compact('inventories', 'phoneTypes', 'emis', 'suppliers', 'stockTypes'));
+        $emis = PhoneInventory::where('status', 0)
+            ->select('emi')
+            ->distinct()
+            ->pluck('emi');
+
+        $suppliers = PhoneInventory::where('status', 0)
+            ->select('supplier')
+            ->distinct()
+            ->pluck('supplier');
+
+        $stockTypes = PhoneInventory::where('status', 0)
+            ->select('stock_type')
+            ->distinct()
+            ->pluck('stock_type');
+
+        return view(
+            'phone-shop.phoneInventory',
+            compact('inventories', 'phoneTypes', 'emis', 'suppliers', 'stockTypes')
+        );
     }
 
     /**

@@ -70,7 +70,7 @@
                     <p><strong>Date:</strong> {{ \Carbon\Carbon::now()->format('Y-m-d') }}</p>
                 </div>
                 <div class="text-right">
-                    <h2 class="text-xl font-semibold text-gray-800">Invoice {{ $invoice->invoice_number }}</h2>
+                    <h2 class="text-xl font-semibold text-gray-800">Invoice No : {{ $invoice->invoice_number }}</h2>
                 </div>
             </div>
 
@@ -154,7 +154,7 @@
                     <tfoot>
                         <tr class="bg-gray-100 font-bold">
                             <td class="border px-3 py-2 text-right">Total</td>
-                            <td class="border px-3 py-2 text-right">{{ number_format($invoice->total_amount, 2) }}</td>
+                            <td class="border px-3 py-2 text-right">LKR {{ number_format($invoice->total_amount, 2) }}</td>
                         </tr>
                     </tfoot>
                 </table>
