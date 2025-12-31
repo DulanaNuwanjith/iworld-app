@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FinanceOrderController;
 use App\Http\Controllers\FinanceDashboardController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\InvoiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -50,11 +51,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-
-    Route::get('/createInvoice', function () {
-        return view('phone-shop.createInvoice');
-    })->name('createInvoice.index');
-
     // Store new phone inventory
     Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store');
 
@@ -69,6 +65,14 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/inventory/{inventory}/repairs', [InventoryController::class, 'getRepairs'])
     ->name('inventory.repairs');
+
+    // Main page with invoice table
+    Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+
+    // Store the invoice
+    Route::post('/invoices/store', [InvoiceController::class, 'store'])->name('invoices.store');
+
+    Route::get('/phone-inventory/{emi}', [PhoneInventoryController::class, 'getByEmi']);
 
 });
 

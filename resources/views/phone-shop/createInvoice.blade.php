@@ -148,7 +148,7 @@
                                     <div class="flex space-x-3">
 
                                         <button
-                                            onclick="document.getElementById('addPhoneModal').classList.remove('hidden')"
+                                            onclick="document.getElementById('createInvoiceModal').classList.remove('hidden')"
                                             class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded shadow">
                                             + Add Invoice
                                         </button>
@@ -156,103 +156,148 @@
                                 </div>
                             </div>
 
-                            <!-- Add Phone Stock Modal -->
-                            <div id="addPhoneModal"
+                            <!-- Create Invoice Modal -->
+                            <div id="createInvoiceModal"
                                 class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center py-5">
                                 <div class="w-full max-w-[700px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-4 transform transition-all scale-95 max-h-[calc(100vh-10rem)] overflow-y-auto"
                                     onclick="event.stopPropagation()">
                                     <div class="max-w-[600px] mx-auto p-8">
-
                                         <h2 class="text-2xl font-semibold mb-8 text-gray-900 mt-4 text-center">
-                                            Add Phone Stock
+                                            Create Invoice
                                         </h2>
 
-                                        <!-- Unified Form -->
-                                        <form id="unifiedOrderForm" action=""
-                                            method="POST">
+                                        <form method="POST" action="{{ route('invoices.store') }}" id="invoiceForm">
                                             @csrf
 
-                                            <div id="itemsContainer"></div>
-
-                                            <button type="button" id="addItemBtn"
-                                                class="mt-4 px-4 py-2 bg-green-500 text-white rounded text-sm">
-                                                + Add Phone
-                                            </button>
-
-                                            <!-- MASTER FIELDS -->
-                                            <div class="grid grid-cols-2 gap-4 mt-3">
-                                                <div class="mt-6">
-                                                    <label
-                                                        class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
-                                                        Stock Type
-                                                    </label>
-                                                    <div class="relative w-full text-left">
-                                                        <button type="button"
-                                                            class="dropdown-btn inline-flex justify-between w-full rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 h-10"
-                                                            onclick="toggleDropdownStock(this)">
-                                                            <span class="selected-stock">Select Stock Type</span>
-                                                            <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20"
-                                                                fill="currentColor">
-                                                                <path fill-rule="evenodd"
-                                                                    d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
-                                                                    clip-rule="evenodd" />
-                                                            </svg>
-                                                        </button>
-
-                                                        <div
-                                                            class="dropdown-menu-stock hidden absolute z-10 mt-2 w-full rounded-md bg-white dark:bg-gray-700 shadow-lg ring-1 ring-black/5 max-h-48 overflow-y-auto">
-                                                            <div class="py-1 options-container flex flex-col"
-                                                                role="listbox" tabindex="-1">
-                                                                <button type="button"
-                                                                    class="dropdown-option w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
-                                                                    onclick="selectDropdownStock(this, 'Exchange')">Exchange</button>
-                                                                <button type="button"
-                                                                    class="dropdown-option w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
-                                                                    onclick="selectDropdownStock(this, 'Direct Import')">Direct
-                                                                    Import</button>
-                                                            </div>
-                                                        </div>
-
-                                                        <input type="hidden" name="stock_type" class="input-stock"
-                                                            value="">
-                                                    </div>
-                                                </div>
-
-                                                <div class="mt-6">
-                                                    <label
-                                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                        Date
-                                                    </label>
-                                                    <input type="date" name="date" required
-                                                        class="w-full mt-1 px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white text-sm">
-                                                </div>
+                                            <!-- Customer Details -->
+                                            <div class="mb-6">
+                                                <h3 class="text-xl font-semibold mb-4">Customer Details</h3>
+                                                <input name="customer_name" placeholder="Customer Name" required
+                                                    class="w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                                                <input name="customer_phone" placeholder="Customer Phone" required
+                                                    class="w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                                                <textarea name="customer_address" placeholder="Customer Address"
+                                                    class="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"></textarea>
                                             </div>
 
-                                            <div class="mt-3">
-                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                    Supplier
-                                                </label>
-                                                <input type="text" name="supplier" required
-                                                    class="w-full mt-1 px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                            <!-- Phone Selection -->
+                                            <div class="mb-6">
+                                                <h3 class="text-xl font-semibold mb-4">Select Phone</h3>
+                                                <select id="emi" name="emi" required
+                                                    class="w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                                                    <option value="">Select EMI</option>
+                                                    @foreach ($emis as $emi)
+                                                        <option value="{{ $emi->emi }}"
+                                                            data-phone_type="{{ $emi->phone_type }}"
+                                                            data-colour="{{ $emi->colour }}"
+                                                            data-capacity="{{ $emi->capacity }}">
+                                                            {{ $emi->emi }} - {{ $emi->phone_type }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+
+                                                <input id="phone_type" readonly placeholder="Phone Type"
+                                                    class="w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                                                <input id="colour" readonly placeholder="Colour"
+                                                    class="w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                                                <input id="capacity" readonly placeholder="Capacity"
+                                                    class="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
                                             </div>
 
-                                            <!-- ACTIONS -->
-                                            <div class="flex justify-end mt-6 space-x-3">
+                                            <!-- Selling Price -->
+                                            <div class="mb-6">
+                                                <h3 class="text-xl font-semibold mb-4">Selling Price</h3>
+                                                <input type="number" name="selling_price" id="selling_price"
+                                                    placeholder="Enter Selling Price" min="0"
+                                                    class="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                                            </div>
+
+                                            <!-- Accessories -->
+                                            <div class="mb-6">
+                                                <h3 class="text-xl font-semibold mb-4">Accessories</h3>
+                                                <input type="number" name="tempered" placeholder="Tempered price"
+                                                    min="0"
+                                                    class="accessory w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                                                <input type="number" name="back_cover" placeholder="Back cover price"
+                                                    min="0"
+                                                    class="accessory w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                                                <input type="number" name="charger" placeholder="Charger price"
+                                                    min="0"
+                                                    class="accessory w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                                                <input type="number" name="data_cable" placeholder="Data cable price"
+                                                    min="0"
+                                                    class="accessory w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                                                <input type="number" name="hand_free" placeholder="Hand free price"
+                                                    min="0"
+                                                    class="accessory w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                                                <input type="number" name="airpods" placeholder="AirPods price"
+                                                    min="0"
+                                                    class="accessory w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                                                <input type="number" name="power_bank" placeholder="Power bank price"
+                                                    min="0"
+                                                    class="accessory w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                                            </div>
+
+                                            <!-- Total Amount -->
+                                            <div class="mb-6">
+                                                <h3 class="text-xl font-semibold mb-2">Total Amount</h3>
+                                                <input type="text" id="total_amount" readonly
+                                                    class="w-full mb-4 p-2 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white">
+                                            </div>
+
+                                            <!-- Actions -->
+                                            <div class="flex justify-end space-x-3">
                                                 <button type="button"
-                                                    onclick="document.getElementById('addPhoneModal').classList.add('hidden')"
+                                                    onclick="document.getElementById('createInvoiceModal').classList.add('hidden')"
                                                     class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded hover:bg-gray-300">
                                                     Cancel
                                                 </button>
 
-                                                <button type="submit" id="createPhoneBtn"
-                                                    class="px-4 py-2 bg-gray-500 text-white text-sm rounded hover:bg-gray-600">
-                                                    Save Stock
+                                                <button type="submit"
+                                                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                                                    Save Invoice
                                                 </button>
                                             </div>
                                         </form>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- JS -->
+                            <script>
+                                document.addEventListener('DOMContentLoaded', () => {
+                                    // Auto-fill phone details
+                                    const emiSelect = document.getElementById('emi');
+                                    emiSelect.addEventListener('change', function() {
+                                        const selected = this.selectedOptions[0];
+                                        if (!selected.value) {
+                                            document.getElementById('phone_type').value = '';
+                                            document.getElementById('colour').value = '';
+                                            document.getElementById('capacity').value = '';
+                                            return;
+                                        }
+                                        document.getElementById('phone_type').value = selected.dataset.phone_type;
+                                        document.getElementById('colour').value = selected.dataset.colour;
+                                        document.getElementById('capacity').value = selected.dataset.capacity;
+                                    });
+
+                                    // Calculate total amount live
+                                    const accessories = document.querySelectorAll('.accessory');
+                                    const sellingPriceInput = document.getElementById('selling_price');
+                                    const totalAmount = document.getElementById('total_amount');
+
+                                    function calculateTotal() {
+                                        let total = parseFloat(sellingPriceInput.value) || 0;
+                                        accessories.forEach(input => {
+                                            total += parseFloat(input.value) || 0;
+                                        });
+                                        totalAmount.value = total.toFixed(2);
+                                    }
+
+                                    accessories.forEach(input => input.addEventListener('input', calculateTotal));
+                                    sellingPriceInput.addEventListener('input', calculateTotal);
+                                });
+                            </script>
 
                             {{-- Main Table --}}
                             <div id="sampleInquiryRecordsScroll" class="overflow-x-auto bg-white shadow rounded-lg">
@@ -304,12 +349,42 @@
                                     </thead>
 
                                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                        
+                                        @forelse($invoices as $invoice)
+                                            <tr class="text-center">
+                                                <td class="px-4 py-2">{{ $invoice->emi }}</td>
+                                                <td class="px-4 py-2">
+                                                    {{ $invoice->phone_type }} <br>
+                                                    {{ $invoice->colour }} - {{ $invoice->capacity }}
+                                                </td>
+                                                <td class="px-4 py-2">{{ $invoice->customer_name }}</td>
+                                                <td class="px-4 py-2">Invoice</td>
+                                                <td class="px-4 py-2">
+                                                    {{ $invoice->selling_price ?? $invoice->total_amount }}</td>
+                                                <td class="px-4 py-2">{{ $invoice->created_at->format('Y-m-d') }}</td>
+                                                <td class="px-4 py-2">
+                                                    <form action=""
+                                                        method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button
+                                                            class="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs">
+                                                            Delete
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="7" class="px-4 py-2 text-center text-gray-500">No invoices
+                                                    found.</td>
+                                            </tr>
+                                        @endforelse
                                     </tbody>
+
                                 </table>
                             </div>
                             <div class="py-6 flex justify-center">
-                                
+
                             </div>
 
                         </div>
@@ -344,5 +419,4 @@
             });
         });
     </script>
-
 @endsection

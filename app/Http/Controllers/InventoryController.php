@@ -132,4 +132,19 @@ class InventoryController extends Controller
         ]);
     }
 
+    public function getByEmi($emi)
+    {
+        $phone = PhoneInventory::where('emi', $emi)->first();
+
+        if (!$phone) {
+            return response()->json(['error' => 'Phone not found'], 404);
+        }
+
+        return response()->json([
+            'phone_type' => $phone->phone_type,
+            'colour' => $phone->colour,
+            'capacity' => $phone->capacity,
+        ]);
+    }
+
 }

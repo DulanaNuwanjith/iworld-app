@@ -17,9 +17,9 @@
             <div class="sticky top-0 z-50 flex space-x-4 border-b border-gray-300 bg-white p-5">
 
                 {{-- Inventory Tab --}}
-                <a href="{{ route('createInvoice.index') }}"
+                <a href="{{ route('invoices.index') }}"
                     class="pb-2 px-3 font-semibold 
-       {{ request()->routeIs('createInvoice.index') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
+       {{ request()->routeIs('invoices.index') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
                     Create Invoice
                 </a>
 

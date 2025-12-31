@@ -24,11 +24,9 @@
     </script>
 
     <!-- Sidebar -->
-    <aside x-data="{ collapsed: window.__initialCollapsed, initialized: false }" 
-           x-init="initialized = true" 
-           :class="collapsed ? 'w-20' : 'w-72'"
-           class="relative bg-gradient-to-b from-gray-700 to-white min-h-screen shadow-md flex flex-col transition-all duration-300"
-           style="width: var(--sidebar-width);">
+    <aside x-data="{ collapsed: window.__initialCollapsed, initialized: false }" x-init="initialized = true" :class="collapsed ? 'w-20' : 'w-72'"
+        class="relative bg-gradient-to-b from-gray-700 to-white min-h-screen shadow-md flex flex-col transition-all duration-300"
+        style="width: var(--sidebar-width);">
 
         <!-- Toggle Button -->
         <div class="flex justify-end p-6">
@@ -69,8 +67,8 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('createInvoice.index') }}"
-                        class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('createInvoice.*') ? 'bg-gray-200' : '' }}">
+                    <a href="{{ route('invoices.index') }}"
+                        class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('invoices.*') ? 'bg-gray-200' : '' }}">
                         <img src="{{ asset('images/invoice.png') }}" alt="" class="w-6 h-6 mr-5" />
                         <span x-show="initialized && !collapsed">Create Invoice</span>
                     </a>
@@ -126,4 +124,5 @@
     </aside>
 
 </body>
+
 </html>
