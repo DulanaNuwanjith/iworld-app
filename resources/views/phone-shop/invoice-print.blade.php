@@ -9,7 +9,8 @@
         /* A4 page setup */
         @page {
             size: A4;
-            margin: 0; /* We'll handle margin in container */
+            margin: 0;
+            /* We'll handle margin in container */
         }
 
         body {
@@ -53,7 +54,10 @@
         <div class="content">
             <!-- Header -->
             <div class="flex justify-between items-center mb-6 border-b pb-4">
-                <div class="text-4xl font-bold text-gray-800">Iworld</div>
+                <!-- Logo -->
+                <div class="w-72">
+                    <img src="{{ asset('images/logo.png') }}" alt="Iworld Logo" class="w-full h-auto">
+                </div>
                 <div class="text-sm text-gray-600 leading-relaxed text-right">
                     <strong>Iworld</strong> - Mobile Selling Shop<br>
                     Tel: 076 411 28 49 | 077 20 87 649<br>
@@ -105,7 +109,8 @@
                         @if ($invoice->selling_price > 0)
                             <tr>
                                 <td class="border px-3 py-2">Phone Price</td>
-                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->selling_price, 2) }}</td>
+                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->selling_price, 2) }}
+                                </td>
                             </tr>
                         @endif
                         @if ($invoice->tempered > 0)
@@ -117,7 +122,8 @@
                         @if ($invoice->back_cover > 0)
                             <tr>
                                 <td class="border px-3 py-2">Back Cover</td>
-                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->back_cover, 2) }}</td>
+                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->back_cover, 2) }}
+                                </td>
                             </tr>
                         @endif
                         @if ($invoice->charger > 0)
@@ -129,13 +135,15 @@
                         @if ($invoice->data_cable > 0)
                             <tr>
                                 <td class="border px-3 py-2">Data Cable</td>
-                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->data_cable, 2) }}</td>
+                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->data_cable, 2) }}
+                                </td>
                             </tr>
                         @endif
                         @if ($invoice->hand_free > 0)
                             <tr>
                                 <td class="border px-3 py-2">Hand Free</td>
-                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->hand_free, 2) }}</td>
+                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->hand_free, 2) }}
+                                </td>
                             </tr>
                         @endif
                         @if ($invoice->airpods > 0)
@@ -147,14 +155,16 @@
                         @if ($invoice->power_bank > 0)
                             <tr>
                                 <td class="border px-3 py-2">Power Bank</td>
-                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->power_bank, 2) }}</td>
+                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->power_bank, 2) }}
+                                </td>
                             </tr>
                         @endif
                     </tbody>
                     <tfoot>
                         <tr class="bg-gray-100 font-bold">
                             <td class="border px-3 py-2 text-right">Total</td>
-                            <td class="border px-3 py-2 text-right">LKR {{ number_format($invoice->total_amount, 2) }}</td>
+                            <td class="border px-3 py-2 text-right">LKR {{ number_format($invoice->total_amount, 2) }}
+                            </td>
                         </tr>
                     </tfoot>
                 </table>
@@ -162,7 +172,8 @@
 
             <!-- Notes -->
             <div class="text-sm text-gray-700 mt-4">
-                <p><strong>Note:</strong> Thank you for your purchase! Please check your phone and accessories at the time of delivery.</p>
+                <p><strong>Note:</strong> Thank you for your purchase! Please check your phone and accessories at the
+                    time of delivery.</p>
             </div>
         </div>
 

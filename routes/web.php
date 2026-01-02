@@ -80,6 +80,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/inventory/sold', [InventoryController::class, 'sold'])->name('inventory.sold');
 
+    Route::post('/inventory/exchange', [InventoryController::class, 'exchange'])->name('inventory.exchange');
 
 });
 

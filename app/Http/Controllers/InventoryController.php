@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use App\Models\PhoneInventory;
-    use App\Models\PhoneRepair;
+use App\Models\PhoneRepair;
+use App\Models\Invoice;
 
 class InventoryController extends Controller
 {
@@ -38,7 +39,7 @@ class InventoryController extends Controller
 
         $inventories = $inventoriesQuery
             ->latest()
-            ->paginate(20)
+            ->paginate(15)
             ->withQueryString();
 
         // Dropdown data → ONLY unsold phones
@@ -70,44 +71,46 @@ class InventoryController extends Controller
 
     public function sold(Request $request)
     {
-        // Base query → ONLY sold phones
-        $soldQuery = PhoneInventory::where('status', 1);
+        // Step 1: Get latest invoice ID per EMI
+        $latestInvoiceIds = Invoice::selectRaw('MAX(id) as id')
+            ->groupBy('emi')
+            ->pluck('id');
+
+        // Step 2: Join only latest invoices
+        $soldQuery = PhoneInventory::where('phone_inventories.status', 1)
+            ->leftJoin('invoices', 'phone_inventories.emi', '=', 'invoices.emi')
+            ->whereIn('invoices.id', $latestInvoiceIds) // only latest invoice per EMI
+            ->select(
+                'phone_inventories.*',
+                'invoices.customer_name',
+                'invoices.customer_phone',
+                'invoices.customer_address',
+                'invoices.invoice_number',
+                'invoices.selling_price',
+                'invoices.created_at as sold_date'
+            );
 
         // Filters
         if ($request->filled('phone_type')) {
-            $soldQuery->where('phone_type', $request->phone_type);
+            $soldQuery->where('phone_inventories.phone_type', $request->phone_type);
         }
 
         if ($request->filled('emi')) {
-            $soldQuery->where('emi', $request->emi);
-        }
-
-        if ($request->filled('supplier')) {
-            $soldQuery->where('supplier', $request->supplier);
-        }
-
-        if ($request->filled('stock_type')) {
-            $soldQuery->where('stock_type', $request->stock_type);
-        }
-
-        if ($request->filled('date')) {
-            $soldQuery->whereDate('date', $request->date);
+            $soldQuery->where('phone_inventories.emi', $request->emi);
         }
 
         $soldInventories = $soldQuery
-            ->latest()
-            ->paginate(20)
+            ->orderByDesc('invoices.created_at')
+            ->paginate(15)
             ->withQueryString();
 
-        // Dropdown data (only sold)
+        // Dropdowns (only sold)
         $phoneTypes = PhoneInventory::where('status', 1)->distinct()->pluck('phone_type');
         $emis       = PhoneInventory::where('status', 1)->distinct()->pluck('emi');
-        $suppliers  = PhoneInventory::where('status', 1)->distinct()->pluck('supplier');
-        $stockTypes = PhoneInventory::where('status', 1)->distinct()->pluck('stock_type');
 
         return view(
             'phone-shop.sold-phone-inventory',
-            compact('soldInventories', 'phoneTypes', 'emis', 'suppliers', 'stockTypes')
+            compact('soldInventories', 'phoneTypes', 'emis')
         );
     }
 
@@ -217,6 +220,35 @@ class InventoryController extends Controller
             'colour' => $phone->colour,
             'capacity' => $phone->capacity,
         ]);
+    }
+
+    public function exchange(Request $request)
+    {
+        $request->validate([
+            'inventory_id' => 'required|exists:phone_inventories,id',
+            'cost' => 'required|numeric|min:0',
+            'note' => 'nullable|string|max:255', // optional
+        ]);
+
+        $inventory = PhoneInventory::findOrFail($request->inventory_id);
+
+        // Get buyer name from invoice
+        $invoice = Invoice::where('emi', $inventory->emi)->first();
+        $buyerName = $invoice->customer_name ?? 'Unknown Buyer';
+
+        // **Delete related repairs for this phone (under the same EMI)**
+        PhoneRepair::where('emi', $inventory->emi)->delete();
+
+        $inventory->update([
+            'date' => now(), // today
+            'supplier' => $buyerName, // buyer name
+            'cost' => $request->cost, // cost from popup
+            'stock_type' => 'Exchange',
+            'status' => 0, // back to inventory
+            'note' => $request->note ?? null, // save note or null
+        ]);
+
+        return redirect()->back()->with('success', 'Phone returned to inventory successfully!');
     }
 
 

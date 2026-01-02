@@ -252,7 +252,7 @@
                             <div class="flex-1">
 
                                 <div class="flex justify-between items-center mb-6">
-                                    <h1 class="text-2xl font-bold text-gray-800">Phone Inventory Records
+                                    <h1 class="text-2xl font-bold text-gray-800">Sold Phone Inventory Records
                                     </h1>
                                 </div>
                             </div>
@@ -279,25 +279,27 @@
                                                 class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-48 text-xs text-gray-600 uppercase">
                                                 EMI Number
                                             </th>
+
                                             <th
                                                 class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-56 text-xs text-gray-600 uppercase">
                                                 Model Details
                                             </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-40 text-xs text-gray-600 uppercase">
-                                                Supplier
-                                            </th>
-                                            <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-40 text-xs text-gray-600 uppercase">
-                                                Stock Type
-                                            </th>
+
+                                            {{-- Buyer Details --}}
                                             <th
                                                 class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-56 text-xs text-gray-600 uppercase">
-                                                Note
+                                                Buyer Details
                                             </th>
+
+                                            {{-- Sold Price --}}
                                             <th
                                                 class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-36 text-xs text-gray-600 uppercase">
-                                                Status
+                                                Sold Price
+                                            </th>
+
+                                            <th
+                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-36 text-xs text-gray-600 uppercase">
+                                                Action
                                             </th>
                                         </tr>
                                     </thead>
@@ -308,7 +310,9 @@
 
                                                 <!-- EMI -->
                                                 <td class="px-4 py-2">
-                                                    <span class="font-semibold">{{ $inventory->emi }}</span>
+                                                    <span class="font-semibold">{{ $inventory->emi }}</span><br>
+                                                    <span
+                                                        class="text-xs text-gray-500">{{ Carbon::parse($inventory->sold_date)->format('Y-m-d') }}</span>
                                                 </td>
 
                                                 <!-- Model -->
@@ -320,32 +324,35 @@
                                                     <span class="font-semibold">Colour:</span> {{ $inventory->colour }}
                                                 </td>
 
-                                                <!-- Supplier -->
+                                                <!-- Buyer Details -->
                                                 <td class="px-4 py-2 text-left">
-                                                    {{ $inventory->supplier }}
+                                                    <span class="font-semibold">Name:</span>
+                                                    {{ $inventory->customer_name ?? '-' }}<br>
+
+                                                    <span class="font-semibold">Phone:</span>
+                                                    {{ $inventory->customer_phone ?? '-' }}<br>
+
+                                                    <span class="font-semibold">Invoice:</span>
+                                                    {{ $inventory->invoice_number ?? '-' }}
                                                 </td>
 
-                                                <!-- Stock Type -->
-                                                <td class="px-4 py-2">
-                                                    {{ $inventory->stock_type }}
-                                                </td>
-
-                                                <!-- Note -->
-                                                <td class="px-4 py-2 text-left">
-                                                    {{ $inventory->note ?? '-' }}
+                                                <!-- Sold Price -->
+                                                <td class="px-4 py-2 text-center">
+                                                    LKR {{ number_format($inventory->selling_price ?? 0, 2) }}
                                                 </td>
 
                                                 <!-- Status -->
                                                 <td class="px-4 py-2">
-                                                    <span
-                                                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                                                        SOLD
-                                                    </span>
+                                                    <button
+                                                        class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                                                        onclick="openExchangeModal('{{ $inventory->id }}', '{{ $inventory->customer_name }}')">
+                                                        Return / Exchange
+                                                    </button>
                                                 </td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="7" class="px-4 py-4 text-center text-gray-500">
+                                                <td colspan="4" class="px-4 py-4 text-center text-gray-500">
                                                     No sold phone records found.
                                                 </td>
                                             </tr>
@@ -357,6 +364,52 @@
                                 {{ $soldInventories->links() }}
                             </div>
                         </div>
+
+                        <!-- Exchange Modal -->
+                        <div id="exchangeModal"
+                            class="fixed inset-0 hidden bg-black bg-opacity-50 z-50 flex items-center justify-center min-h-screen">
+                            <div class="bg-white rounded-lg shadow-lg w-96 max-w-full p-6 relative">
+                                <h2 class="text-lg font-semibold mb-4">Return / Exchange Phone</h2>
+
+                                <form id="exchangeForm" method="POST" action="{{ route('inventory.exchange') }}">
+                                    @csrf
+                                    <input type="hidden" name="inventory_id" id="exchangeInventoryId">
+
+                                    <!-- Buyer Name (readonly) -->
+                                    <div class="mb-3">
+                                        <label class="block text-sm font-medium text-gray-700">Exchanger Name</label>
+                                        <input type="text" id="exchangeBuyerName"
+                                            class="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 text-sm bg-gray-100"
+                                            readonly>
+                                    </div>
+
+                                    <!-- Cost -->
+                                    <div class="mb-3">
+                                        <label class="block text-sm font-medium text-gray-700">Cost</label>
+                                        <input type="number" name="cost"
+                                            class="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 text-sm"
+                                            required>
+                                    </div>
+
+                                    <!-- Note (optional) -->
+                                    <div class="mb-3">
+                                        <label class="block text-sm font-medium text-gray-700">Note</label>
+                                        <textarea name="note" id="exchangeNote"
+                                            class="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 text-sm" placeholder="Enter note (optional)"></textarea>
+                                    </div>
+
+                                    <div class="flex justify-end space-x-2 mt-4">
+                                        <button type="button" onclick="closeExchangeModal()"
+                                            class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">Cancel</button>
+                                        <button type="submit"
+                                            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Return
+                                            Phone
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -453,5 +506,18 @@
             }
 
         });
+    </script>
+
+    <script>
+        function openExchangeModal(inventoryId, buyerName, note = '') {
+            document.getElementById('exchangeInventoryId').value = inventoryId;
+            document.getElementById('exchangeBuyerName').value = buyerName;
+            document.getElementById('exchangeNote').value = note; // prefill note if exists
+            document.getElementById('exchangeModal').classList.remove('hidden');
+        }
+
+        function closeExchangeModal() {
+            document.getElementById('exchangeModal').classList.add('hidden');
+        }
     </script>
 @endsection
