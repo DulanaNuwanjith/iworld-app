@@ -9,15 +9,45 @@ use Illuminate\Http\Request;
 class InvoiceController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        $invoices = Invoice::latest()->paginate(15);
-        // Only get phones with status = 0
-        $emis = PhoneInventory::where('status', 0)
-                    ->select('emi', 'phone_type', 'colour', 'capacity')
-                    ->get();
+        $query = Invoice::query();
 
-        return view('phone-shop.createInvoice', compact('invoices', 'emis'));
+        // Apply filters
+        if ($request->filled('invoice_number')) {
+            $query->where('invoice_number', $request->invoice_number);
+        }
+        if ($request->filled('customer_name')) {
+            $query->where('customer_name', $request->customer_name);
+        }
+        if ($request->filled('emi')) {
+            $query->where('emi', $request->emi);
+        }
+        if ($request->filled('phone_type')) {
+            $query->where('phone_type', $request->phone_type);
+        }
+
+        $invoices = $query->latest()->paginate(15)->withQueryString();
+
+        // For filter dropdowns (only distinct strings)
+        $allInvoiceNumbers = Invoice::select('invoice_number')->distinct()->pluck('invoice_number');
+        $allCustomerNames = Invoice::select('customer_name')->distinct()->pluck('customer_name');
+        $filterEmis = Invoice::select('emi')->distinct()->pluck('emi'); // for filter dropdown
+        $filterPhoneTypes = Invoice::select('phone_type')->distinct()->pluck('phone_type'); // for filter dropdown
+
+        // For Add Invoice form (full details)
+        $addInvoiceEmis = PhoneInventory::select('emi','phone_type','colour','capacity')
+            ->where('status', 0) // optional: only available phones
+            ->get();
+
+        return view('phone-shop.createInvoice', compact(
+            'invoices',
+            'allInvoiceNumbers',
+            'allCustomerNames',
+            'filterEmis',
+            'filterPhoneTypes',
+            'addInvoiceEmis'
+        ));
     }
 
     public function store(Request $request)

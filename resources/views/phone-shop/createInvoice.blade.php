@@ -139,6 +139,160 @@
                                 }
                             </script>
 
+                            {{-- Filters --}}
+                            <div class="flex justify-start">
+                                <button onclick="toggleFilterForm()"
+                                    class="bg-white border border-gray-500 text-gray-500 hover:text-gray-600 hover:border-gray-600 font-semibold py-1 px-3 rounded shadow flex items-center gap-2 mb-6">
+                                    <img src="{{ asset('icons/filter.png') }}" class="w-6 h-6" alt="Filter Icon">
+                                    Filters
+                                </button>
+                            </div>
+
+                            <div id="filterFormContainerInvoice" class="mt-4 hidden">
+                                <form id="filterFormInvoice" method="GET" action="{{ route('invoices.index') }}"
+                                    class="mb-6 flex gap-6 items-center flex-wrap">
+
+                                    {{-- Invoice Number --}}
+                                    <div class="relative inline-block text-left w-48">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Invoice No</label>
+                                        <input type="hidden" name="invoice_number" id="invoiceNumberInput"
+                                            value="{{ request('invoice_number') }}">
+                                        <button type="button"
+                                            class="inline-flex w-full justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 h-10"
+                                            onclick="toggleDropdown(event, 'invoiceNumberDropdownMenu')">
+                                            <span
+                                                id="selectedInvoiceNumber">{{ request('invoice_number') ?? 'Select Invoice No' }}</span>
+                                            <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                    d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                        <div id="invoiceNumberDropdownMenu"
+                                            class="absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg hidden max-h-48 overflow-y-auto p-2">
+                                            <input type="text" id="invoiceNumberSearch"
+                                                onkeyup="filterDropdown('invoiceNumberSearch','invoice-number-option')"
+                                                placeholder="Search..." class="w-full px-2 py-1 text-sm border rounded-md"
+                                                autocomplete="off">
+                                            <div onclick="selectDropdown('','invoiceNumberInput','selectedInvoiceNumber')"
+                                                class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">All Invoice
+                                                Numbers</div>
+                                            @foreach ($allInvoiceNumbers as $inv)
+                                                <div onclick="selectDropdown('{{ $inv }}','invoiceNumberInput','selectedInvoiceNumber')"
+                                                    class="invoice-number-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                    {{ $inv }}</div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                    {{-- Customer Name --}}
+                                    <div class="relative inline-block text-left w-56">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Customer Name</label>
+                                        <input type="hidden" name="customer_name" id="customerNameInput"
+                                            value="{{ request('customer_name') }}">
+                                        <button type="button"
+                                            class="inline-flex w-full justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 h-10"
+                                            onclick="toggleDropdown(event, 'customerNameDropdownMenu')">
+                                            <span
+                                                id="selectedCustomerName">{{ request('customer_name') ?? 'Select Customer Name' }}</span>
+                                            <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                    d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                        <div id="customerNameDropdownMenu"
+                                            class="absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg hidden max-h-48 overflow-y-auto p-2">
+                                            <input type="text" id="customerNameSearch"
+                                                onkeyup="filterDropdown('customerNameSearch','customer-name-option')"
+                                                placeholder="Search..." class="w-full px-2 py-1 text-sm border rounded-md"
+                                                autocomplete="off">
+                                            <div onclick="selectDropdown('','customerNameInput','selectedCustomerName')"
+                                                class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">All Customers
+                                            </div>
+                                            @foreach ($allCustomerNames as $cust)
+                                                <div onclick="selectDropdown('{{ $cust }}','customerNameInput','selectedCustomerName')"
+                                                    class="customer-name-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                    {{ $cust }}</div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                    {{-- EMI --}}
+                                    <div class="relative inline-block text-left w-48">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">EMI</label>
+                                        <input type="hidden" name="emi" id="emiInput" value="{{ request('emi') }}">
+                                        <button type="button"
+                                            class="inline-flex w-full justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 h-10"
+                                            onclick="toggleDropdown(event, 'emiDropdownMenu')">
+                                            <span id="selectedEmi">{{ request('emi') ?? 'Select EMI' }}</span>
+                                            <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                    d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                        <div id="emiDropdownMenu"
+                                            class="absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg hidden max-h-48 overflow-y-auto p-2">
+                                            <input type="text" id="emiSearch"
+                                                onkeyup="filterDropdown('emiSearch','emi-option')" placeholder="Search..."
+                                                class="w-full px-2 py-1 text-sm border rounded-md" autocomplete="off">
+                                            <div onclick="selectDropdown('','emiInput','selectedEmi')"
+                                                class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">All EMIs</div>
+                                            @foreach ($filterEmis as $emi)
+                                                <div onclick="selectDropdown('{{ $emi }}','emiInput','selectedEmi')"
+                                                    class="emi-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                    {{ $emi }}</div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                    {{-- Phone Type --}}
+                                    <div class="relative inline-block text-left w-48">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone Type</label>
+                                        <input type="hidden" name="phone_type" id="phoneTypeInput"
+                                            value="{{ request('phone_type') }}">
+                                        <button type="button"
+                                            class="inline-flex w-full justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 h-10"
+                                            onclick="toggleDropdown(event, 'phoneTypeDropdownMenu')">
+                                            <span
+                                                id="selectedPhoneType">{{ request('phone_type') ?? 'Select Phone Type' }}</span>
+                                            <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20"
+                                                fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                    d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                        <div id="phoneTypeDropdownMenu"
+                                            class="absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg hidden max-h-48 overflow-y-auto p-2">
+                                            <input type="text" id="phoneTypeSearch"
+                                                onkeyup="filterDropdown('phoneTypeSearch','phone-type-option')"
+                                                placeholder="Search..." class="w-full px-2 py-1 text-sm border rounded-md"
+                                                autocomplete="off">
+                                            <div onclick="selectDropdown('','phoneTypeInput','selectedPhoneType')"
+                                                class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">All Phone Types
+                                            </div>
+                                            @foreach ($filterPhoneTypes as $type)
+                                                <div onclick="selectDropdown('{{ $type }}','phoneTypeInput','selectedPhoneType')"
+                                                    class="phone-type-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                    {{ $type }}</div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                    {{-- Buttons --}}
+                                    <div class="flex items-end space-x-2 mt-2">
+                                        <button type="submit"
+                                            class="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Apply
+                                            Filters</button>
+                                        <button type="button" onclick="clearFiltersInvoice()"
+                                            class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">Clear</button>
+                                    </div>
+
+                                </form>
+                            </div>
+
                             <div class="flex-1">
 
                                 <div class="flex justify-between items-center mb-6">
@@ -186,7 +340,7 @@
                                                 <select id="emi" name="emi" required
                                                     class="w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
                                                     <option value="">Select EMI</option>
-                                                    @foreach ($emis as $emi)
+                                                    @foreach ($addInvoiceEmis as $emi)
                                                         <option value="{{ $emi->emi }}"
                                                             data-phone_type="{{ $emi->phone_type }}"
                                                             data-colour="{{ $emi->colour }}"
@@ -489,5 +643,79 @@
             printWindow.focus();
             printWindow.print();
         }
+    </script>
+
+    <script>
+        function toggleFilterForm() {
+            const form = document.getElementById('filterFormContainerInvoice');
+            form.classList.toggle('hidden');
+        }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            const menus = [
+                "invoiceNumberDropdownMenu",
+                "customerNameDropdownMenu",
+                "emiDropdownMenu",
+                "phoneTypeDropdownMenu"
+            ].map(id => document.getElementById(id));
+
+            menus.forEach(menu => {
+                if (menu) menu.addEventListener("click", e => e.stopPropagation());
+            });
+
+            // Toggle dropdown
+            window.toggleDropdown = function(event, id) {
+                event.stopPropagation();
+                closeAllDropdowns();
+                const menu = document.getElementById(id);
+                if (menu) menu.classList.toggle("hidden");
+            }
+
+            // Select value
+            window.selectDropdown = function(value, inputId, spanId) {
+                const input = document.getElementById(inputId);
+                const span = document.getElementById(spanId);
+
+                if (input) input.value = value;
+                if (span) {
+                    let placeholder = "Select";
+                    if (spanId === "selectedInvoiceNumber") placeholder = "Select Invoice No";
+                    if (spanId === "selectedCustomerName") placeholder = "Select Customer Name";
+                    if (spanId === "selectedEmi") placeholder = "Select EMI";
+                    if (spanId === "selectedPhoneType") placeholder = "Select Phone Type";
+                    span.textContent = value || placeholder;
+                }
+                closeAllDropdowns();
+            }
+
+            // Filter options
+            window.filterDropdown = function(searchId, optionClass) {
+                const searchInput = document.getElementById(searchId);
+                if (!searchInput) return;
+                const filter = searchInput.value.toLowerCase();
+                document.querySelectorAll('.' + optionClass).forEach(option => {
+                    option.style.display = option.textContent.toLowerCase().includes(filter) ? "block" :
+                        "none";
+                });
+            }
+
+            // Close all dropdowns
+            function closeAllDropdowns() {
+                menus.forEach(menu => {
+                    if (menu) menu.classList.add("hidden");
+                });
+            }
+
+            document.addEventListener("click", closeAllDropdowns);
+
+            // Clear filters
+            window.clearFiltersInvoice = function() {
+                window.location.href = window.location.pathname;
+            }
+
+        });
     </script>
 @endsection
