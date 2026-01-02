@@ -17,16 +17,16 @@
 
             <!-- ✅ TAB NAVIGATION (VISIBLE IN ALL PAGES) -->
             <div class="sticky top-0 z-10 flex space-x-4 border-b border-gray-300 bg-white p-5 ">
-                <a href="{{ route('financeReport.index') }}"
-                    class="pb-2 px-3 font-semibold {{ request()->routeIs('financeReport.index') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
-                    Finance Reports
-                </a>
 
                 <a href="{{ route('phoneShopReport.index') }}"
                     class="pb-2 px-3 font-semibold {{ request()->routeIs('phoneShopReport.index') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
                     Phone-shop Reports
                 </a>
-                
+
+                <a href="{{ route('financeReport.index') }}"
+                    class="pb-2 px-3 font-semibold {{ request()->routeIs('financeReport.index') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
+                    Finance Reports
+                </a>
             </div>
 
             <!-- ✅ PAGE CONTENT -->

@@ -91,8 +91,8 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('financeReport.index') }}"
-                        class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('financeReport.*') ? 'bg-gray-200' : '' }}">
+                    <a href="{{ route('phoneShopReport.index') }}"
+                        class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('financeReport.*','phoneShopReport.*') ? 'bg-gray-200' : '' }}">
                         <img src="{{ asset('images/report.png') }}" alt="" class="w-6 h-6 mr-5" />
                         <span x-show="initialized && !collapsed">Reports</span>
                     </a>
