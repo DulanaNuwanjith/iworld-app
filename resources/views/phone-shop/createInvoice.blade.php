@@ -502,43 +502,42 @@
                             </div>
 
                             <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const accessories = document.querySelectorAll('.accessory');
-    const sellingPriceInput = document.getElementById('selling_price');
-    const totalAmount = document.getElementById('total_amount');
-    const invoiceForm = document.getElementById('invoiceForm');
+                                document.addEventListener('DOMContentLoaded', () => {
+                                    const accessories = document.querySelectorAll('.accessory');
+                                    const sellingPriceInput = document.getElementById('selling_price');
+                                    const totalAmount = document.getElementById('total_amount');
+                                    const invoiceForm = document.getElementById('invoiceForm');
 
-    // Function to calculate total
-    function calculateTotal() {
-        let total = parseFloat(sellingPriceInput.value) || 0;
-        accessories.forEach(input => {
-            total += parseFloat(input.value) || 0;
-        });
-        totalAmount.value = total.toFixed(2);
-    }
+                                    // Function to calculate total
+                                    function calculateTotal() {
+                                        let total = parseFloat(sellingPriceInput.value) || 0;
+                                        accessories.forEach(input => {
+                                            total += parseFloat(input.value) || 0;
+                                        });
+                                        totalAmount.value = total.toFixed(2);
+                                    }
 
-    // Listen for input changes
-    sellingPriceInput.addEventListener('input', calculateTotal);
-    accessories.forEach(input => input.addEventListener('input', calculateTotal));
+                                    // Listen for input changes
+                                    sellingPriceInput.addEventListener('input', calculateTotal);
+                                    accessories.forEach(input => input.addEventListener('input', calculateTotal));
 
-    // Reset form when modal closes
-    window.closeInvoiceModal = function() {
-        document.getElementById('createInvoiceModal').classList.add('hidden');
-        invoiceForm.reset();
-        totalAmount.value = '';
-        document.getElementById('phone_type').value = '';
-        document.getElementById('colour').value = '';
-        document.getElementById('capacity').value = '';
-    };
+                                    // Reset form when modal closes
+                                    window.closeInvoiceModal = function() {
+                                        document.getElementById('createInvoiceModal').classList.add('hidden');
+                                        invoiceForm.reset();
+                                        totalAmount.value = '';
+                                        document.getElementById('phone_type').value = '';
+                                        document.getElementById('colour').value = '';
+                                        document.getElementById('capacity').value = '';
+                                    };
 
-    // Open modal and focus first input
-    window.openInvoiceModal = function() {
-        document.getElementById('createInvoiceModal').classList.remove('hidden');
-        invoiceForm.querySelector('[name="customer_name"]').focus();
-    };
-});
-</script>
-
+                                    // Open modal and focus first input
+                                    window.openInvoiceModal = function() {
+                                        document.getElementById('createInvoiceModal').classList.remove('hidden');
+                                        invoiceForm.querySelector('[name="customer_name"]').focus();
+                                    };
+                                });
+                            </script>
 
                             {{-- Main Table --}}
                             <div id="sampleInquiryRecordsScroll" class="overflow-x-auto bg-white shadow rounded-lg">
