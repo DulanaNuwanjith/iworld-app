@@ -529,23 +529,29 @@
                                                     @endif
                                                 </td>
                                                 <td class="px-4 py-2 text-left">{{ $inventory->note ?? '-' }}</td>
-                                                <td class="px-4 py-2 flex justify-center gap-2">
-                                                    <!-- Delete button -->
-                                                    <form id="delete-form-{{ $inventory->id }}"
-                                                        action="{{ route('inventory.destroy', $inventory->id) }}"
-                                                        method="POST" class="inline">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button"
-                                                            class="bg-red-600 h-10 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
-                                                            onclick="confirmDelete('{{ $inventory->id }}')">Delete</button>
-                                                    </form>
+                                                <td class="px-4 py-2">
+                                                    <div class="inline-flex items-center justify-center gap-2">
 
-                                                    <button type="button"
-                                                        class="bg-blue-600 h-10 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
-                                                        onclick="openRepairModal({{ $inventory->id }})">
-                                                        Repair
-                                                    </button>
+                                                        <!-- Repair Button -->
+                                                        <button type="button"
+                                                            class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
+                                                            onclick="openRepairModal({{ $inventory->id }})">
+                                                            Repair
+                                                        </button>
+
+                                                        <!-- Delete Button -->
+                                                        <form id="delete-form-{{ $inventory->id }}"
+                                                            action="{{ route('inventory.destroy', $inventory->id) }}"
+                                                            method="POST" class="inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="button"
+                                                                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm mt-3"
+                                                                onclick="confirmDelete('{{ $inventory->id }}')">
+                                                                Delete
+                                                            </button>
+                                                        </form>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         @empty
