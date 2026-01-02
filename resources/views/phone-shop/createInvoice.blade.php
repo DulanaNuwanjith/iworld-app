@@ -312,146 +312,233 @@
 
                             <!-- Create Invoice Modal -->
                             <div id="createInvoiceModal"
-                                class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center py-5">
-                                <div class="w-full max-w-[700px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-4 transform transition-all scale-95 max-h-[calc(100vh-10rem)] overflow-y-auto"
-                                    onclick="event.stopPropagation()">
-                                    <div class="max-w-[600px] mx-auto p-8">
-                                        <h2 class="text-2xl font-semibold mb-8 text-gray-900 mt-4 text-center">
+                                class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center px-4 py-6">
+
+                                <form id="invoiceForm" action="{{ route('invoices.store') }}" method="POST"
+                                    class="w-full max-w-6xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden transform transition-all scale-95 max-h-[90vh] flex flex-col">
+
+                                    @csrf
+
+                                    <!-- Header -->
+                                    <div
+                                        class="flex justify-between items-center px-8 py-4 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                                        <h2
+                                            class="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor"
+                                                stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M3 3v18h18V3H3z M16 3v18 M3 9h18" />
+                                            </svg>
                                             Create Invoice
                                         </h2>
+                                        <button type="button" onclick="closeInvoiceModal()"
+                                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-4xl font-bold">&times;</button>
+                                    </div>
 
-                                        <form method="POST" action="{{ route('invoices.store') }}" id="invoiceForm">
-                                            @csrf
+                                    <!-- Body -->
+                                    <div class="px-8 py-6 overflow-y-auto flex-1 space-y-8">
 
-                                            <!-- Customer Details -->
-                                            <div class="mb-6">
-                                                <h3 class="text-xl font-semibold mb-4">Customer Details</h3>
+                                        <!-- Customer Details -->
+                                        <div
+                                            class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                            <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
+                                                Customer Details</h3>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <input name="customer_name" placeholder="Customer Name" required
-                                                    class="w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                                <input name="customer_phone" placeholder="Customer Phone" required
-                                                    class="w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                                <textarea name="customer_address" placeholder="Customer Address"
-                                                    class="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white"></textarea>
+                                                    class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                                                <input name="customer_phone" placeholder="Customer Phone No" required
+                                                    pattern="^(0\d{9}|94\d{9})$"
+                                                    title="Enter a valid Sri Lankan phone number, e.g., 0777137830 or 94777137830"
+                                                    class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
                                             </div>
+                                            <textarea name="customer_address" placeholder="Customer Address" rows="3"
+                                                class="w-full mt-4 p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"></textarea>
+                                        </div>
 
-                                            <!-- Phone Selection -->
-                                            <div class="mb-6">
-                                                <h3 class="text-xl font-semibold mb-4">Select Phone</h3>
-                                                <select id="emi" name="emi" required
-                                                    class="w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                                    <option value="">Select EMI</option>
+                                        <!-- Phone Selection -->
+                                        <div
+                                            class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                            <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">Select
+                                                Phone</h3>
+                                            <!-- Custom EMI Dropdown with Search -->
+                                            <div class="relative w-full" x-data="{
+                                                open: false,
+                                                search: '',
+                                                selected: null,
+                                                options: [
                                                     @foreach ($addInvoiceEmis as $emi)
-                                                        <option value="{{ $emi->emi }}"
-                                                            data-phone_type="{{ $emi->phone_type }}"
-                                                            data-colour="{{ $emi->colour }}"
-                                                            data-capacity="{{ $emi->capacity }}">
-                                                            {{ $emi->emi }} - {{ $emi->phone_type }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
+        { value: '{{ $emi->emi }}', label: '{{ $emi->emi }} - {{ $emi->phone_type }}', phone_type: '{{ $emi->phone_type }}', colour: '{{ $emi->colour }}', capacity: '{{ $emi->capacity }}' }, @endforeach
+                                                ],
+                                                get filteredOptions() {
+                                                    if (this.search === '') return this.options;
+                                                    return this.options.filter(o => o.label.toLowerCase().includes(this.search.toLowerCase()));
+                                                }
+                                            }">
+                                                <label
+                                                    class="block mb-2 text-gray-700 dark:text-gray-200 font-semibold">Select
+                                                    EMI</label>
 
-                                                <input id="phone_type" readonly placeholder="Phone Type"
-                                                    class="w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                                <input id="colour" readonly placeholder="Colour"
-                                                    class="w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                                <input id="capacity" readonly placeholder="Capacity"
-                                                    class="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                                                <!-- Selected value -->
+                                                <div @click="open = !open"
+                                                    class="cursor-pointer w-full p-4 border rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-white flex justify-between items-center focus:ring-2 focus:ring-blue-500">
+                                                    <span x-text="selected ? selected.label : 'Select EMI'"></span>
+                                                    <svg class="w-5 h-5 text-gray-400" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </div>
+
+                                                <!-- Dropdown options -->
+                                                <div x-show="open" @click.outside="open = false" x-transition
+                                                    class="absolute z-10 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg">
+
+                                                    <!-- Search input -->
+                                                    <input type="text" x-model="search" placeholder="Search EMI..."
+                                                        class="w-full px-4 py-2 border-b border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+
+                                                    <!-- Options list -->
+                                                    <template x-for="option in filteredOptions" :key="option.value">
+                                                        <div @click="selected = option; open = false;
+                         document.getElementById('phone_type').value = option.phone_type;
+                         document.getElementById('colour').value = option.colour;
+                         document.getElementById('capacity').value = option.capacity;"
+                                                            class="cursor-pointer px-4 py-2 hover:bg-blue-100 dark:hover:bg-gray-600 text-gray-700 dark:text-white">
+                                                            <span x-text="option.label"></span>
+                                                        </div>
+                                                    </template>
+
+                                                    <!-- No results -->
+                                                    <div x-show="filteredOptions.length === 0"
+                                                        class="px-4 py-2 text-gray-400 dark:text-gray-300">
+                                                        No results found
+                                                    </div>
+                                                </div>
+
+                                                <!-- Hidden input for form submission -->
+                                                <input type="hidden" name="emi"
+                                                    :value="selected ? selected.value : ''" required>
                                             </div>
 
+                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                                <input id="phone_type" name="phone_type" readonly
+                                                    placeholder="Phone Type"
+                                                    class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
+                                                <input id="colour" name="colour" readonly placeholder="Colour"
+                                                    class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
+                                                <input id="capacity" name="capacity" readonly placeholder="Capacity"
+                                                    class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
+                                            </div>
+                                        </div>
+
+                                        <!-- Selling Price & Accessories -->
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <!-- Selling Price -->
-                                            <div class="mb-6">
-                                                <h3 class="text-xl font-semibold mb-4">Selling Price</h3>
+                                            <div
+                                                class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                                <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
+                                                    Selling Price</h3>
                                                 <input type="number" name="selling_price" id="selling_price"
                                                     placeholder="Enter Selling Price" min="0"
-                                                    class="w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                                                    class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
                                             </div>
 
                                             <!-- Accessories -->
-                                            <div class="mb-6">
-                                                <h3 class="text-xl font-semibold mb-4">Accessories</h3>
-                                                <input type="number" name="tempered" placeholder="Tempered price"
-                                                    min="0"
-                                                    class="accessory w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                                <input type="number" name="back_cover" placeholder="Back cover price"
-                                                    min="0"
-                                                    class="accessory w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                                <input type="number" name="charger" placeholder="Charger price"
-                                                    min="0"
-                                                    class="accessory w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                                <input type="number" name="data_cable" placeholder="Data cable price"
-                                                    min="0"
-                                                    class="accessory w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                                <input type="number" name="hand_free" placeholder="Hand free price"
-                                                    min="0"
-                                                    class="accessory w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                                <input type="number" name="airpods" placeholder="AirPods price"
-                                                    min="0"
-                                                    class="accessory w-full mb-2 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
-                                                <input type="number" name="power_bank" placeholder="Power bank price"
-                                                    min="0"
-                                                    class="accessory w-full mb-4 p-2 border rounded-md dark:bg-gray-700 dark:text-white">
+                                            <div
+                                                class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                                <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
+                                                    Accessories</h3>
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <input type="number" name="tempered" placeholder="Tempered price"
+                                                        min="0"
+                                                        class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
+                                                    <input type="number" name="back_cover"
+                                                        placeholder="Back cover price" min="0"
+                                                        class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
+                                                    <input type="number" name="charger" placeholder="Charger price"
+                                                        min="0"
+                                                        class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
+                                                    <input type="number" name="data_cable"
+                                                        placeholder="Data cable price" min="0"
+                                                        class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
+                                                    <input type="number" name="hand_free" placeholder="Hand free price"
+                                                        min="0"
+                                                        class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
+                                                    <input type="number" name="airpods" placeholder="AirPods price"
+                                                        min="0"
+                                                        class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
+                                                    <input type="number" name="power_bank"
+                                                        placeholder="Power bank price" min="0"
+                                                        class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
+                                                </div>
                                             </div>
+                                        </div>
 
-                                            <!-- Total Amount -->
-                                            <div class="mb-6">
-                                                <h3 class="text-xl font-semibold mb-2">Total Amount</h3>
-                                                <input type="text" id="total_amount" readonly
-                                                    class="w-full mb-4 p-2 border rounded-md bg-gray-100 dark:bg-gray-700 dark:text-white">
-                                            </div>
+                                        <!-- Total Amount -->
+                                        <div
+                                            class="bg-blue-50 dark:bg-gray-800 p-4 rounded-lg border border-blue-200 dark:border-gray-700 flex justify-between items-center shadow-sm">
+                                            <span class="font-semibold text-gray-700 dark:text-gray-200">Total
+                                                Amount</span>
+                                            <input type="text" id="total_amount" name="total_amount" readonly
+                                                class="w-36 text-right p-3 border rounded-lg bg-blue-100 dark:bg-gray-700 dark:text-white font-semibold">
+                                        </div>
 
-                                            <!-- Actions -->
-                                            <div class="flex justify-end space-x-3">
-                                                <button type="button"
-                                                    onclick="document.getElementById('createInvoiceModal').classList.add('hidden')"
-                                                    class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded hover:bg-gray-300">
-                                                    Cancel
-                                                </button>
-
-                                                <button type="submit"
-                                                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
-                                                    Save Invoice
-                                                </button>
-                                            </div>
-                                        </form>
                                     </div>
-                                </div>
+
+                                    <!-- Footer Actions -->
+                                    <div
+                                        class="px-8 py-4 bg-gray-50 dark:bg-gray-800 border-t dark:border-gray-700 flex justify-end gap-4">
+                                        <button type="button" onclick="closeInvoiceModal()"
+                                            class="px-6 py-3 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded hover:bg-gray-300">
+                                            Cancel
+                                        </button>
+                                        <button type="submit"
+                                            class="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-semibold">
+                                            Save Invoice
+                                        </button>
+                                    </div>
+
+                                </form>
                             </div>
 
-                            <!-- JS -->
                             <script>
-                                document.addEventListener('DOMContentLoaded', () => {
-                                    // Auto-fill phone details
-                                    const emiSelect = document.getElementById('emi');
-                                    emiSelect.addEventListener('change', function() {
-                                        const selected = this.selectedOptions[0];
-                                        if (!selected.value) {
-                                            document.getElementById('phone_type').value = '';
-                                            document.getElementById('colour').value = '';
-                                            document.getElementById('capacity').value = '';
-                                            return;
-                                        }
-                                        document.getElementById('phone_type').value = selected.dataset.phone_type;
-                                        document.getElementById('colour').value = selected.dataset.colour;
-                                        document.getElementById('capacity').value = selected.dataset.capacity;
-                                    });
+document.addEventListener('DOMContentLoaded', () => {
+    const accessories = document.querySelectorAll('.accessory');
+    const sellingPriceInput = document.getElementById('selling_price');
+    const totalAmount = document.getElementById('total_amount');
+    const invoiceForm = document.getElementById('invoiceForm');
 
-                                    // Calculate total amount live
-                                    const accessories = document.querySelectorAll('.accessory');
-                                    const sellingPriceInput = document.getElementById('selling_price');
-                                    const totalAmount = document.getElementById('total_amount');
+    // Function to calculate total
+    function calculateTotal() {
+        let total = parseFloat(sellingPriceInput.value) || 0;
+        accessories.forEach(input => {
+            total += parseFloat(input.value) || 0;
+        });
+        totalAmount.value = total.toFixed(2);
+    }
 
-                                    function calculateTotal() {
-                                        let total = parseFloat(sellingPriceInput.value) || 0;
-                                        accessories.forEach(input => {
-                                            total += parseFloat(input.value) || 0;
-                                        });
-                                        totalAmount.value = total.toFixed(2);
-                                    }
+    // Listen for input changes
+    sellingPriceInput.addEventListener('input', calculateTotal);
+    accessories.forEach(input => input.addEventListener('input', calculateTotal));
 
-                                    accessories.forEach(input => input.addEventListener('input', calculateTotal));
-                                    sellingPriceInput.addEventListener('input', calculateTotal);
-                                });
-                            </script>
+    // Reset form when modal closes
+    window.closeInvoiceModal = function() {
+        document.getElementById('createInvoiceModal').classList.add('hidden');
+        invoiceForm.reset();
+        totalAmount.value = '';
+        document.getElementById('phone_type').value = '';
+        document.getElementById('colour').value = '';
+        document.getElementById('capacity').value = '';
+    };
+
+    // Open modal and focus first input
+    window.openInvoiceModal = function() {
+        document.getElementById('createInvoiceModal').classList.remove('hidden');
+        invoiceForm.querySelector('[name="customer_name"]').focus();
+    };
+});
+</script>
+
 
                             {{-- Main Table --}}
                             <div id="sampleInquiryRecordsScroll" class="overflow-x-auto bg-white shadow rounded-lg">
