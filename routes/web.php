@@ -76,8 +76,10 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/invoices/{id}', [InvoiceController::class, 'destroy'])->name('invoices.destroy');
 
-    // routes/web.php
     Route::get('/phone-shop/invoice-print/{id}', [InvoiceController::class, 'printInvoice'])->name('phone-shop.invoice-print');
+
+    Route::get('/inventory/sold', [InventoryController::class, 'sold'])->name('inventory.sold');
+
 
 });
 

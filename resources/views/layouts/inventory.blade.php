@@ -23,6 +23,12 @@
                     Phone Inventory
                 </a>
 
+                <a href="{{ route('inventory.sold') }}"
+                    class="pb-2 px-3 font-semibold 
+       {{ request()->routeIs('inventory.sold') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
+                    Sold Phones Details
+                </a>
+
             </div>
 
             <!-- ✅ PAGE CONTENT -->

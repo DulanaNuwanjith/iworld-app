@@ -68,6 +68,49 @@ class InventoryController extends Controller
         );
     }
 
+    public function sold(Request $request)
+    {
+        // Base query → ONLY sold phones
+        $soldQuery = PhoneInventory::where('status', 1);
+
+        // Filters
+        if ($request->filled('phone_type')) {
+            $soldQuery->where('phone_type', $request->phone_type);
+        }
+
+        if ($request->filled('emi')) {
+            $soldQuery->where('emi', $request->emi);
+        }
+
+        if ($request->filled('supplier')) {
+            $soldQuery->where('supplier', $request->supplier);
+        }
+
+        if ($request->filled('stock_type')) {
+            $soldQuery->where('stock_type', $request->stock_type);
+        }
+
+        if ($request->filled('date')) {
+            $soldQuery->whereDate('date', $request->date);
+        }
+
+        $soldInventories = $soldQuery
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        // Dropdown data (only sold)
+        $phoneTypes = PhoneInventory::where('status', 1)->distinct()->pluck('phone_type');
+        $emis       = PhoneInventory::where('status', 1)->distinct()->pluck('emi');
+        $suppliers  = PhoneInventory::where('status', 1)->distinct()->pluck('supplier');
+        $stockTypes = PhoneInventory::where('status', 1)->distinct()->pluck('stock_type');
+
+        return view(
+            'phone-shop.sold-phone-inventory',
+            compact('soldInventories', 'phoneTypes', 'emis', 'suppliers', 'stockTypes')
+        );
+    }
+
     /**
      * Store newly added phones into inventory.
      */
