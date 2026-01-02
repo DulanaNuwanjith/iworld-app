@@ -91,6 +91,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/repairs/report', [InventoryController::class, 'generateRepairsReport'])
     ->name('repairs.dateRangeReport');
 
+    // routes/web.php
+    Route::get('/reports/sales', [InvoiceController::class, 'salesReportForm'])->name('sales.reportForm');
+    Route::get('/reports/sales/generate', [InvoiceController::class, 'generateSalesReport'])->name('sales.dateRangeReport');
+
+
 });
 
 require __DIR__.'/auth.php';

@@ -32,4 +32,9 @@ class Invoice extends Model
 
     // Dates
     protected $dates = ['created_at', 'updated_at'];
+
+    public function inventory()
+    {
+        return $this->belongsTo(PhoneInventory::class, 'emi', 'emi');
+    }
 }

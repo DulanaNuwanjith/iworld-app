@@ -129,4 +129,38 @@ class InvoiceController extends Controller
         return view('phone-shop.invoice-print', compact('invoice'));
     }
 
+    // Generate Sales Report
+    public function generateSalesReport(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date'   => 'required|date|after_or_equal:start_date',
+        ]);
+
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+
+        // Get invoices in date range with related phone inventory
+        $invoices = Invoice::with('inventory')
+                    ->whereDate('created_at', '>=', $startDate)
+                    ->whereDate('created_at', '<=', $endDate)
+                    ->get();
+
+        // Calculate totals
+        $totalInvoices = $invoices->count();
+        $totalSelling  = $invoices->sum(fn($inv) => $inv->selling_price ?? 0);
+        $totalCost     = $invoices->sum(fn($inv) => $inv->inventory->cost ?? 0);
+        $totalProfit   = $totalSelling - $totalCost;
+
+        return view('report.templates.SalesReportDateRange', [
+            'invoices'     => $invoices,
+            'startDate'    => $startDate,
+            'endDate'      => $endDate,
+            'totalInvoices'=> $totalInvoices,
+            'totalSelling' => $totalSelling,
+            'totalCost'    => $totalCost,
+            'totalProfit'  => $totalProfit,
+        ]);
+    }
+
 }
