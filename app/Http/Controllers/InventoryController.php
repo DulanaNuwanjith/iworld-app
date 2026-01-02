@@ -38,7 +38,7 @@ class InventoryController extends Controller
         }
 
         $inventories = $inventoriesQuery
-            ->latest()
+            ->orderBy('date', 'desc')
             ->paginate(15)
             ->withQueryString();
 

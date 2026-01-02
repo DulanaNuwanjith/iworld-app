@@ -568,27 +568,30 @@
                                                 <td class="px-4 py-2 text-center font-bold">LKR
                                                     {{ number_format($invoice->total_amount, 2) }}</td>
 
-                                                <td class="px-4 py-2 flex justify-center gap-2">
-                                                    <!-- Print Invoice Button -->
-                                                    <button type="button"
-                                                        class="bg-blue-500 h-10 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
-                                                        onclick="printInvoice({{ $invoice->id }})">
-                                                        Print
-                                                    </button>
-
-                                                    <!-- Delete Invoice -->
-                                                    <form id="delete-form-{{ $invoice->id }}"
-                                                        action="{{ route('invoices.destroy', $invoice->id) }}"
-                                                        method="POST">
-                                                        @csrf
-                                                        @method('DELETE')
+                                                <td class="px-4 align-middle">
+                                                    <div class="inline-flex items-center justify-center gap-2">
+                                                        <!-- Print Invoice Button -->
                                                         <button type="button"
-                                                            class="bg-red-600 h-10 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
-                                                            onclick="confirmDelete('{{ $invoice->id }}')">
-                                                            Delete
+                                                            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                                                            onclick="printInvoice({{ $invoice->id }})">
+                                                            Print
                                                         </button>
-                                                    </form>
+
+                                                        <!-- Delete Invoice -->
+                                                        <form id="delete-form-{{ $invoice->id }}"
+                                                            action="{{ route('invoices.destroy', $invoice->id) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="button"
+                                                                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm mt-3"
+                                                                onclick="confirmDelete('{{ $invoice->id }}')">
+                                                                Delete
+                                                            </button>
+                                                        </form>
+                                                    </div>
                                                 </td>
+
                                             </tr>
                                         @empty
                                             <tr>
