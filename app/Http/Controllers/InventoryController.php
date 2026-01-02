@@ -114,16 +114,14 @@ class InventoryController extends Controller
         );
     }
 
-    /**
-     * Store newly added phones into inventory.
-     */
     public function store(Request $request): RedirectResponse
     {
-        // Validate the request
-        $request->validate([
+        // Base rules
+        $rules = [
             'date' => 'required|date',
             'supplier' => 'required|string|max:255',
-            'stock_type' => 'required|string|max:50', // master field
+            'stock_type' => 'required|string|max:50',
+
             'items' => 'required|array|min:1',
             'items.*.phone_type' => 'required|string|max:255',
             'items.*.colour' => 'required|string|max:255',
@@ -131,16 +129,51 @@ class InventoryController extends Controller
             'items.*.emi' => 'required|string|max:255',
             'items.*.cost' => 'required|numeric|min:0',
             'items.*.note' => 'nullable|string|max:255',
-        ]);
+        ];
 
-        $data = $request->all();
+        // ✅ ONLY require images if Exchange
+        if ($request->stock_type === 'Exchange') {
+            $rules['supplier_id_front'] = 'required|image|mimes:jpg,jpeg,png|max:2048';
+            $rules['supplier_id_back']  = 'required|image|mimes:jpg,jpeg,png|max:2048';
+        }
 
-        // Loop through each item and store it
-        foreach ($data['items'] as $item) {
+        $validated = $request->validate($rules);
+
+        // Prepare default paths
+        $supplierIdFrontPath = null;
+        $supplierIdBackPath = null;
+
+        if ($validated['stock_type'] === 'Exchange') {
+
+            // Use first item for naming
+            $firstItem = $validated['items'][0];
+
+            // Clean values for filenames
+            $emi = preg_replace('/\s+/', '_', $firstItem['emi']);
+            $phoneType = preg_replace('/\s+/', '_', $firstItem['phone_type']);
+            $supplier = preg_replace('/\s+/', '_', $validated['supplier']);
+
+            // Extensions
+            $frontExt = $request->file('supplier_id_front')->getClientOriginalExtension();
+            $backExt  = $request->file('supplier_id_back')->getClientOriginalExtension();
+
+            // Custom filenames
+            $frontFileName = "{$emi}-{$phoneType}-{$supplier}-id-front.{$frontExt}";
+            $backFileName  = "{$emi}-{$phoneType}-{$supplier}-id-back.{$backExt}";
+
+            // Store files
+            $supplierIdFrontPath = $request->file('supplier_id_front')
+                ->storeAs('supplier_ids', $frontFileName, 'public');
+
+            $supplierIdBackPath = $request->file('supplier_id_back')
+                ->storeAs('supplier_ids', $backFileName, 'public');
+        }
+
+        foreach ($validated['items'] as $item) {
             PhoneInventory::create([
-                'date' => $data['date'],
-                'supplier' => $data['supplier'],
-                'stock_type' => $data['stock_type'], // use master field
+                'date' => $validated['date'],
+                'supplier' => $validated['supplier'],
+                'stock_type' => $validated['stock_type'],
                 'phone_type' => $item['phone_type'],
                 'colour' => $item['colour'],
                 'capacity' => $item['capacity'],
@@ -148,11 +181,14 @@ class InventoryController extends Controller
                 'cost' => $item['cost'],
                 'note' => $item['note'] ?? null,
                 'status' => 0,
+                'supplier_id_front' => $supplierIdFrontPath,
+                'supplier_id_back' => $supplierIdBackPath,
             ]);
         }
 
         return redirect()->back()->with('success', 'Phones added successfully.');
     }
+
 
     /**
      * Delete a phone inventory item.

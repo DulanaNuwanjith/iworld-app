@@ -348,6 +348,18 @@
                                                         onclick="openExchangeModal('{{ $inventory->id }}', '{{ $inventory->customer_name }}')">
                                                         Return / Exchange
                                                     </button>
+
+                                                    <!-- Previous Owner ID Button (ONLY IF AVAILABLE) -->
+                                                    @if ($inventory->supplier_id_front && $inventory->supplier_id_back)
+                                                        <button
+                                                            class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 mt-2"
+                                                            onclick="openSupplierIdModal(
+            '{{ asset('storage/' . $inventory->supplier_id_front) }}',
+            '{{ asset('storage/' . $inventory->supplier_id_back) }}'
+        )">
+                                                            Previous Owner ID
+                                                        </button>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @empty
@@ -364,6 +376,48 @@
                                 {{ $soldInventories->links() }}
                             </div>
                         </div>
+
+                        <!-- Supplier ID Modal -->
+                        <div id="supplierIdModal"
+                            class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+
+                            <div class="bg-white dark:bg-gray-900 rounded-xl shadow-xl p-6 max-w-2xl w-full relative">
+                                <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white text-center">
+                                    Supplier ID Details
+                                </h2>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-sm text-gray-600 mb-2 text-center">Front Side</p>
+                                        <img id="supplierIdFrontImg" class="w-full h-64 object-contain border rounded">
+                                    </div>
+
+                                    <div>
+                                        <p class="text-sm text-gray-600 mb-2 text-center">Back Side</p>
+                                        <img id="supplierIdBackImg" class="w-full h-64 object-contain border rounded">
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-end mt-6">
+                                    <button onclick="closeSupplierIdModal()"
+                                        class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <script>
+                            function openSupplierIdModal(front, back) {
+                                document.getElementById('supplierIdFrontImg').src = front;
+                                document.getElementById('supplierIdBackImg').src = back;
+                                document.getElementById('supplierIdModal').classList.remove('hidden');
+                            }
+
+                            function closeSupplierIdModal() {
+                                document.getElementById('supplierIdModal').classList.add('hidden');
+                            }
+                        </script>
 
                         <!-- Exchange Modal -->
                         <div id="exchangeModal"

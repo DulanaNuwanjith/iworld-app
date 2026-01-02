@@ -22,6 +22,8 @@ return new class extends Migration
             $table->decimal('cost', 10, 2);            // Cost
             $table->string('note')->nullable();        // Optional note
             $table->string('stock_type')->nullable();  // Optional stock type
+            $table->string('supplier_id_front')->nullable();
+            $table->string('supplier_id_back')->nullable();
             $table->tinyInteger('status')->default(0); // Status: 0 = unsold, 1 = sold
             $table->timestamps();                      // created_at & updated_at
         });

@@ -335,7 +335,7 @@
 
                                         <!-- Unified Form -->
                                         <form id="unifiedOrderForm" action="{{ route('inventory.store') }}"
-                                            method="POST">
+                                            method="POST" enctype="multipart/form-data">
                                             @csrf
 
                                             <div id="itemsContainer"></div>
@@ -400,6 +400,24 @@
                                                 </label>
                                                 <input type="text" name="supplier" required
                                                     class="w-full mt-1 px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                            </div>
+
+                                            <div id="supplierIdUpload" class="mt-3 hidden">
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Upload Supplier ID (Front & Back)
+                                                </label>
+                                                <div class="grid grid-cols-2 gap-4 mt-2">
+                                                    <div>
+                                                        <input type="file" name="supplier_id_front" accept="image/*"
+                                                            class="w-full border rounded-md p-2 dark:bg-gray-700 dark:text-white text-sm">
+                                                        <p class="text-xs text-gray-500 mt-1">Front side</p>
+                                                    </div>
+                                                    <div>
+                                                        <input type="file" name="supplier_id_back" accept="image/*"
+                                                            class="w-full border rounded-md p-2 dark:bg-gray-700 dark:text-white text-sm">
+                                                        <p class="text-xs text-gray-500 mt-1">Back side</p>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <!-- ACTIONS -->
@@ -484,7 +502,18 @@
                                                     {{ $inventory->capacity }}<br>
                                                     <span class="font-semibold">Colour:</span> {{ $inventory->colour }}
                                                 </td>
-                                                <td class="px-4 py-2 text-left">{{ $inventory->supplier }}</td>
+                                                <td class="px-4 py-2 text-left">{{ $inventory->supplier }}<br>
+                                                    @if ($inventory->stock_type === 'Exchange' && $inventory->supplier_id_front)
+                                                        <button
+                                                            onclick="openSupplierIdModal(
+            '{{ asset('storage/' . $inventory->supplier_id_front) }}',
+            '{{ asset('storage/' . $inventory->supplier_id_back) }}'
+        )"
+                                                            class="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600">
+                                                            Supplier ID
+                                                        </button>
+                                                    @endif
+                                                </td>
                                                 <td class="px-4 py-2">{{ $inventory->stock_type }}</td>
                                                 <td class="px-4 py-2 text-center">
                                                     LKR: {{ number_format($inventory->cost, 2) }}
@@ -531,6 +560,51 @@
                             <div class="py-6 flex justify-center">
                                 {{ $inventories->links() }}
                             </div>
+
+                            <!-- Supplier ID Modal -->
+                            <div id="supplierIdModal"
+                                class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+
+                                <div class="bg-white dark:bg-gray-900 rounded-xl shadow-xl p-6 max-w-2xl w-full relative">
+                                    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white text-center">
+                                        Supplier ID Details
+                                    </h2>
+
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <p class="text-sm text-gray-600 mb-2 text-center">Front Side</p>
+                                            <img id="supplierIdFrontImg"
+                                                class="w-full h-64 object-contain border rounded">
+                                        </div>
+
+                                        <div>
+                                            <p class="text-sm text-gray-600 mb-2 text-center">Back Side</p>
+                                            <img id="supplierIdBackImg" class="w-full h-64 object-contain border rounded">
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-end mt-6">
+                                        <button onclick="closeSupplierIdModal()"
+                                            class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <script>
+                                function openSupplierIdModal(frontUrl, backUrl) {
+                                    document.getElementById('supplierIdFrontImg').src = frontUrl;
+                                    document.getElementById('supplierIdBackImg').src = backUrl;
+                                    document.getElementById('supplierIdModal').classList.remove('hidden');
+                                }
+
+                                function closeSupplierIdModal() {
+                                    document.getElementById('supplierIdModal').classList.add('hidden');
+                                    document.getElementById('supplierIdFrontImg').src = '';
+                                    document.getElementById('supplierIdBackImg').src = '';
+                                }
+                            </script>
 
                             <div id="repairModal"
                                 class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
@@ -886,19 +960,35 @@
     <script>
         function toggleDropdownStock(button) {
             const dropdownMenu = button.nextElementSibling;
+            // Hide other dropdowns
             document.querySelectorAll('.dropdown-menu-stock').forEach(menu => {
                 if (menu !== dropdownMenu) menu.classList.add('hidden');
             });
+            // Toggle this dropdown
             dropdownMenu.classList.toggle('hidden');
         }
 
         function selectDropdownStock(button, value) {
             const dropdown = button.closest('.relative');
+            // Update selected text and hidden input
             dropdown.querySelector('.selected-stock').innerText = value;
             dropdown.querySelector('.input-stock').value = value;
+
+            // Hide the dropdown menu
             dropdown.querySelector('.dropdown-menu-stock').classList.add('hidden');
+
+            // Show/hide Supplier ID upload section
+            const supplierIdDiv = document.getElementById('supplierIdUpload');
+            if (value === 'Exchange') {
+                supplierIdDiv.classList.remove('hidden');
+            } else {
+                supplierIdDiv.classList.add('hidden');
+                // Clear file inputs when hiding
+                supplierIdDiv.querySelectorAll('input[type="file"]').forEach(input => input.value = '');
+            }
         }
     </script>
+
     <script>
         function openRepairModal(inventoryId) {
             const modal = document.getElementById('repairModal');

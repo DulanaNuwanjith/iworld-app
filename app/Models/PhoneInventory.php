@@ -25,6 +25,8 @@ class PhoneInventory extends Model
         'note',
         'stock_type',
         'status',
+        'supplier_id_front',
+        'supplier_id_back',
     ];
 
     // Field type casting
@@ -32,6 +34,8 @@ class PhoneInventory extends Model
         'date' => 'date',
         'cost' => 'decimal:2',
         'emi' => 'string',
+        'supplier_id_front' => 'string',
+        'supplier_id_back' => 'string', 
     ];
 
     public function repairs()
