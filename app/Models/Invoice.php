@@ -25,6 +25,7 @@ class Invoice extends Model
         'charger',
         'data_cable',
         'hand_free',
+        'cam_glass',
         'airpods',
         'power_bank',
         'total_amount',

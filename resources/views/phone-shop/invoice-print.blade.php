@@ -146,6 +146,13 @@
                                 </td>
                             </tr>
                         @endif
+                        @if ($invoice->cam_glass > 0)
+                            <tr>
+                                <td class="border px-3 py-2">Camera Glass</td>
+                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->cam_glass, 2) }}
+                                </td>
+                            </tr>
+                        @endif
                         @if ($invoice->airpods > 0)
                             <tr>
                                 <td class="border px-3 py-2">AirPods</td>

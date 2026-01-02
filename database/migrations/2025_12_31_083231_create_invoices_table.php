@@ -32,6 +32,7 @@ return new class extends Migration
             $table->decimal('charger', 10, 2)->nullable();
             $table->decimal('data_cable', 10, 2)->nullable();
             $table->decimal('hand_free', 10, 2)->nullable();
+            $table->decimal('cam_glass', 10, 2)->nullable();
             $table->decimal('airpods', 10, 2)->nullable();
             $table->decimal('power_bank', 10, 2)->nullable();
 

@@ -62,6 +62,7 @@ class InvoiceController extends Controller
             'back_cover' => 'nullable|numeric|min:0',
             'charger' => 'nullable|numeric|min:0',
             'data_cable' => 'nullable|numeric|min:0',
+            'cam_glass' => 'nullable|numeric|min:0',
             'hand_free' => 'nullable|numeric|min:0',
             'airpods' => 'nullable|numeric|min:0',
             'power_bank' => 'nullable|numeric|min:0',
@@ -99,6 +100,7 @@ class InvoiceController extends Controller
             ($invoice->charger ?? 0) +
             ($invoice->data_cable ?? 0) +
             ($invoice->hand_free ?? 0) +
+            ($invoice->cam_glass ?? 0) +
             ($invoice->airpods ?? 0) +
             ($invoice->power_bank ?? 0)
         );
