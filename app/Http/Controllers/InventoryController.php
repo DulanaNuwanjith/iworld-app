@@ -287,5 +287,36 @@ class InventoryController extends Controller
         return redirect()->back()->with('success', 'Phone returned to inventory successfully!');
     }
 
+    // Show the form to select date range
+    public function generateRepairsReport(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date'   => 'required|date|after_or_equal:start_date',
+        ]);
+
+        $startDate = $request->start_date;
+        $endDate   = $request->end_date;
+
+        // Fetch repairs in date range
+        $repairs = PhoneRepair::with('inventory')
+            ->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $totalRepairs = $repairs->count();
+        $totalRepairCost = $repairs->sum('repair_cost');
+
+        return view('report.templates.RepairReportDateRange', compact(
+            'repairs',
+            'totalRepairs',
+            'totalRepairCost',
+            'startDate',
+            'endDate'
+        ));
+    }
+
+    
+
 
 }

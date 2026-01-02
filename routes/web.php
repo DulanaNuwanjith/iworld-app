@@ -82,6 +82,15 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/inventory/exchange', [InventoryController::class, 'exchange'])->name('inventory.exchange');
 
+    // Phone shop Report page
+    Route::get('phoneShopReport', function () {
+        return view('report.phoneShopReport');
+    })->name('phoneShopReport.index');
+
+    // Repair report route
+    Route::get('/repairs/report', [InventoryController::class, 'generateRepairsReport'])
+    ->name('repairs.dateRangeReport');
+
 });
 
 require __DIR__.'/auth.php';

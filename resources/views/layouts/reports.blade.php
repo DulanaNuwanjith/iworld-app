@@ -21,10 +21,12 @@
                     class="pb-2 px-3 font-semibold {{ request()->routeIs('financeReport.index') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
                     Finance Reports
                 </a>
-                {{-- <a href="{{ route('production-reports.index') }}"
-                    class="pb-2 px-3 font-semibold {{ request()->routeIs('production-reports.*') ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600' }}">
-                    Production Reports
-                </a> --}}
+
+                <a href="{{ route('phoneShopReport.index') }}"
+                    class="pb-2 px-3 font-semibold {{ request()->routeIs('phoneShopReport.index') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
+                    Phone-shop Reports
+                </a>
+                
             </div>
 
             <!-- ✅ PAGE CONTENT -->
