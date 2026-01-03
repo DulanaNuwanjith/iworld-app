@@ -385,12 +385,13 @@
                                     </h1>
 
                                     <div class="flex space-x-3">
-
-                                        <button
-                                            onclick="document.getElementById('addFinanceModal').classList.remove('hidden')"
-                                            class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded shadow">
-                                            + Add Finance Order
-                                        </button>
+                                        @if (auth()->user()->hasRole(['ADMIN', 'SUPERADMIN', 'FINANCECOORDINATOR']))
+                                            <button
+                                                onclick="document.getElementById('addFinanceModal').classList.remove('hidden')"
+                                                class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded shadow">
+                                                + Add Finance Order
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -630,10 +631,12 @@
                                                     </div>
 
                                                     <div class="flex justify-center mt-3">
-                                                        <button onclick="openModal({{ $order->id }})"
-                                                            class="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600">
-                                                            Payment Details
-                                                        </button>
+                                                        @if (auth()->user()->hasRole(['ADMIN', 'SUPERADMIN', 'FINANCECOORDINATOR']))
+                                                            <button onclick="openModal({{ $order->id }})"
+                                                                class="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600">
+                                                                Payment Details
+                                                            </button>
+                                                        @endif
                                                     </div>
                                                 </td>
 

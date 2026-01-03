@@ -91,7 +91,7 @@
                 <!-- Inventory (SUPERADMIN, ADMIN, PHONESHOPOPERATOR) -->
                 @if (auth()->user()->hasRole(['SUPERADMIN', 'ADMIN', 'PHONESHOPOPERATOR']))
                     <li>
-                        <a href="{{ route('inventory.index') }}"
+                        <a href="{{ route('inventory.sold') }}"
                             class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('inventory.*') ? 'bg-gray-200' : '' }}">
                             <img src="{{ asset('images/iphone.png') }}" class="w-6 h-6 mr-5" />
                             <span x-show="initialized && !collapsed">Inventory</span>

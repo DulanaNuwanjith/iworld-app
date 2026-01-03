@@ -464,8 +464,8 @@
                                                     <input type="number" name="hand_free" placeholder="Hand free price"
                                                         min="0"
                                                         class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
-                                                    <input type="number" name="cam_glass" placeholder="Camera glass price"
-                                                        min="0"
+                                                    <input type="number" name="cam_glass"
+                                                        placeholder="Camera glass price" min="0"
                                                         class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
                                                     <input type="number" name="airpods" placeholder="AirPods price"
                                                         min="0"
@@ -671,20 +671,22 @@
                                                         </button>
 
                                                         <!-- Delete Invoice -->
-                                                        <form id="delete-form-{{ $invoice->id }}"
-                                                            action="{{ route('invoices.destroy', $invoice->id) }}"
-                                                            method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="button"
-                                                                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm mt-3"
-                                                                onclick="confirmDelete('{{ $invoice->id }}')">
-                                                                Delete
-                                                            </button>
-                                                        </form>
+                                                        @if (auth()->user()->hasRole('SUPERADMIN'))
+                                                            <form id="delete-form-{{ $invoice->id }}"
+                                                                action="{{ route('invoices.destroy', $invoice->id) }}"
+                                                                method="POST">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="button"
+                                                                    class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm mt-3"
+                                                                    onclick="confirmDelete('{{ $invoice->id }}')">
+                                                                    Delete
+                                                                </button>
+                                                            </form>
+                                                        @endif
+
                                                     </div>
                                                 </td>
-
                                             </tr>
                                         @empty
                                             <tr>
