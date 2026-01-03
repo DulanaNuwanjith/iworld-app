@@ -24,9 +24,16 @@
     </script>
 
     <!-- Sidebar -->
-    <aside x-data="{ collapsed: window.__initialCollapsed, initialized: false }" x-init="initialized = true" :class="collapsed ? 'w-20' : 'w-72'"
-        class="relative bg-gradient-to-b from-gray-700 to-white min-h-screen shadow-md flex flex-col transition-all duration-300"
-        style="width: var(--sidebar-width);">
+    <aside x-data="{ collapsed: window.__initialCollapsed, initialized: false, open: false }" x-init="initialized = true"
+        :class="[
+            collapsed ? 'md:w-20 scroll-hidden' : 'md:w-72 overflow-y-auto scroll-hidden',
+            { '-translate-x-full': !open, 'translate-x-0': open }
+        ]"
+        style="width: var(--sidebar-width);"
+        class="fixed md:relative z-40 inset-y-0 left-0 transform md:translate-x-0
+           transition-transform duration-300 ease-in-out
+           bg-gradient-to-b from-gray-700 to-white sidebar-bg
+           shadow-md flex flex-col min-h-screen">
 
         <!-- Toggle Button -->
         <div class="flex justify-end p-6">
@@ -48,79 +55,101 @@
             </a>
         </div>
 
-        <!-- Navigation -->
+        <!-- Sidebar Navigation -->
         <nav class="flex flex-col justify-between flex-1 p-3 text-base font-bold text-gray-900" x-cloak>
+
             <!-- Menu Items -->
             <ul class="space-y-2">
+
+                <!-- Title -->
                 <li>
                     <a x-show="initialized && !collapsed" class="flex items-center bg-white px-4 py-2 rounded">
                         <span>Money Junction Iworld</span>
                     </a>
                 </li>
 
+                <!-- Dashboard (Everyone) -->
                 <li>
                     <a href="{{ route('dashboard') }}"
                         class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('dashboard') ? 'bg-gray-200' : '' }}">
-                        <img src="{{ asset('images/statisctics.png') }}" alt="Dashboard" class="w-6 h-6 mr-5" />
+                        <img src="{{ asset('images/statisctics.png') }}" class="w-6 h-6 mr-5" />
                         <span x-show="initialized && !collapsed">Dashboard</span>
                     </a>
                 </li>
 
-                <li>
-                    <a href="{{ route('invoices.index') }}"
-                        class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('invoices.*') ? 'bg-gray-200' : '' }}">
-                        <img src="{{ asset('images/invoice.png') }}" alt="" class="w-6 h-6 mr-5" />
-                        <span x-show="initialized && !collapsed">Invoice</span>
-                    </a>
-                </li>
+                <!-- Invoice (SUPERADMIN, ADMIN, PHONESHOPOPERATOR) -->
+                @if (auth()->user()->hasRole(['SUPERADMIN', 'ADMIN', 'PHONESHOPOPERATOR']))
+                    <li>
+                        <a href="{{ route('invoices.index') }}"
+                            class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('invoices.*') ? 'bg-gray-200' : '' }}">
+                            <img src="{{ asset('images/invoice.png') }}" class="w-6 h-6 mr-5" />
+                            <span x-show="initialized && !collapsed">Invoice</span>
+                        </a>
+                    </li>
+                @endif
 
-                <li>
-                    <a href="{{ route('inventory.index') }}"
-                        class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('inventory.*') ? 'bg-gray-200' : '' }}">
-                        <img src="{{ asset('images/iphone.png') }}" alt="" class="w-6 h-6 mr-5" />
-                        <span x-show="initialized && !collapsed">Inventory</span>
-                    </a>
-                </li>
+                <!-- Inventory (SUPERADMIN, ADMIN, PHONESHOPOPERATOR) -->
+                @if (auth()->user()->hasRole(['SUPERADMIN', 'ADMIN', 'PHONESHOPOPERATOR']))
+                    <li>
+                        <a href="{{ route('inventory.index') }}"
+                            class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('inventory.*') ? 'bg-gray-200' : '' }}">
+                            <img src="{{ asset('images/iphone.png') }}" class="w-6 h-6 mr-5" />
+                            <span x-show="initialized && !collapsed">Inventory</span>
+                        </a>
+                    </li>
+                @endif
 
-                <li>
-                    <a href="{{ route('finance.index') }}"
-                        class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('finance.*') ? 'bg-gray-200' : '' }}">
-                        <img src="{{ asset('images/acquisition.png') }}" alt="" class="w-6 h-6 mr-5" />
-                        <span x-show="initialized && !collapsed">Finance PLC</span>
-                    </a>
-                </li>
+                <!-- Finance PLC (SUPERADMIN, ADMIN, FINANCECOORDINATOR, FINANCEMONITOR) -->
+                @if (auth()->user()->hasRole(['SUPERADMIN', 'ADMIN', 'FINANCECOORDINATOR', 'FINANCEMONITOR']))
+                    <li>
+                        <a href="{{ route('finance.index') }}"
+                            class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('finance.*') ? 'bg-gray-200' : '' }}">
+                            <img src="{{ asset('images/acquisition.png') }}" class="w-6 h-6 mr-5" />
+                            <span x-show="initialized && !collapsed">Finance PLC</span>
+                        </a>
+                    </li>
+                @endif
 
-                <li>
-                    <a href="{{ route('phoneShopReport.index') }}"
-                        class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('financeReport.*','phoneShopReport.*') ? 'bg-gray-200' : '' }}">
-                        <img src="{{ asset('images/report.png') }}" alt="" class="w-6 h-6 mr-5" />
-                        <span x-show="initialized && !collapsed">Reports</span>
-                    </a>
-                </li>
+                <!-- Reports (SUPERADMIN, ADMIN) -->
+                @if (auth()->user()->hasRole(['SUPERADMIN', 'ADMIN']))
+                    <li>
+                        <a href="{{ route('phoneShopReport.index') }}"
+                            class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('financeReport.*', 'phoneShopReport.*') ? 'bg-gray-200' : '' }}">
+                            <img src="{{ asset('images/report.png') }}" class="w-6 h-6 mr-5" />
+                            <span x-show="initialized && !collapsed">Reports</span>
+                        </a>
+                    </li>
+                @endif
+
             </ul>
 
             <!-- Profile & Logout -->
             <ul class="space-y-2 border-t pt-4 mt-4">
+
+                <!-- Profile (Everyone) -->
                 <li>
                     <a href="{{ route('profile.show') }}"
-                        class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('profile.edit') ? 'bg-gray-200' : '' }}">
-                        <img src="{{ asset('images/employee.png') }}" alt="Profile Icon" class="w-6 h-6 mr-5" />
+                        class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('profile.*') ? 'bg-gray-200' : '' }}">
+                        <img src="{{ asset('images/employee.png') }}" class="w-6 h-6 mr-5" />
                         <span x-show="initialized && !collapsed">Profile</span>
                     </a>
                 </li>
 
+                <!-- Logout (Everyone) -->
                 <li>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
-                            class="w-full flex items-center px-4 py-2 rounded hover:bg-gray-200 text-left text-gray-900">
-                            <img src="{{ asset('images/close.png') }}" alt="Logout Icon" class="w-6 h-6 mr-5" />
+                            class="w-full flex items-center px-4 py-2 rounded hover:bg-gray-200 text-left">
+                            <img src="{{ asset('images/close.png') }}" class="w-6 h-6 mr-5" />
                             <span x-show="initialized && !collapsed">Logout</span>
                         </button>
                     </form>
                 </li>
+
             </ul>
         </nav>
+
     </aside>
 
 </body>

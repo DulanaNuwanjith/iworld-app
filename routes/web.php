@@ -11,10 +11,6 @@ Route::get('/', function () {
     return view('auth.login');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
 Route::middleware('auth')->group(function () {
 
     // Finance pages
@@ -34,7 +30,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/finance/nearest-payments', [FinanceOrderController::class, 'nearestPayments'])->name('finance.nearestPayments');
 
     // Finance Dashboard
-    Route::get('/dashboard', [FinanceDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [FinanceDashboardController::class, 'index'])
+        ->name('dashboard');
     // Daily Finance Report web view
     Route::get('/finance/daily-report', [FinanceOrderController::class, 'dailyReport'])
         ->name('finance.dailyReport');

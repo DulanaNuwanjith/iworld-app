@@ -65,4 +65,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function hasRole(array|string $roles): bool
+    {
+        return in_array($this->role, (array) $roles);
+    }
 }

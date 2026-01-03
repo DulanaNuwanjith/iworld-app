@@ -29,6 +29,8 @@
                     <option value="ADMIN">Admin</option>
                     <option value="SUPERADMIN">Super Admin</option>
                     <option value="FINANCECOORDINATOR">Finance Coordinator</option>
+                    <option value="FINANCEMONITOR">Finance Monitor</option>
+                    <option value="PHONESHOPOPERATOR">Phone Shop Operator</option>
                 </select>
             </div>
 

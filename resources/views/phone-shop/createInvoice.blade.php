@@ -643,6 +643,10 @@
                                                         <span class="font-semibold">Hand Free:</span> LKR
                                                         {{ number_format($invoice->hand_free, 2) }}<br>
                                                     @endif
+                                                    @if ($invoice->cam_glass > 0)
+                                                        <span class="font-semibold">Camera Glass:</span> LKR
+                                                        {{ number_format($invoice->cam_glass, 2) }}<br>
+                                                    @endif
                                                     @if ($invoice->airpods > 0)
                                                         <span class="font-semibold">AirPods:</span> LKR
                                                         {{ number_format($invoice->airpods, 2) }}<br>
