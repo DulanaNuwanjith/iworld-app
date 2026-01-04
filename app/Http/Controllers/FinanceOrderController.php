@@ -440,4 +440,44 @@ class FinanceOrderController extends Controller
         ));
     }
 
+    public function settledPayments(Request $request)
+    {
+        $query = FinanceOrder::where('remaining_amount', 0);
+
+        // Filters
+        if ($request->filled('order_number')) {
+            $query->where('order_number', $request->order_number);
+        }
+
+        if ($request->filled('buyer_name')) {
+            $query->where('buyer_name', 'like', '%' . $request->buyer_name . '%');
+        }
+
+        if ($request->filled('buyer_id')) {
+            $query->where('buyer_id', 'like', '%' . $request->buyer_id . '%');
+        }
+
+        $financeOrders = $query
+            ->orderBy('item_created_date', 'desc')
+            ->paginate(15)
+            ->withQueryString();
+
+        // Dropdown data (same as Finance tab)
+        $orderNumbers = FinanceOrder::where('remaining_amount', 0)
+            ->select('order_number')->distinct()->pluck('order_number');
+
+        $buyerNames = FinanceOrder::where('remaining_amount', 0)
+            ->select('buyer_name')->distinct()->pluck('buyer_name');
+
+        $buyerIds = FinanceOrder::where('remaining_amount', 0)
+            ->select('buyer_id')->distinct()->pluck('buyer_id');
+
+        return view('finance-plc.settledPayments', compact(
+            'financeOrders',
+            'orderNumbers',
+            'buyerNames',
+            'buyerIds'
+        ));
+    }
+
 }
