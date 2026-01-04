@@ -30,6 +30,13 @@
        {{ request()->routeIs('finance.nearestPayments') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
                     Nearest Expected Payments
                 </a>
+
+                {{-- Settled Payments Tab --}}
+                <a href="{{ route('settledPayments.index') }}"
+                    class="pb-2 px-3 font-semibold 
+       {{ request()->routeIs('settledPayments.index') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
+                    Settled Payments
+                </a>
             </div>
 
             <!-- ✅ PAGE CONTENT -->

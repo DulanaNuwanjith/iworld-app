@@ -65,6 +65,11 @@ Route::middleware(['auth'])->group(function () {
 
         Route::delete('/finance/{id}', [FinanceOrderController::class, 'destroy'])
             ->name('finance.destroy');
+
+        // Settled Payments Route
+        Route::get('/settledPayments', function () {
+            return view('finance-plc.settledPayments');
+        })->name('settledPayments.index');
     });
 
     /*
