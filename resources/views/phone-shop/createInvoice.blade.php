@@ -492,12 +492,12 @@
                                     <div
                                         class="px-8 py-4 bg-gray-50 dark:bg-gray-800 border-t dark:border-gray-700 flex justify-end gap-4">
                                         <button type="button" onclick="closeInvoiceModal()"
-                                            class="px-6 py-3 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded hover:bg-gray-300">
+                                            class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-3000">
                                             Cancel
                                         </button>
-                                        <button type="submit"
-                                            class="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-semibold">
-                                            Save Invoice
+                                        <button type="submit" id="createInvoiceBtn"
+                                            class="px-4 py-2 bg-gray-500 text-white text-sm rounded hover:bg-gray-600">
+                                            Create Invoice
                                         </button>
                                     </div>
 
@@ -724,8 +724,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const form = document.querySelector('#addPhoneModal form');
-            const submitBtn = document.getElementById('createPhoneBtn');
+            const form = document.querySelector('#createInvoiceModal form');
+            const submitBtn = document.getElementById('createInvoiceBtn');
 
             form.addEventListener('submit', function() {
                 submitBtn.disabled = true;
