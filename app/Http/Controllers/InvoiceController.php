@@ -40,13 +40,20 @@ class InvoiceController extends Controller
             ->where('status', 0) // optional: only available phones
             ->get();
 
+        // Add Exchange phones
+        $exchangePhones = PhoneInventory::select('emi','phone_type','colour','capacity','cost')
+            ->where('stock_type', 'Exchange')
+            ->where('status', 0) 
+            ->get();
+
         return view('phone-shop.createInvoice', compact(
             'invoices',
             'allInvoiceNumbers',
             'allCustomerNames',
             'filterEmis',
             'filterPhoneTypes',
-            'addInvoiceEmis'
+            'addInvoiceEmis',
+            'exchangePhones'
         ));
     }
 
@@ -57,7 +64,7 @@ class InvoiceController extends Controller
             'customer_phone' => 'required|string|max:50',
             'customer_address' => 'nullable|string|max:500',
             'emi' => 'required|string|exists:phone_inventories,emi',
-            'selling_price' => 'nullable|numeric|min:0',
+            'selling_price' => 'required|numeric|min:0',
             'tempered' => 'nullable|numeric|min:0',
             'back_cover' => 'nullable|numeric|min:0',
             'charger' => 'nullable|numeric|min:0',
@@ -66,11 +73,22 @@ class InvoiceController extends Controller
             'hand_free' => 'nullable|numeric|min:0',
             'airpods' => 'nullable|numeric|min:0',
             'power_bank' => 'nullable|numeric|min:0',
+            'isExchange' => 'sometimes|boolean',
+            'exchange_emi' => 'nullable|string|exists:phone_inventories,emi',
+            'exchange_phone_type' => 'nullable|string|max:255',
+            'exchange_colour' => 'nullable|string|max:255',
+            'exchange_capacity' => 'nullable|string|max:255',
+            'exchange_cost' => 'nullable|numeric|min:0',
         ]);
 
-        $invoice = new Invoice($request->all());
+        // Only assign fillable fields
+        $invoice = new Invoice($request->only([
+            'customer_name', 'customer_phone', 'customer_address',
+            'emi', 'selling_price', 'tempered', 'back_cover', 'charger',
+            'data_cable', 'cam_glass', 'hand_free', 'airpods', 'power_bank'
+        ]));
 
-        // Fill phone details
+        // Assign phone details
         $phone = PhoneInventory::where('emi', $request->emi)->first();
         if ($phone) {
             $invoice->phone_type = $phone->phone_type;
@@ -78,36 +96,41 @@ class InvoiceController extends Controller
             $invoice->capacity = $phone->capacity;
         }
 
-        // Generate unique invoice number (INV-GAM-00001, 00002, ...)
+        // Assign exchange phone if selected
+        if ((bool)$request->isExchange && $request->exchange_emi) {
+            $invoice->exchange_emi = $request->exchange_emi;
+            $invoice->exchange_phone_type = $request->exchange_phone_type;
+            $invoice->exchange_colour = $request->exchange_colour;
+            $invoice->exchange_capacity = $request->exchange_capacity;
+            $invoice->exchange_cost = $request->exchange_cost;
+        }
+
+        // Generate invoice number
         $lastInvoiceNumber = Invoice::where('invoice_number', 'like', 'INV-GAM-%')
             ->orderBy('id', 'desc')
             ->value('invoice_number');
 
-        if ($lastInvoiceNumber) {
-            $lastNumber = (int)substr($lastInvoiceNumber, 8); // get numeric part
-            $nextNumber = $lastNumber + 1;
-        } else {
-            $nextNumber = 1;
-        }
-
+        $nextNumber = $lastInvoiceNumber ? (int)substr($lastInvoiceNumber, 8) + 1 : 1;
         $invoice->invoice_number = 'INV-GAM-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
-        // Calculate total amount
-        $invoice->total_amount = (
-            ($invoice->selling_price ?? 0) +
-            ($invoice->tempered ?? 0) +
-            ($invoice->back_cover ?? 0) +
-            ($invoice->charger ?? 0) +
-            ($invoice->data_cable ?? 0) +
-            ($invoice->hand_free ?? 0) +
-            ($invoice->cam_glass ?? 0) +
-            ($invoice->airpods ?? 0) +
-            ($invoice->power_bank ?? 0)
-        );
+        // Calculate total
+        $total = ($invoice->selling_price ?? 0) +
+                ($invoice->tempered ?? 0) +
+                ($invoice->back_cover ?? 0) +
+                ($invoice->charger ?? 0) +
+                ($invoice->data_cable ?? 0) +
+                ($invoice->hand_free ?? 0) +
+                ($invoice->cam_glass ?? 0) +
+                ($invoice->airpods ?? 0) +
+                ($invoice->power_bank ?? 0);
+
+        if ($invoice->exchange_cost) $total -= floatval($invoice->exchange_cost);
+
+        $invoice->total_amount = $total;
 
         $invoice->save();
 
-        // Update phone status to 1
+        // Update phone status
         if ($phone) {
             $phone->status = 1;
             $phone->save();
