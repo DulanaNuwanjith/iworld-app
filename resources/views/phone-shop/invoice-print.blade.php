@@ -10,7 +10,6 @@
         @page {
             size: A4;
             margin: 0;
-            /* We'll handle margin in container */
         }
 
         body {
@@ -54,7 +53,6 @@
         <div class="content">
             <!-- Header -->
             <div class="flex justify-between items-center mb-6 border-b pb-4">
-                <!-- Logo -->
                 <div class="w-72">
                     <img src="{{ asset('images/logo.png') }}" alt="Iworld Logo" class="w-full h-auto">
                 </div>
@@ -79,19 +77,28 @@
             </div>
 
             <!-- Customer & Phone Details -->
-            <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-                <div>
+            <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                <div class="break-words">
                     <h4 class="text-gray-800 font-semibold mb-2 border-b pb-1">Customer Details</h4>
                     <p><strong>Name:</strong> {{ $invoice->customer_name }}</p>
                     <p><strong>Phone:</strong> {{ $invoice->customer_phone }}</p>
                     <p><strong>Address:</strong> {{ $invoice->customer_address ?? '-' }}</p>
                 </div>
-                <div>
+                <div class="break-words">
                     <h4 class="text-gray-800 font-semibold mb-2 border-b pb-1">Phone Details</h4>
                     <p><strong>EMI:</strong> {{ $invoice->emi }}</p>
                     <p><strong>Model:</strong> {{ $invoice->phone_type }}</p>
                     <p><strong>Capacity:</strong> {{ $invoice->capacity }}</p>
                     <p><strong>Colour:</strong> {{ $invoice->colour }}</p>
+                </div>
+                <div class="break-words">
+                    @if ($invoice->exchange_emi)
+                        <h4 class="text-gray-800 font-semibold mb-2 border-b pb-1">Exchanged Phone</h4>
+                        <p><strong>EMI:</strong> {{ $invoice->exchange_emi }}</p>
+                        <p><strong>Model:</strong> {{ $invoice->exchange_phone_type }}</p>
+                        <p><strong>Capacity:</strong> {{ $invoice->exchange_capacity }}</p>
+                        <p><strong>Colour:</strong> {{ $invoice->exchange_colour }}</p>
+                    @endif
                 </div>
             </div>
 
@@ -106,6 +113,19 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            $customerPay =
+                                $invoice->selling_price +
+                                $invoice->tempered +
+                                $invoice->back_cover +
+                                $invoice->charger +
+                                $invoice->data_cable +
+                                $invoice->hand_free +
+                                $invoice->cam_glass +
+                                $invoice->airpods +
+                                $invoice->power_bank;
+                        @endphp
+
                         @if ($invoice->selling_price > 0)
                             <tr>
                                 <td class="border px-3 py-2">Phone Price</td>
@@ -113,6 +133,7 @@
                                 </td>
                             </tr>
                         @endif
+
                         @if ($invoice->tempered > 0)
                             <tr>
                                 <td class="border px-3 py-2">Tempered</td>
@@ -166,12 +187,22 @@
                                 </td>
                             </tr>
                         @endif
+
+                        @if ($invoice->exchange_emi)
+                            <tr class="bg-red-100">
+                                <td class="border px-3 py-2 font-semibold text-red-700">Exchanged Phone Deduction</td>
+                                <td class="border px-3 py-2 text-right text-red-700">-
+                                    {{ number_format($invoice->exchange_cost, 2) }}</td>
+                            </tr>
+                            @php
+                                $customerPay -= $invoice->exchange_cost;
+                            @endphp
+                        @endif
                     </tbody>
                     <tfoot>
                         <tr class="bg-gray-100 font-bold">
-                            <td class="border px-3 py-2 text-right">Total</td>
-                            <td class="border px-3 py-2 text-right">LKR {{ number_format($invoice->total_amount, 2) }}
-                            </td>
+                            <td class="border px-3 py-2 text-right">Total Amount to Pay</td>
+                            <td class="border px-3 py-2 text-right">LKR {{ number_format($customerPay, 2) }}</td>
                         </tr>
                     </tfoot>
                 </table>

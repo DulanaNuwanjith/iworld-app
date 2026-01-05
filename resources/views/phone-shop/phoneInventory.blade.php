@@ -371,11 +371,12 @@
                                                                 role="listbox" tabindex="-1">
                                                                 <button type="button"
                                                                     class="dropdown-option w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
-                                                                    onclick="selectDropdownStock(this, 'Exchange')">Exchange</button>
+                                                                    onclick="selectDropdownStock(this, 'Direct Import Used')">Direct
+                                                                    Import Used</button>
                                                                 <button type="button"
                                                                     class="dropdown-option w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
-                                                                    onclick="selectDropdownStock(this, 'Direct Import')">Direct
-                                                                    Import</button>
+                                                                    onclick="selectDropdownStock(this, 'Direct Import Brand New')">Direct
+                                                                    Import Brand New</button>
                                                             </div>
                                                         </div>
 
@@ -400,24 +401,6 @@
                                                 </label>
                                                 <input type="text" name="supplier" required
                                                     class="w-full mt-1 px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white text-sm">
-                                            </div>
-
-                                            <div id="supplierIdUpload" class="mt-3 hidden">
-                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                    Upload Supplier ID (Front & Back)
-                                                </label>
-                                                <div class="grid grid-cols-2 gap-4 mt-2">
-                                                    <div>
-                                                        <input type="file" name="supplier_id_front" accept="image/*"
-                                                            class="w-full border rounded-md p-2 dark:bg-gray-700 dark:text-white text-sm">
-                                                        <p class="text-xs text-gray-500 mt-1">Front side</p>
-                                                    </div>
-                                                    <div>
-                                                        <input type="file" name="supplier_id_back" accept="image/*"
-                                                            class="w-full border rounded-md p-2 dark:bg-gray-700 dark:text-white text-sm">
-                                                        <p class="text-xs text-gray-500 mt-1">Back side</p>
-                                                    </div>
-                                                </div>
                                             </div>
 
                                             <!-- ACTIONS -->
@@ -927,6 +910,30 @@
             Array.from(container.querySelectorAll('.dropdown-option')).forEach(option => {
                 option.style.display = option.innerText.toLowerCase().includes(filter) ? '' : 'none';
             });
+        }
+    </script>
+
+    <script>
+        function toggleDropdownStock(button) {
+            const dropdownMenu = button.nextElementSibling;
+
+            // Hide other dropdowns
+            document.querySelectorAll('.dropdown-menu-stock').forEach(menu => {
+                if (menu !== dropdownMenu) menu.classList.add('hidden');
+            });
+
+            dropdownMenu.classList.toggle('hidden');
+        }
+
+        function selectDropdownStock(button, value) {
+            const dropdown = button.closest('.relative');
+
+            // Update selected text and hidden input
+            dropdown.querySelector('.selected-stock').innerText = value;
+            dropdown.querySelector('.input-stock').value = value;
+
+            // Hide the dropdown menu
+            dropdown.querySelector('.dropdown-menu-stock').classList.add('hidden');
         }
     </script>
 

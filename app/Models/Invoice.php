@@ -29,6 +29,15 @@ class Invoice extends Model
         'airpods',
         'power_bank',
         'total_amount',
+        'exchange_emi',
+        'exchange_phone_type',
+        'exchange_colour',
+        'exchange_capacity',
+        'exchange_cost',
+    ];
+
+    protected $attributes = [
+        'selling_price' => 0,
     ];
 
     // Dates

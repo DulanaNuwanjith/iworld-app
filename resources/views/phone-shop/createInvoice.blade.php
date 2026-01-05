@@ -219,7 +219,7 @@
                                     </div>
 
                                     {{-- EMI --}}
-                                    <div class="relative inline-block text-left w-48">
+                                    <div class="relative inline-block text-left w-56">
                                         <label class="block text-sm font-medium text-gray-700 mb-1">EMI</label>
                                         <input type="hidden" name="emi" id="emiInput" value="{{ request('emi') }}">
                                         <button type="button"
@@ -300,12 +300,111 @@
                                     </h1>
 
                                     <div class="flex space-x-3">
-
+                                        <button
+                                            onclick="document.getElementById('addExchangePhoneModal').classList.remove('hidden')"
+                                            class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded shadow">
+                                            + Add Exchange Phone
+                                        </button>
                                         <button
                                             onclick="document.getElementById('createInvoiceModal').classList.remove('hidden')"
                                             class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded shadow">
                                             + Add Invoice
                                         </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Add Exchange Phone Stock Modal -->
+                            <div id="addExchangePhoneModal"
+                                class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center py-5">
+                                <div class="w-full max-w-[700px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-4 transform transition-all scale-95 max-h-[calc(100vh-10rem)] overflow-y-auto"
+                                    onclick="event.stopPropagation()">
+                                    <div class="max-w-[600px] mx-auto p-8">
+
+                                        <h2 class="text-2xl font-semibold mb-8 text-gray-900 mt-4 text-center">
+                                            Add Phone Stock
+                                        </h2>
+
+                                        <!-- Unified Form -->
+                                        <form id="unifiedOrderForm" action="{{ route('inventory.store') }}"
+                                            method="POST" enctype="multipart/form-data">
+                                            @csrf
+
+                                            <div id="itemsContainer"></div>
+
+                                            <button type="button" id="addItemBtn"
+                                                class="mt-4 px-4 py-2 bg-green-500 text-white rounded text-sm">
+                                                + Add Phone
+                                            </button>
+
+                                            <!-- MASTER FIELDS -->
+                                            <div class="grid grid-cols-2 gap-4 mt-3">
+                                                <div class="mt-6">
+                                                    <label
+                                                        class="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-300">
+                                                        Stock Type
+                                                    </label>
+                                                    <!-- Stock Type (Fixed) -->
+                                                    <div class="mt-1">
+                                                        <div
+                                                            class="w-full rounded-md bg-gray-100 dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white ring-1 ring-gray-300">
+                                                            Exchange
+                                                        </div>
+
+                                                        <input type="hidden" name="stock_type" value="Exchange">
+                                                    </div>
+                                                </div>
+
+                                                <div class="mt-6">
+                                                    <label
+                                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                        Date
+                                                    </label>
+                                                    <input type="date" name="date" required
+                                                        class="w-full mt-1 px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                                </div>
+                                            </div>
+
+                                            <div class="mt-3">
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Supplier
+                                                </label>
+                                                <input type="text" name="supplier" required
+                                                    class="w-full mt-1 px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white text-sm">
+                                            </div>
+
+                                            <div id="supplierIdUpload" class="mt-3">
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Upload Supplier ID (Front & Back)
+                                                </label>
+                                                <div class="grid grid-cols-2 gap-4 mt-2">
+                                                    <div>
+                                                        <input type="file" name="supplier_id_front" accept="image/*"
+                                                            class="w-full border rounded-md p-2 dark:bg-gray-700 dark:text-white text-sm">
+                                                        <p class="text-xs text-gray-500 mt-1">Front side</p>
+                                                    </div>
+                                                    <div>
+                                                        <input type="file" name="supplier_id_back" accept="image/*"
+                                                            class="w-full border rounded-md p-2 dark:bg-gray-700 dark:text-white text-sm">
+                                                        <p class="text-xs text-gray-500 mt-1">Back side</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- ACTIONS -->
+                                            <div class="flex justify-end mt-6 space-x-3">
+                                                <button type="button"
+                                                    onclick="document.getElementById('addExchangePhoneModal').classList.add('hidden')"
+                                                    class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded hover:bg-gray-300">
+                                                    Cancel
+                                                </button>
+
+                                                <button type="submit" id="createPhoneBtn"
+                                                    class="px-4 py-2 bg-gray-500 text-white text-sm rounded hover:bg-gray-600">
+                                                    Save Stock
+                                                </button>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -332,11 +431,12 @@
                                             Create Invoice
                                         </h2>
                                         <button type="button" onclick="closeInvoiceModal()"
-                                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-4xl font-bold">&times;</button>
+                                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-4xl font-bold">&times;
+                                        </button>
                                     </div>
 
                                     <!-- Body -->
-                                    <div class="px-8 py-6 overflow-y-auto flex-1 space-y-8">
+                                    <div class="px-8 py-6 overflow-y-auto flex-1 space-y-8" x-data="invoiceModal()">
 
                                         <!-- Customer Details -->
                                         <div
@@ -355,71 +455,119 @@
                                                 class="w-full mt-4 p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"></textarea>
                                         </div>
 
+                                        <!-- Exchange Phone -->
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-4">
+                                                <input type="hidden" name="isExchange" value="0">
+                                                <input type="checkbox" id="is_exchange" name="isExchange"
+                                                    x-model="isExchange" value="1" class="w-5 h-5">
+                                                <label for="is_exchange"
+                                                    class="text-gray-700 dark:text-gray-200 font-semibold">Is this an
+                                                    Exchange?</label>
+                                            </div>
+
+                                            <div x-show="isExchange" x-transition
+                                                class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                                <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
+                                                    Exchange Phones</h3>
+
+                                                <div class="relative w-full">
+                                                    <div @click="open = !open"
+                                                        class="cursor-pointer w-full p-4 border rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-white flex justify-between items-center">
+                                                        <span
+                                                            x-text="exchangeSelected ? exchangeSelected.label : 'Select Exchange Phone'"></span>
+                                                        <svg class="w-5 h-5 text-gray-400" fill="none"
+                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                        </svg>
+                                                    </div>
+
+                                                    <div x-show="open" @click.outside="open = false" x-transition
+                                                        class="absolute z-10 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg">
+
+                                                        <input type="text" x-model="search"
+                                                            placeholder="Search Exchange..."
+                                                            class="w-full px-4 py-2 border-b border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+
+                                                        <template x-for="option in filteredOptions" :key="option.value">
+                                                            <div @click="selectExchange(option)"
+                                                                class="cursor-pointer px-4 py-2 hover:bg-blue-100 dark:hover:bg-gray-600 text-gray-700 dark:text-white">
+                                                                <span
+                                                                    x-text="option.label + ' (' + option.phone_type + ')'"></span>
+                                                            </div>
+                                                        </template>
+
+                                                        <div x-show="filteredOptions.length === 0"
+                                                            class="px-4 py-2 text-gray-400 dark:text-gray-300">
+                                                            No results found
+                                                        </div>
+                                                    </div>
+
+                                                    <input type="hidden" name="exchange_emi"
+                                                        :value="exchangeSelected ? exchangeSelected.value : ''">
+                                                </div>
+
+                                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                                    <input id="exchange_phone_type" name="exchange_phone_type" readonly
+                                                        placeholder="Phone Type"
+                                                        class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white"
+                                                        :value="exchangeSelected ? exchangeSelected.phone_type : ''">
+                                                    <input id="exchange_colour" name="exchange_colour" readonly
+                                                        placeholder="Colour"
+                                                        class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white"
+                                                        :value="exchangeSelected ? exchangeSelected.colour : ''">
+                                                    <input id="exchange_capacity" name="exchange_capacity" readonly
+                                                        placeholder="Capacity"
+                                                        class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white"
+                                                        :value="exchangeSelected ? exchangeSelected.capacity : ''">
+                                                    <input type="hidden" name="exchange_cost"
+                                                        :value="exchangeSelected ? exchangeSelected.cost : ''">
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <!-- Phone Selection -->
                                         <div
                                             class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                                             <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">Select
                                                 Phone</h3>
-                                            <!-- Custom EMI Dropdown with Search -->
-                                            <div class="relative w-full" x-data="{
-                                                open: false,
-                                                search: '',
-                                                selected: null,
-                                                options: [
-                                                    @foreach ($addInvoiceEmis as $emi)
-        { value: '{{ $emi->emi }}', label: '{{ $emi->emi }} - {{ $emi->phone_type }}', phone_type: '{{ $emi->phone_type }}', colour: '{{ $emi->colour }}', capacity: '{{ $emi->capacity }}' }, @endforeach
-                                                ],
-                                                get filteredOptions() {
-                                                    if (this.search === '') return this.options;
-                                                    return this.options.filter(o => o.label.toLowerCase().includes(this.search.toLowerCase()));
-                                                }
-                                            }">
-                                                <label
-                                                    class="block mb-2 text-gray-700 dark:text-gray-200 font-semibold">Select
-                                                    EMI</label>
 
-                                                <!-- Selected value -->
-                                                <div @click="open = !open"
-                                                    class="cursor-pointer w-full p-4 border rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-white flex justify-between items-center focus:ring-2 focus:ring-blue-500">
-                                                    <span x-text="selected ? selected.label : 'Select EMI'"></span>
-                                                    <svg class="w-5 h-5 text-gray-400" fill="none"
-                                                        stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M19 9l-7 7-7-7" />
+                                            <div class="relative w-full inline-block text-left">
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                                <input type="hidden" name="emi" id="phoneEmiInput" required>
+                                                <button type="button"
+                                                    class="inline-flex w-full justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 h-10"
+                                                    onclick="toggleDropdown(event, 'phoneDropdownMenu')">
+                                                    <span id="selectedPhone">Select EMI</span>
+                                                    <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20"
+                                                        fill="currentColor">
+                                                        <path fill-rule="evenodd"
+                                                            d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
+                                                            clip-rule="evenodd" />
                                                     </svg>
-                                                </div>
+                                                </button>
 
-                                                <!-- Dropdown options -->
-                                                <div x-show="open" @click.outside="open = false" x-transition
-                                                    class="absolute z-10 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg">
+                                                <div id="phoneDropdownMenu"
+                                                    class="absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg hidden max-h-60 overflow-y-auto p-2">
+                                                    <input type="text" id="phoneSearch"
+                                                        onkeyup="filterDropdown('phoneSearch','phone-option')"
+                                                        placeholder="Search..."
+                                                        class="w-full px-2 py-1 text-sm border rounded-md mb-2"
+                                                        autocomplete="off">
 
-                                                    <!-- Search input -->
-                                                    <input type="text" x-model="search" placeholder="Search EMI..."
-                                                        class="w-full px-4 py-2 border-b border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
-
-                                                    <!-- Options list -->
-                                                    <template x-for="option in filteredOptions" :key="option.value">
-                                                        <div @click="selected = option; open = false;
-                         document.getElementById('phone_type').value = option.phone_type;
-                         document.getElementById('colour').value = option.colour;
-                         document.getElementById('capacity').value = option.capacity;"
-                                                            class="cursor-pointer px-4 py-2 hover:bg-blue-100 dark:hover:bg-gray-600 text-gray-700 dark:text-white">
-                                                            <span x-text="option.label"></span>
+                                                    {{-- Phone options --}}
+                                                    @foreach ($addInvoiceEmis as $phone)
+                                                        <div onclick="selectPhone('{{ $phone->id }}','{{ $phone->emi }}','{{ $phone->phone_type }}','{{ $phone->colour }}','{{ $phone->capacity }}')"
+                                                            class="phone-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                            {{ $phone->emi }} - {{ $phone->phone_type }}
+                                                            ({{ $phone->colour }}, {{ $phone->capacity }})
                                                         </div>
-                                                    </template>
-
-                                                    <!-- No results -->
-                                                    <div x-show="filteredOptions.length === 0"
-                                                        class="px-4 py-2 text-gray-400 dark:text-gray-300">
-                                                        No results found
-                                                    </div>
+                                                    @endforeach
                                                 </div>
-
-                                                <!-- Hidden input for form submission -->
-                                                <input type="hidden" name="emi"
-                                                    :value="selected ? selected.value : ''" required>
                                             </div>
 
+                                            {{-- Auto-filled phone details --}}
                                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                                                 <input id="phone_type" name="phone_type" readonly
                                                     placeholder="Phone Type"
@@ -431,59 +579,54 @@
                                             </div>
                                         </div>
 
-                                        <!-- Selling Price & Accessories -->
+                                        <!-- Accessories & Selling Price -->
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <!-- Selling Price -->
                                             <div
                                                 class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                                                 <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
                                                     Selling Price</h3>
-                                                <input type="number" name="selling_price" id="selling_price"
-                                                    placeholder="Enter Selling Price" min="0"
+                                                <input type="number" min="0" name="selling_price"
+                                                    x-model.number="sellingPrice" placeholder="Enter Selling Price"
+                                                    required
                                                     class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+
+                                                <div x-show="isExchange && exchangeSelected" class="mt-4">
+                                                    <label
+                                                        class="block text-gray-700 dark:text-gray-200 font-semibold mb-1">Exchanged
+                                                        phone price</label>
+                                                    <input type="text" readonly :value="exchangeSelected.cost"
+                                                        class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white bg-gray-100">
+                                                </div>
                                             </div>
 
-                                            <!-- Accessories -->
                                             <div
                                                 class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                                                 <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
                                                     Accessories</h3>
                                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    <input type="number" name="tempered" placeholder="Tempered price"
-                                                        min="0"
-                                                        class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
-                                                    <input type="number" name="back_cover"
-                                                        placeholder="Back cover price" min="0"
-                                                        class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
-                                                    <input type="number" name="charger" placeholder="Charger price"
-                                                        min="0"
-                                                        class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
-                                                    <input type="number" name="data_cable"
-                                                        placeholder="Data cable price" min="0"
-                                                        class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
-                                                    <input type="number" name="hand_free" placeholder="Hand free price"
-                                                        min="0"
-                                                        class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
-                                                    <input type="number" name="cam_glass"
-                                                        placeholder="Camera glass price" min="0"
-                                                        class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
-                                                    <input type="number" name="airpods" placeholder="AirPods price"
-                                                        min="0"
-                                                        class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
-                                                    <input type="number" name="power_bank"
-                                                        placeholder="Power bank price" min="0"
-                                                        class="accessory w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
+                                                    <template x-for="(value, key) in accessories" :key="key">
+                                                        <div>
+                                                            <label
+                                                                class="block text-gray-700 dark:text-gray-200 mb-1 font-semibold"
+                                                                x-text="key.replace('_',' ').toUpperCase()"></label>
+                                                            <input type="number" min="0"
+                                                                :placeholder="key.replace('_', ' ') + ' price'"
+                                                                :name="key" x-model.number="accessories[key]"
+                                                                class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
+                                                        </div>
+                                                    </template>
                                                 </div>
                                             </div>
                                         </div>
 
                                         <!-- Total Amount -->
                                         <div
-                                            class="bg-blue-50 dark:bg-gray-800 p-4 rounded-lg border border-blue-200 dark:border-gray-700 flex justify-between items-center shadow-sm">
-                                            <span class="font-semibold text-gray-700 dark:text-gray-200">Total
-                                                Amount</span>
-                                            <input type="text" id="total_amount" name="total_amount" readonly
-                                                class="w-36 text-right p-3 border rounded-lg bg-blue-100 dark:bg-gray-700 dark:text-white font-semibold">
+                                            class="bg-blue-50 dark:bg-gray-800 p-6 rounded-xl border border-blue-200 dark:border-gray-700 flex justify-between items-center shadow-md mt-6">
+                                            <span class="font-semibold text-gray-700 dark:text-gray-200 text-lg">
+                                                Total (Selling - Exchange + Accessories)
+                                            </span>
+                                            <input type="text" readonly :value="totalAmount.toFixed(2)"
+                                                class="w-40 text-right p-4 border rounded-lg bg-blue-100 dark:bg-gray-700 dark:text-white font-bold text-lg">
                                         </div>
 
                                     </div>
@@ -500,45 +643,102 @@
                                             Create Invoice
                                         </button>
                                     </div>
-
                                 </form>
                             </div>
 
                             <script>
-                                document.addEventListener('DOMContentLoaded', () => {
-                                    const accessories = document.querySelectorAll('.accessory');
-                                    const sellingPriceInput = document.getElementById('selling_price');
-                                    const totalAmount = document.getElementById('total_amount');
-                                    const invoiceForm = document.getElementById('invoiceForm');
-
-                                    // Function to calculate total
-                                    function calculateTotal() {
-                                        let total = parseFloat(sellingPriceInput.value) || 0;
-                                        accessories.forEach(input => {
-                                            total += parseFloat(input.value) || 0;
-                                        });
-                                        totalAmount.value = total.toFixed(2);
+                                function invoiceModal() {
+                                    return {
+                                        isExchange: false,
+                                        sellingPrice: 0,
+                                        exchangeSelected: null,
+                                        accessories: {
+                                            tempered: 0,
+                                            back_cover: 0,
+                                            charger: 0,
+                                            data_cable: 0,
+                                            hand_free: 0,
+                                            cam_glass: 0,
+                                            airpods: 0,
+                                            power_bank: 0,
+                                        },
+                                        open: false,
+                                        search: '',
+                                        options: [
+                                            @foreach ($exchangePhones as $phone)
+                                                {
+                                                    value: '{{ $phone->emi }}',
+                                                    label: '{{ $phone->emi }}',
+                                                    phone_type: '{{ $phone->phone_type }}',
+                                                    colour: '{{ $phone->colour }}',
+                                                    capacity: '{{ $phone->capacity }}',
+                                                    cost: {{ $phone->cost }}
+                                                }
+                                                @if (!$loop->last)
+                                                    ,
+                                                @endif
+                                            @endforeach
+                                        ],
+                                        get filteredOptions() {
+                                            if (this.search === '') return this.options;
+                                            return this.options.filter(o => o.label.toLowerCase().includes(this.search.toLowerCase()));
+                                        },
+                                        selectExchange(option) {
+                                            this.exchangeSelected = option;
+                                            this.open = false;
+                                        },
+                                        get totalAmount() {
+                                            let total = parseFloat(this.sellingPrice) || 0;
+                                            if (this.isExchange && this.exchangeSelected) total -= parseFloat(this.exchangeSelected.cost) || 0;
+                                            for (let key in this.accessories) total += parseFloat(this.accessories[key]) || 0;
+                                            return total;
+                                        }
                                     }
+                                }
 
-                                    // Listen for input changes
-                                    sellingPriceInput.addEventListener('input', calculateTotal);
-                                    accessories.forEach(input => input.addEventListener('input', calculateTotal));
-
-                                    // Reset form when modal closes
+                                document.addEventListener('DOMContentLoaded', () => {
                                     window.closeInvoiceModal = function() {
-                                        document.getElementById('createInvoiceModal').classList.add('hidden');
-                                        invoiceForm.reset();
-                                        totalAmount.value = '';
-                                        document.getElementById('phone_type').value = '';
-                                        document.getElementById('colour').value = '';
-                                        document.getElementById('capacity').value = '';
-                                    };
-
-                                    // Open modal and focus first input
+                                        const modal = document.getElementById('createInvoiceModal');
+                                        modal.classList.add('hidden');
+                                        const form = document.getElementById('invoiceForm');
+                                        form.reset();
+                                    }
                                     window.openInvoiceModal = function() {
                                         document.getElementById('createInvoiceModal').classList.remove('hidden');
-                                        invoiceForm.querySelector('[name="customer_name"]').focus();
-                                    };
+                                    }
+                                });
+
+                                function toggleDropdown(event, dropdownId) {
+                                    event.stopPropagation();
+                                    const dropdown = document.getElementById(dropdownId);
+                                    dropdown.classList.toggle('hidden');
+                                }
+
+                                function filterDropdown(inputId, optionClass) {
+                                    const filter = document.getElementById(inputId).value.toLowerCase();
+                                    const options = document.getElementsByClassName(optionClass);
+                                    for (let i = 0; i < options.length; i++) {
+                                        let txt = options[i].textContent.toLowerCase();
+                                        options[i].style.display = txt.includes(filter) ? "" : "none";
+                                    }
+                                }
+
+                                function selectPhone(id, emi, phone_type, colour, capacity) {
+                                    document.getElementById('phoneEmiInput').value = emi;
+                                    document.getElementById('selectedPhone').textContent = emi;
+                                    document.getElementById('phone_type').value = phone_type;
+                                    document.getElementById('colour').value = colour;
+                                    document.getElementById('capacity').value = capacity;
+                                    document.getElementById('phoneDropdownMenu').classList.add('hidden');
+                                    document.getElementById('invoiceForm').dataset.phoneId = id; // save phone_id for backend if needed
+                                }
+
+                                document.addEventListener('click', function(event) {
+                                    const dropdown = document.getElementById('phoneDropdownMenu');
+                                    const button = document.getElementById('selectedPhone').closest('button') || null;
+                                    if (!dropdown.contains(event.target) && !button?.contains(event.target)) {
+                                        dropdown.classList.add('hidden');
+                                    }
                                 });
                             </script>
 
@@ -615,6 +815,22 @@
                                                     <span class="font-semibold">Capacity:</span>
                                                     {{ $invoice->capacity }}<br>
                                                     <span class="font-semibold">Colour:</span> {{ $invoice->colour }}
+
+                                                    @if ($invoice->exchange_emi)
+                                                        <hr class="my-2 border-gray-300">
+                                                        <span class="font-semibold text-blue-600">Exchange
+                                                            Phone:</span><br>
+                                                        <span class="font-semibold">EMI:</span>
+                                                        {{ $invoice->exchange_emi }}<br>
+                                                        <span class="font-semibold">Model:</span>
+                                                        {{ $invoice->exchange_phone_type }}<br>
+                                                        <span class="font-semibold">Capacity:</span>
+                                                        {{ $invoice->exchange_capacity }}<br>
+                                                        <span class="font-semibold">Colour:</span>
+                                                        {{ $invoice->exchange_colour }}<br>
+                                                        <span class="font-semibold">Cost:</span> LKR
+                                                        {{ number_format($invoice->exchange_cost, 2) }}
+                                                    @endif
                                                 </td>
 
                                                 <!-- Prices -->
@@ -815,5 +1031,229 @@
             }
 
         });
+    </script>
+
+    <script>
+        let itemIndex = 0;
+
+        // Array of iPhone models
+        const iPhoneModels = [
+            'iPhone 4', 'iPhone 4S', 'iPhone 5', 'iPhone 5C', 'iPhone 5S',
+            'iPhone 6', 'iPhone 6 Plus', 'iPhone 6S', 'iPhone 6S Plus',
+            'iPhone SE (1st generation)', 'iPhone 7', 'iPhone 7 Plus',
+            'iPhone 8', 'iPhone 8 Plus', 'iPhone X', 'iPhone XR', 'iPhone XS', 'iPhone XS Max',
+            'iPhone 11', 'iPhone 11 Pro', 'iPhone 11 Pro Max',
+            'iPhone 12', 'iPhone 12 Mini', 'iPhone 12 Pro', 'iPhone 12 Pro Max',
+            'iPhone 13', 'iPhone 13 Mini', 'iPhone 13 Pro', 'iPhone 13 Pro Max',
+            'iPhone 14', 'iPhone 14 Plus', 'iPhone 14 Pro', 'iPhone 14 Pro Max',
+            'iPhone 15', 'iPhone 15 Plus', 'iPhone 15 Pro', 'iPhone 15 Pro Max',
+            'iPhone 16', 'iPhone 16 Plus', 'iPhone 16 Pro', 'iPhone 16 Pro Max',
+            'iPhone 17', 'iPhone 17 Plus', 'iPhone 17 Pro', 'iPhone 17 Pro Max'
+        ];
+
+        // Array of Capacities
+        const iPhoneCapacities = ['64GB', '128GB', '256GB', '512GB', '1TB'];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const addBtn = document.getElementById('addItemBtn');
+            if (addBtn) addBtn.addEventListener('click', addItem);
+
+            // Keep at least one item on page load
+            addItem();
+        });
+
+        /* ---------- ITEMS ---------- */
+        function addItem() {
+            const container = document.getElementById('itemsContainer');
+
+            // Build phone options dynamically
+            const phoneOptionsHTML = iPhoneModels.map(model =>
+                `<button type="button" class="dropdown-option w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" onclick="selectDropdownPhone(this, '${model}')">${model}</button>`
+            ).join('');
+
+            // Build capacity options dynamically
+            const capacityOptionsHTML = iPhoneCapacities.map(cap =>
+                `<button type="button" class="dropdown-option w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" onclick="selectDropdownCapacity(this, '${cap}')">${cap}</button>`
+            ).join('');
+
+            const phoneDropdownHTML = `
+<div class="relative w-full text-left">
+    <label class="block text-sm font-medium mb-1">Phone Type</label>
+    <button type="button"
+        class="dropdown-btn inline-flex justify-between w-full rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 h-10"
+        onclick="toggleDropdownPhone(this)">
+        <span class="selected-phone">Select Phone Type</span>
+        <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+                d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
+                clip-rule="evenodd" />
+        </svg>
+    </button>
+
+    <div class="dropdown-menu-phone hidden absolute z-10 mt-2 w-full rounded-md bg-white dark:bg-gray-700 shadow-lg ring-1 ring-black/5 max-h-48 overflow-y-auto">
+        <div class="p-2 sticky top-0 bg-white dark:bg-gray-700 z-10">
+            <input type="text"
+                class="search-phone w-full px-2 py-1 text-sm border rounded-md dark:bg-gray-600 dark:text-white dark:placeholder-gray-300"
+                placeholder="Search iPhone..." onkeyup="filterPhoneOptions(this)">
+        </div>
+        <div class="py-1 options-container flex flex-col" role="listbox" tabindex="-1">
+            <button type="button" class="dropdown-option w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" onclick="selectDropdownPhone(this, '')">None</button>
+            ${phoneOptionsHTML}
+        </div>
+    </div>
+
+    <input type="hidden" name="items[${itemIndex}][phone_type]" class="input-phone" value="">
+</div>
+`;
+
+            const capacityDropdownHTML = `
+<div class="relative w-full text-left">
+    <label class="block text-sm font-medium mb-1">Capacity</label>
+    <button type="button"
+        class="dropdown-btn inline-flex justify-between w-full rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 h-10"
+        onclick="toggleDropdownCapacity(this)">
+        <span class="selected-capacity">Select Capacity</span>
+        <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+                d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
+                clip-rule="evenodd" />
+        </svg>
+    </button>
+
+    <div class="dropdown-menu-capacity hidden absolute z-10 mt-2 w-full rounded-md bg-white dark:bg-gray-700 shadow-lg ring-1 ring-black/5 max-h-48 overflow-y-auto">
+        <div class="p-2 sticky top-0 bg-white dark:bg-gray-700 z-10">
+            <input type="text"
+                class="search-capacity w-full px-2 py-1 text-sm border rounded-md dark:bg-gray-600 dark:text-white dark:placeholder-gray-300"
+                placeholder="Search Capacity..." onkeyup="filterCapacityOptions(this)">
+        </div>
+        <div class="py-1 options-container flex flex-col" role="listbox" tabindex="-1">
+            <button type="button" class="dropdown-option w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600" onclick="selectDropdownCapacity(this, '')">None</button>
+            ${capacityOptionsHTML}
+        </div>
+    </div>
+
+    <input type="hidden" name="items[${itemIndex}][capacity]" class="input-capacity" value="">
+</div>
+`;
+
+            const itemHTML = `
+<div class="item-group border rounded-md p-4 mb-4 bg-gray-50" data-index="${itemIndex}">
+    ${phoneDropdownHTML}
+
+    <div class="grid grid-cols-2 gap-4 mt-3">
+        <div>
+            <label class="block text-sm font-medium">Colour</label>
+            <input type="text" name="items[${itemIndex}][colour]"
+                class="w-full mt-1 px-3 py-2 border rounded-md text-sm">
+        </div>
+        <div>
+            ${capacityDropdownHTML}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 mt-3">
+        <div>
+            <label class="block text-sm font-medium">EMI</label>
+            <input type="text" name="items[${itemIndex}][emi]"
+                class="w-full mt-1 px-3 py-2 border rounded-md text-sm">
+        </div>
+        <div>
+            <label class="block text-sm font-medium">Cost</label>
+            <input type="number" step="0.01" name="items[${itemIndex}][cost]"
+                class="w-full mt-1 px-3 py-2 border rounded-md text-sm">
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <label class="block text-sm font-medium">Note</label>
+        <textarea name="items[${itemIndex}][note]"
+            class="w-full mt-1 px-3 py-2 border rounded-md text-sm"
+            rows="2" placeholder="Enter note here"></textarea>
+    </div>
+
+    <div class="flex justify-end mt-4">
+        <button type="button" onclick="removeItem(this)"
+            class="px-3 py-1 bg-red-500 text-white rounded text-sm">
+            Remove
+        </button>
+    </div>
+</div>
+`;
+
+            container.insertAdjacentHTML('beforeend', itemHTML);
+            itemIndex++;
+        }
+
+        // Remove item function (keeps at least one)
+        function removeItem(button) {
+            const container = document.getElementById('itemsContainer');
+            const allItems = container.querySelectorAll('.item-group');
+
+            if (allItems.length > 1) {
+                button.closest('.item-group').remove();
+            } else {
+                // SweetAlert2 toast for warning
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'warning',
+                    title: 'You must keep at least one item.',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    customClass: {
+                        popup: 'swal2-toast swal2-shadow'
+                    },
+                    iconColor: '#6c757d'
+                });
+            }
+        }
+
+        /* ---------- DROPDOWN FUNCTIONS ---------- */
+        function toggleDropdownPhone(button) {
+            const dropdownMenu = button.nextElementSibling;
+            document.querySelectorAll('.dropdown-menu-phone').forEach(menu => {
+                if (menu !== dropdownMenu) menu.classList.add('hidden');
+            });
+            dropdownMenu.classList.toggle('hidden');
+        }
+
+        function selectDropdownPhone(button, value) {
+            const dropdown = button.closest('.relative');
+            dropdown.querySelector('.selected-phone').innerText = value || 'None';
+            dropdown.querySelector('.input-phone').value = value;
+            dropdown.querySelector('.dropdown-menu-phone').classList.add('hidden');
+        }
+
+        function filterPhoneOptions(input) {
+            const filter = input.value.toLowerCase();
+            const container = input.closest('.dropdown-menu-phone').querySelector('.options-container');
+            Array.from(container.querySelectorAll('.dropdown-option')).forEach(option => {
+                option.style.display = option.innerText.toLowerCase().includes(filter) ? '' : 'none';
+            });
+        }
+
+        function toggleDropdownCapacity(button) {
+            const dropdownMenu = button.nextElementSibling;
+            document.querySelectorAll('.dropdown-menu-capacity').forEach(menu => {
+                if (menu !== dropdownMenu) menu.classList.add('hidden');
+            });
+            dropdownMenu.classList.toggle('hidden');
+        }
+
+        function selectDropdownCapacity(button, value) {
+            const dropdown = button.closest('.relative');
+            dropdown.querySelector('.selected-capacity').innerText = value || 'None';
+            dropdown.querySelector('.input-capacity').value = value;
+            dropdown.querySelector('.dropdown-menu-capacity').classList.add('hidden');
+        }
+
+        function filterCapacityOptions(input) {
+            const filter = input.value.toLowerCase();
+            const container = input.closest('.dropdown-menu-capacity').querySelector('.options-container');
+            Array.from(container.querySelectorAll('.dropdown-option')).forEach(option => {
+                option.style.display = option.innerText.toLowerCase().includes(filter) ? '' : 'none';
+            });
+        }
     </script>
 @endsection

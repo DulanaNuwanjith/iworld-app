@@ -17,6 +17,13 @@ return new class extends Migration
             $table->string('customer_phone');
             $table->text('customer_address')->nullable();
 
+            // Exchange phone details (optional)
+            $table->string('exchange_emi')->nullable();
+            $table->string('exchange_phone_type')->nullable();
+            $table->string('exchange_colour')->nullable();
+            $table->string('exchange_capacity')->nullable();
+            $table->decimal('exchange_cost', 10, 2)->nullable();
+
             // Phone details (required)
             $table->string('emi'); 
             $table->string('phone_type');
