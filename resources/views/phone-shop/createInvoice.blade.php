@@ -607,7 +607,7 @@
                                                     <template x-for="(value, key) in accessories" :key="key">
                                                         <div>
                                                             <label
-                                                                class="block text-gray-700 dark:text-gray-200 mb-1 font-semibold"
+                                                                class="block text-gray-700 text-sm dark:text-gray-200 mb-1 font-semibold"
                                                                 x-text="key.replace('_',' ').toUpperCase()"></label>
                                                             <input type="number" min="0"
                                                                 :placeholder="key.replace('_', ' ') + ' price'"

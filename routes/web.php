@@ -7,6 +7,7 @@ use App\Http\Controllers\FinanceDashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PhoneInventoryController;
+use App\Http\Controllers\WorkerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -160,6 +161,21 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/finance/report/date-range', [FinanceOrderController::class, 'dateRangeReport'])
             ->name('finance.dateRangeReport');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Compensations (SUPERADMIN | ADMIN ONLY)
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:SUPERADMIN,ADMIN'])->group(function () {
+
+        Route::get('/workers', [WorkerController::class, 'index'])->name('workers.index');
+        Route::post('/workers/store', [WorkerController::class, 'store'])->name('workers.store');
+        Route::patch('/workers/{worker}/update-note', [WorkerController::class, 'updateNote'])->name('workers.update-note');
+        Route::patch('/workers/{worker}/update-inline',[WorkerController::class, 'updateInline'])->name('workers.update-inline');
+        Route::delete('/workers/{worker}', [WorkerController::class, 'destroy'])->name('workers.destroy');
+
     });
 
     /*
