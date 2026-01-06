@@ -7,10 +7,19 @@ use Illuminate\Http\Request;
 
 class WorkerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $workers = Worker::latest()->paginate(10); // 10 per page
-        return view('Compensation.workersDetails', compact('workers'));
+        $query = Worker::query();
+
+        // Filter by name
+        if ($request->has('name') && $request->name != '') {
+            $query->where('name', $request->name);
+        }
+
+        $workers = $query->latest()->paginate(10)->withQueryString(); // Pagination keeps filters
+        $allWorkerNames = Worker::pluck('name')->unique(); // For dropdown
+
+        return view('Compensation.workersDetails', compact('workers', 'allWorkerNames'));
     }
 
     public function store(Request $request)

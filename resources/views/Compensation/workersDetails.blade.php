@@ -149,9 +149,50 @@
                             </div>
 
                             <div id="filterFormContainerWorkerDetails" class="mt-4 hidden">
+                                <form method="GET" action="{{ route('workers.index') }}"
+                                    class="mb-6 flex gap-6 items-center flex-wrap">
 
+                                    <!-- Name Dropdown -->
+                                    <div class="relative inline-block text-left w-56">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                        <input type="hidden" name="name" id="workerNameInput"
+                                            value="{{ request('name') }}">
+                                        <button type="button"
+                                            class="inline-flex w-full justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 h-10"
+                                            onclick="toggleDropdown(event, 'workerNameDropdownMenu')">
+                                            <span id="selectedWorkerName">{{ request('name') ?? 'Select Name' }}</span>
+                                            <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                    d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                        <div id="workerNameDropdownMenu"
+                                            class="absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg hidden max-h-48 overflow-y-auto p-2">
+                                            <input type="text" id="workerNameSearch"
+                                                onkeyup="filterDropdown('workerNameSearch','worker-name-option')"
+                                                placeholder="Search..." class="w-full px-2 py-1 text-sm border rounded-md"
+                                                autocomplete="off">
+                                            <div onclick="selectDropdown('','workerNameInput','selectedWorkerName')"
+                                                class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">All Workers</div>
+                                            @foreach ($allWorkerNames as $workerName)
+                                                <div onclick="selectDropdown('{{ $workerName }}','workerNameInput','selectedWorkerName')"
+                                                    class="worker-name-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                    {{ $workerName }}</div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                    <!-- Buttons -->
+                                    <div class="flex items-end space-x-2">
+                                        <button type="submit"
+                                            class="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Apply
+                                            Filters</button>
+                                        <button type="button" onclick="clearWorkerFilters()"
+                                            class="mt-4 bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">Clear</button>
+                                    </div>
+                                </form>
                             </div>
-
 
                             <div class="flex-1">
 
@@ -262,8 +303,8 @@
                                                     <label class="block text-sm font-medium text-gray-700">
                                                         Basic Salary (LKR)
                                                     </label>
-                                                    <input type="number" name="basic_salary" step="0.01" min="0"
-                                                        required
+                                                    <input type="number" name="basic_salary" step="0.01"
+                                                        min="0" required
                                                         class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
                                                         placeholder="Enter salary amount">
                                                 </div>
@@ -609,5 +650,65 @@
                     });
                 });
         }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            const menus = [
+                "workerNameDropdownMenu"
+            ].map(id => document.getElementById(id));
+
+            menus.forEach(menu => {
+                if (menu) menu.addEventListener("click", e => e.stopPropagation());
+            });
+
+            // Toggle dropdown
+            window.toggleDropdown = function(event, id) {
+                event.stopPropagation();
+                closeAllDropdowns();
+                const menu = document.getElementById(id);
+                if (menu) menu.classList.toggle("hidden");
+            }
+
+            // Select value
+            window.selectDropdown = function(value, inputId, spanId) {
+                const input = document.getElementById(inputId);
+                const span = document.getElementById(spanId);
+
+                if (input) input.value = value;
+                if (span) {
+                    let placeholder = "Select";
+                    if (spanId === "selectedWorkerName") placeholder = "Select Name";
+                    span.textContent = value || placeholder;
+                }
+                closeAllDropdowns();
+            }
+
+            // Filter options
+            window.filterDropdown = function(searchId, optionClass) {
+                const searchInput = document.getElementById(searchId);
+                if (!searchInput) return;
+                const filter = searchInput.value.toLowerCase();
+                document.querySelectorAll('.' + optionClass).forEach(option => {
+                    option.style.display = option.textContent.toLowerCase().includes(filter) ? "block" :
+                        "none";
+                });
+            }
+
+            // Close all dropdowns
+            function closeAllDropdowns() {
+                menus.forEach(menu => {
+                    if (menu) menu.classList.add("hidden");
+                });
+            }
+
+            // Clear filters
+            window.clearWorkerFilters = function() {
+                window.location.href = window.location.pathname;
+            }
+
+            document.addEventListener("click", closeAllDropdowns);
+
+        });
     </script>
 @endsection
