@@ -34,6 +34,7 @@ class Invoice extends Model
         'exchange_colour',
         'exchange_capacity',
         'exchange_cost',
+        'worker_id',
     ];
 
     protected $attributes = [
@@ -46,5 +47,11 @@ class Invoice extends Model
     public function inventory()
     {
         return $this->belongsTo(PhoneInventory::class, 'emi', 'emi');
+    }
+
+    // Relationship to Worker (Coordinator)
+    public function worker()
+    {
+        return $this->belongsTo(Worker::class, 'worker_id');
     }
 }

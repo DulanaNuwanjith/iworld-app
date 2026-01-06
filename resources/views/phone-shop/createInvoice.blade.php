@@ -438,6 +438,51 @@
                                     <!-- Body -->
                                     <div class="px-8 py-6 overflow-y-auto flex-1 space-y-8" x-data="invoiceModal()">
 
+                                        <!-- Customer Coordinator -->
+                                        <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-6"
+                                            x-data="workerDropdown()">
+                                            <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
+                                                Customer Coordinator</h3>
+
+                                            <!-- Customer Coordinator Dropdown -->
+                                            <div class="relative w-full inline-block text-left mb-6">
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">Customer
+                                                    Coordinator</label>
+                                                <input type="hidden" name="worker_id" id="workerIdInput" required>
+                                                <input type="hidden" name="worker_name" id="workerNameInput">
+
+                                                <button type="button"
+                                                    class="inline-flex w-full justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 h-10"
+                                                    onclick="toggleDropdown(event, 'workerDropdownMenu')">
+                                                    <span id="selectedWorker">Select Worker</span>
+                                                    <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20"
+                                                        fill="currentColor">
+                                                        <path fill-rule="evenodd"
+                                                            d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
+                                                            clip-rule="evenodd" />
+                                                    </svg>
+                                                </button>
+
+                                                <div id="workerDropdownMenu"
+                                                    class="absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg hidden max-h-60 overflow-y-auto p-2">
+
+                                                    <input type="text" id="workerSearch"
+                                                        onkeyup="filterDropdown('workerSearch','worker-option')"
+                                                        placeholder="Search..."
+                                                        class="w-full px-2 py-1 text-sm border rounded-md mb-2"
+                                                        autocomplete="off">
+
+                                                    {{-- Worker options --}}
+                                                    @foreach ($workers as $worker)
+                                                        <div onclick="selectWorker('{{ $worker->id }}','{{ $worker->name }}')"
+                                                            class="worker-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                            {{ $worker->name }}
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <!-- Customer Details -->
                                         <div
                                             class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
@@ -738,6 +783,74 @@
                                     const button = document.getElementById('selectedPhone').closest('button') || null;
                                     if (!dropdown.contains(event.target) && !button?.contains(event.target)) {
                                         dropdown.classList.add('hidden');
+                                    }
+                                });
+                            </script>
+
+                            <script>
+                                // Toggle dropdown visibility
+                                function toggleDropdown(event, dropdownId) {
+                                    event.stopPropagation();
+                                    const dropdown = document.getElementById(dropdownId);
+                                    dropdown.classList.toggle('hidden');
+                                }
+
+                                // Generic search/filter for dropdown options
+                                function filterDropdown(inputId, optionClass) {
+                                    const filter = document.getElementById(inputId).value.toLowerCase();
+                                    const options = document.getElementsByClassName(optionClass);
+                                    for (let i = 0; i < options.length; i++) {
+                                        let txt = options[i].textContent.toLowerCase();
+                                        options[i].style.display = txt.includes(filter) ? "" : "none";
+                                    }
+                                }
+
+                                // Select worker
+                                function selectWorker(id, name) {
+                                    document.getElementById('workerIdInput').value = id;
+                                    document.getElementById('workerNameInput').value = name;
+                                    document.getElementById('selectedWorker').textContent = name;
+                                    document.getElementById('workerDropdownMenu').classList.add('hidden');
+                                }
+
+                                // Select phone
+                                function selectPhone(id, emi, phone_type, colour, capacity) {
+                                    document.getElementById('phoneEmiInput').value = emi;
+                                    document.getElementById('selectedPhone').textContent = emi;
+                                    document.getElementById('phone_type').value = phone_type;
+                                    document.getElementById('colour').value = colour;
+                                    document.getElementById('capacity').value = capacity;
+                                    document.getElementById('phoneDropdownMenu').classList.add('hidden');
+                                    document.getElementById('invoiceForm').dataset.phoneId = id; // optional
+                                }
+
+                                // Close dropdowns if click outside
+                                document.addEventListener('click', function(event) {
+                                    const phoneDropdown = document.getElementById('phoneDropdownMenu');
+                                    const workerDropdown = document.getElementById('workerDropdownMenu');
+
+                                    const phoneButton = document.getElementById('selectedPhone').closest('button');
+                                    const workerButton = document.getElementById('selectedWorker').closest('button');
+
+                                    if (!phoneDropdown.contains(event.target) && !phoneButton.contains(event.target)) {
+                                        phoneDropdown.classList.add('hidden');
+                                    }
+                                    if (!workerDropdown.contains(event.target) && !workerButton.contains(event.target)) {
+                                        workerDropdown.classList.add('hidden');
+                                    }
+                                });
+
+                                // Modal open/close
+                                document.addEventListener('DOMContentLoaded', () => {
+                                    window.openInvoiceModal = function() {
+                                        document.getElementById('createInvoiceModal').classList.remove('hidden');
+                                    }
+                                    window.closeInvoiceModal = function() {
+                                        const modal = document.getElementById('createInvoiceModal');
+                                        modal.classList.add('hidden');
+                                        document.getElementById('invoiceForm').reset();
+                                        document.getElementById('selectedPhone').textContent = 'Select EMI';
+                                        document.getElementById('selectedWorker').textContent = 'Select Worker';
                                     }
                                 });
                             </script>

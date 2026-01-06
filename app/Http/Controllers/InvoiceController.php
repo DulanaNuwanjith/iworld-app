@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\PhoneInventory;
 use Illuminate\Http\Request;
+use App\Models\Worker;
 
 class InvoiceController extends Controller
 {
@@ -46,6 +47,8 @@ class InvoiceController extends Controller
             ->where('status', 0) 
             ->get();
 
+        $workers = Worker::select('id','name')->orderBy('name')->get();
+
         return view('phone-shop.createInvoice', compact(
             'invoices',
             'allInvoiceNumbers',
@@ -53,13 +56,16 @@ class InvoiceController extends Controller
             'filterEmis',
             'filterPhoneTypes',
             'addInvoiceEmis',
-            'exchangePhones'
+            'exchangePhones',
+            'workers'
         ));
     }
 
     public function store(Request $request)
     {
         $request->validate([
+            'worker_id' => 'required|exists:workers,id',
+            'worker_name' => 'required|string|max:255',
             'customer_name' => 'required|string|max:255',
             'customer_phone' => 'required|string|max:50',
             'customer_address' => 'nullable|string|max:500',
@@ -87,6 +93,9 @@ class InvoiceController extends Controller
             'emi', 'selling_price', 'tempered', 'back_cover', 'charger',
             'data_cable', 'cam_glass', 'hand_free', 'airpods', 'power_bank'
         ]));
+
+        $invoice->worker_id = $request->worker_id;
+        $invoice->worker_name = $request->worker_name;
 
         // Assign phone details
         $phone = PhoneInventory::where('emi', $request->emi)->first();

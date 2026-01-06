@@ -11,6 +11,10 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
 
+            // Worker / Coordinator (required)
+            $table->foreignId('worker_id')->constrained('workers')->onDelete('restrict');
+            $table->string('worker_name');
+
             // Invoice info (required)
             $table->string('invoice_number')->unique();
             $table->string('customer_name');
