@@ -32,11 +32,11 @@
                 </a>
 
                 {{-- Settled Payments Tab --}}
-                {{-- <a href="{{ route('finance.settledPayments') }}"
+                <a href="{{ route('finance.settledPayments') }}"
                     class="pb-2 px-3 font-semibold 
        {{ request()->routeIs('finance.settledPayments') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
                     Settled Payments
-                </a> --}}
+                </a>
             </div>
 
             <!-- ✅ PAGE CONTENT -->
