@@ -22,7 +22,7 @@
             width: 210mm;
             min-height: 297mm;
             margin: auto;
-            padding: 20mm;
+            padding: 12mm 12mm 12mm 12mm;
             box-sizing: border-box;
             background: white;
             border: 1px solid #d1d5db;
@@ -69,7 +69,8 @@
             <!-- Invoice Info -->
             <div class="flex justify-between items-center mb-6">
                 <div class="text-gray-700">
-                    <p><strong>Date:</strong> {{ \Carbon\Carbon::now()->format('Y-m-d') }}</p>
+                    <p><strong>Date:</strong> {{ \Carbon\Carbon::now()->format('d M Y') }}</p><br>
+                    <p><strong>Coordinator:</strong> {{ $invoice->worker->name }}</p>
                 </div>
                 <div class="text-right">
                     <h2 class="text-xl font-semibold text-gray-800">Invoice No : {{ $invoice->invoice_number }}</h2>
@@ -196,6 +197,16 @@
                             </tr>
                             @php
                                 $customerPay -= $invoice->exchange_cost;
+                            @endphp
+                        @endif
+                        @if ($invoice->payable_amount)
+                            <tr class="bg-blue-100">
+                                <td class="border px-3 py-2 font-semibold text-blue-700">Payable Amount</td>
+                                <td class="border px-3 py-2 text-right text-blue-700">-
+                                    {{ number_format($invoice->payable_amount, 2) }}</td>
+                            </tr>
+                            @php
+                                $customerPay -= $invoice->payable_amount;
                             @endphp
                         @endif
                     </tbody>

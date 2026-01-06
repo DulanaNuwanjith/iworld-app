@@ -496,7 +496,7 @@
                                                     title="Enter a valid Sri Lankan phone number, e.g., 0777137830 or 94777137830"
                                                     class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
                                             </div>
-                                            <textarea name="customer_address" placeholder="Customer Address" rows="3"
+                                            <textarea name="customer_address" placeholder="Customer Address" rows="3" maxlength="25"
                                                 class="w-full mt-4 p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"></textarea>
                                         </div>
 
@@ -664,6 +664,50 @@
                                             </div>
                                         </div>
 
+                                        <!-- Payable Section -->
+                                        <div class="flex flex-col gap-2">
+
+                                            <!-- Checkbox to toggle payable -->
+                                            <div class="flex items-center justify-between mb-4">
+                                                <div class="flex items-center gap-2">
+                                                    <input type="hidden" name="isPayable" value="0">
+                                                    <input type="checkbox" id="is_payable" name="isPayable"
+                                                        x-model="isPayable" value="1" class="w-5 h-5">
+                                                    <label for="is_payable"
+                                                        class="text-gray-700 dark:text-gray-200 font-semibold">
+                                                        Is this Payable?
+                                                    </label>
+                                                </div>
+
+                                                <!-- Right-side note -->
+                                                <span
+                                                    class="text-lg text-red-600 font-semibold border border-red-600 px-3 py-1 rounded-md">
+                                                    This can only be applied after CEO approval.
+                                                </span>
+                                            </div>
+
+                                            <!-- Section that appears when checkbox is checked -->
+                                            <div x-show="isPayable" x-transition
+                                                class="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+
+                                                <h1 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2">
+                                                    Payable Amount</h1>
+
+                                                <!-- Input for payable amount -->
+                                                <input type="number" name="payable_amount"
+                                                    x-model.number="payableAmount" placeholder="Enter payable amount"
+                                                    min="0"
+                                                    class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+
+                                                <!-- Display remaining amount -->
+                                                <p class="mt-2 text-gray-700 dark:text-gray-200">
+                                                    Customer need to pay Now: <span
+                                                        x-text="remainingAmount.toFixed(2)"></span>
+                                                </p>
+
+                                            </div>
+                                        </div>
+
                                         <!-- Total Amount -->
                                         <div
                                             class="bg-blue-50 dark:bg-gray-800 p-6 rounded-xl border border-blue-200 dark:border-gray-700 flex justify-between items-center shadow-md mt-6">
@@ -724,19 +768,32 @@
                                                 @endif
                                             @endforeach
                                         ],
-                                        get filteredOptions() {
-                                            if (this.search === '') return this.options;
-                                            return this.options.filter(o => o.label.toLowerCase().includes(this.search.toLowerCase()));
-                                        },
-                                        selectExchange(option) {
-                                            this.exchangeSelected = option;
-                                            this.open = false;
-                                        },
+
+                                        // Payable data
+                                        isPayable: false,
+                                        payableAmount: 0,
+
+                                        // Computed total
                                         get totalAmount() {
                                             let total = parseFloat(this.sellingPrice) || 0;
                                             if (this.isExchange && this.exchangeSelected) total -= parseFloat(this.exchangeSelected.cost) || 0;
                                             for (let key in this.accessories) total += parseFloat(this.accessories[key]) || 0;
                                             return total;
+                                        },
+
+                                        // Remaining amount after payable
+                                        get remainingAmount() {
+                                            return (this.totalAmount - (this.payableAmount || 0));
+                                        },
+
+                                        get filteredOptions() {
+                                            if (this.search === '') return this.options;
+                                            return this.options.filter(o => o.label.toLowerCase().includes(this.search.toLowerCase()));
+                                        },
+
+                                        selectExchange(option) {
+                                            this.exchangeSelected = option;
+                                            this.open = false;
                                         }
                                     }
                                 }
@@ -907,7 +964,9 @@
                                                 <td class="px-4 py-2">
                                                     <span class="font-semibold">{{ $invoice->invoice_number }}</span><br>
                                                     <span
-                                                        class="text-xs text-gray-500">{{ $invoice->updated_at->format('d-m-Y') }}</span>
+                                                        class="text-xs text-gray-500">{{ $invoice->worker->name }}</span><br>
+                                                    <span
+                                                        class="text-xs text-gray-500">{{ $invoice->updated_at->format('d M Y') }}</span>
                                                 </td>
 
                                                 <!-- Customer Details -->
@@ -987,8 +1046,20 @@
                                                 </td>
 
                                                 <!-- Total Price -->
-                                                <td class="px-4 py-2 text-center font-bold">LKR
-                                                    {{ number_format($invoice->total_amount, 2) }}</td>
+                                                <td class="px-4 py-2 text-center font-bold">
+                                                    @if (isset($invoice->payable_amount) && $invoice->payable_amount > 0)
+                                                        <div class="text-red-600">
+                                                            Payable: LKR {{ number_format($invoice->payable_amount, 2) }}
+                                                        </div>
+                                                        <div class="text-gray-500">
+                                                            Total: LKR {{ number_format($invoice->total_amount, 2) }}
+                                                        </div>
+                                                    @else
+                                                        <div class="text-green-600">
+                                                            LKR {{ number_format($invoice->total_amount, 2) }}
+                                                        </div>
+                                                    @endif
+                                                </td>
 
                                                 <td class="px-4 align-middle">
                                                     <div class="inline-flex items-center justify-center gap-2">
@@ -1055,6 +1126,18 @@
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.querySelector('#createInvoiceModal form');
             const submitBtn = document.getElementById('createInvoiceBtn');
+
+            form.addEventListener('submit', function() {
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Submitting...';
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.querySelector('#addExchangePhoneModal form');
+            const submitBtn = document.getElementById('createPhoneBtn');
 
             form.addEventListener('submit', function() {
                 submitBtn.disabled = true;

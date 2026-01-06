@@ -220,7 +220,10 @@
                                                             Phone No 01
                                                         </label>
                                                         <input type="text" name="phone_1" required
-                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                                            maxlength="10" pattern="[0-9]{10}"
+                                                            title="Enter a 10-digit phone number"
+                                                            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                                     </div>
 
                                                     <div class="w-1/2">
@@ -228,7 +231,10 @@
                                                             Phone No 02
                                                         </label>
                                                         <input type="text" name="phone_2"
-                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm">
+                                                            class="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+                                                            maxlength="10" pattern="[0-9]{10}"
+                                                            title="Enter a 10-digit phone number"
+                                                            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                                                     </div>
                                                 </div>
 
@@ -280,7 +286,7 @@
                                                     Cancel
                                                 </button>
 
-                                                <button type="submit"
+                                                <button type="submit" id="saveWokerBtn"
                                                     class="px-4 py-2 bg-gray-500 text-white text-sm rounded hover:bg-gray-600">
                                                     Save Worker
                                                 </button>
@@ -513,7 +519,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.querySelector('#addWorkerModal form');
-            const submitBtn = document.getElementById('createPhoneBtn');
+            const submitBtn = document.getElementById('saveWokerBtn');
 
             form.addEventListener('submit', function() {
                 submitBtn.disabled = true;

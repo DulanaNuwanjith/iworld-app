@@ -34,6 +34,7 @@ class Invoice extends Model
         'exchange_colour',
         'exchange_capacity',
         'exchange_cost',
+        'payable_amount',
         'worker_id',
     ];
 

@@ -476,7 +476,7 @@
                                                 <td class="px-4 py-2">
                                                     <span class="font-semibold">{{ $inventory->emi }}</span> <br>
                                                     <span
-                                                        class="text-xs text-gray-500">{{ $inventory->date->format('d-m-Y') }}</span>
+                                                        class="text-xs text-gray-500">{{ $inventory->date->format('d M Y') }}</span>
                                                 </td>
                                                 <td class="px-4 py-2 text-left">
                                                     <span class="font-semibold">Model:</span>

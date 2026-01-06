@@ -23,6 +23,15 @@
                     Create Invoice
                 </a>
 
+                {{-- Payables Tab --}}
+                @if (auth()->user()->hasRole(['SUPERADMIN', 'ADMIN']))
+                    <a href="{{ route('invoices.payables') }}"
+                        class="pb-2 px-3 font-semibold 
+       {{ request()->routeIs('invoices.payables') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
+                        Payables
+                    </a>
+                @endif
+
             </div>
 
             <!-- ✅ PAGE CONTENT -->

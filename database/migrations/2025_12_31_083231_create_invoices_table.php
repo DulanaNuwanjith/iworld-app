@@ -50,6 +50,9 @@ return new class extends Migration
             // Total amount (required, default 0)
             $table->decimal('total_amount', 10, 2)->default(0);
 
+            // Payable amount (optional)
+            $table->decimal('payable_amount', 10, 2)->nullable();
+
             $table->timestamps();
         });
     }

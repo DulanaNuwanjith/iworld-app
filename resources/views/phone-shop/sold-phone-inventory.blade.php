@@ -312,7 +312,7 @@
                                                 <td class="px-4 py-2">
                                                     <span class="font-semibold">{{ $inventory->emi }}</span><br>
                                                     <span
-                                                        class="text-xs text-gray-500">{{ Carbon::parse($inventory->sold_date)->format('Y-m-d') }}</span>
+                                                        class="text-xs text-gray-500">{{ Carbon::parse($inventory->sold_date)->format('d M Y') }}</span>
                                                 </td>
 
                                                 <!-- Model -->

@@ -63,6 +63,7 @@ class InvoiceController extends Controller
 
     public function store(Request $request)
     {
+        // Validate input
         $request->validate([
             'worker_id' => 'required|exists:workers,id',
             'worker_name' => 'required|string|max:255',
@@ -85,15 +86,17 @@ class InvoiceController extends Controller
             'exchange_colour' => 'nullable|string|max:255',
             'exchange_capacity' => 'nullable|string|max:255',
             'exchange_cost' => 'nullable|numeric|min:0',
+            'payable_amount' => 'nullable|numeric|min:0',
         ]);
 
-        // Only assign fillable fields
+        // Create invoice with basic fields
         $invoice = new Invoice($request->only([
             'customer_name', 'customer_phone', 'customer_address',
             'emi', 'selling_price', 'tempered', 'back_cover', 'charger',
-            'data_cable', 'cam_glass', 'hand_free', 'airpods', 'power_bank'
+            'data_cable', 'cam_glass', 'hand_free', 'airpods', 'power_bank','payable_amount',
         ]));
 
+        // Assign worker info
         $invoice->worker_id = $request->worker_id;
         $invoice->worker_name = $request->worker_name;
 
@@ -114,6 +117,11 @@ class InvoiceController extends Controller
             $invoice->exchange_cost = $request->exchange_cost;
         }
 
+        // Assign payable amount if selected
+        $invoice->payable_amount = ((bool)$request->isPayable && $request->payable_amount)
+                                    ? $request->payable_amount
+                                    : 0;
+
         // Generate invoice number
         $lastInvoiceNumber = Invoice::where('invoice_number', 'like', 'INV-GAM-%')
             ->orderBy('id', 'desc')
@@ -122,7 +130,7 @@ class InvoiceController extends Controller
         $nextNumber = $lastInvoiceNumber ? (int)substr($lastInvoiceNumber, 8) + 1 : 1;
         $invoice->invoice_number = 'INV-GAM-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
-        // Calculate total
+        // Calculate total amount (Selling - Exchange + Accessories)
         $total = ($invoice->selling_price ?? 0) +
                 ($invoice->tempered ?? 0) +
                 ($invoice->back_cover ?? 0) +
@@ -137,11 +145,12 @@ class InvoiceController extends Controller
 
         $invoice->total_amount = $total;
 
+        // Save invoice
         $invoice->save();
 
-        // Update phone status
+        // Update phone inventory status
         if ($phone) {
-            $phone->status = 1;
+            $phone->status = 1; // mark as sold
             $phone->save();
         }
 
@@ -195,6 +204,51 @@ class InvoiceController extends Controller
             'totalCost'    => $totalCost,
             'totalProfit'  => $totalProfit,
         ]);
+    }
+
+    public function payableInvoices(Request $request)
+    {
+        $query = Invoice::whereNotNull('payable_amount')
+            ->where('payable_amount', '>', 0);
+
+        // Apply filters if provided
+        if ($request->filled('invoice_number')) {
+            $query->where('invoice_number', $request->invoice_number);
+        }
+
+        if ($request->filled('customer_name')) {
+            $query->where('customer_name', $request->customer_name);
+        }
+
+        // Latest first and paginate
+        $invoices = $query->latest()->paginate(20);
+
+        // For the dropdown filters
+        $allInvoiceNumbers = Invoice::whereNotNull('payable_amount')
+            ->where('payable_amount', '>', 0)
+            ->pluck('invoice_number')->unique();
+
+        $allCustomerNames = Invoice::whereNotNull('payable_amount')
+            ->where('payable_amount', '>', 0)
+            ->pluck('customer_name')->unique();
+
+        return view('phone-shop.payables', compact('invoices', 'allInvoiceNumbers', 'allCustomerNames'));
+    }
+
+    public function payAmount(Request $request, $id)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01'
+        ]);
+
+        $invoice = Invoice::findOrFail($id);
+
+        $payAmount = min($request->amount, $invoice->payable_amount);
+
+        $invoice->payable_amount -= $payAmount;
+        $invoice->save();
+
+        return redirect()->back()->with('success', 'Payment processed successfully!');
     }
 
 }

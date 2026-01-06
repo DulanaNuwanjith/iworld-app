@@ -112,7 +112,7 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | INVOICES (SUPERADMIN | ADMIN ONLY)
+    | INVOICES (SUPERADMIN | ADMIN | PHONESHOPOPERATOR)
     |--------------------------------------------------------------------------
     */
     Route::middleware(['role:SUPERADMIN,ADMIN,PHONESHOPOPERATOR'])->group(function () {
@@ -130,6 +130,21 @@ Route::middleware(['auth'])->group(function () {
 
         Route::delete('/invoices/{id}', [InvoiceController::class, 'destroy'])
             ->name('invoices.destroy');
+
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Payables (SUPERADMIN | ADMIN )
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['role:SUPERADMIN,ADMIN'])->group(function () {
+
+        Route::get('/invoices/payables', [InvoiceController::class, 'payableInvoices'])
+            ->name('invoices.payables');
+
+        Route::post('/invoices/pay/{id}', [InvoiceController::class, 'payAmount'])->name('invoices.payAmount');
+
     });
 
     /*
