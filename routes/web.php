@@ -77,7 +77,7 @@ Route::middleware(['auth'])->group(function () {
     | INVENTORY (SUPERADMIN | ADMIN ONLY)
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:SUPERADMIN,ADMIN'])->group(function () {
+    Route::middleware(['role:SUPERADMIN,ADMIN,PHONESHOPOPERATOR'])->group(function () {
 
         Route::get('/inventory', [InventoryController::class, 'index'])
             ->name('inventory.index');
@@ -97,21 +97,24 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/inventory/update-status-availability', [InventoryController::class, 'updateStatusAvailability'])
             ->name('inventory.updateStatusAvailability');
 
-    });
-
-    /*
-    |--------------------------------------------------------------------------
-    | INVENTORY (SOLD / EXCHANGE)
-    | SUPERADMIN | ADMIN | PHONESHOPOPERATOR
-    |--------------------------------------------------------------------------
-    */
-    Route::middleware(['role:SUPERADMIN,ADMIN,PHONESHOPOPERATOR'])->group(function () {
-
         Route::get('/inventory/sold', [InventoryController::class, 'sold'])
             ->name('inventory.sold');
 
         Route::post('/inventory/exchange', [InventoryController::class, 'exchange'])
             ->name('inventory.exchange');
+
+        Route::get('/accessories', function () {
+            return view('phone-shop.accessories');
+        })->name('accessories.index');
+
+        Route::get('/macbooks', function () {
+            return view('phone-shop.macbooks');
+        })->name('macbooks.index');
+
+        Route::get('/jbl', function () {
+            return view('phone-shop.jbl');
+        })->name('jbl.index');
+
     });
 
     /*

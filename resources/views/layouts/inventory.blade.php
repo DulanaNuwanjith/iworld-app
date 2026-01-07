@@ -17,22 +17,39 @@
             <div class="sticky top-0 z-50 flex space-x-4 border-b border-gray-300 bg-white p-5">
 
                 {{-- Sold Phones Details Tab (PhoneShopOperator or SuperAdmin) --}}
-                @if (auth()->user()->hasRole(['PHONESHOPOPERATOR', 'SUPERADMIN', 'ADMIN']))
-                    <a href="{{ route('inventory.sold') }}"
-                        class="pb-2 px-3 font-semibold 
+                <a href="{{ route('inventory.sold') }}"
+                    class="pb-2 px-3 font-semibold 
             {{ request()->routeIs('inventory.sold') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
-                        Sold Phones Details
-                    </a>
-                @endif
+                    Sold Phones Details
+                </a>
 
                 {{-- Phone Inventory Tab (Admin or SuperAdmin) --}}
-                @if (auth()->user()->hasRole(['ADMIN', 'SUPERADMIN']))
-                    <a href="{{ route('inventory.index') }}"
-                        class="pb-2 px-3 font-semibold 
+                <a href="{{ route('inventory.index') }}"
+                    class="pb-2 px-3 font-semibold 
             {{ request()->routeIs('inventory.index') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
-                        Phone Inventory
-                    </a>
-                @endif
+                    Phone Inventory
+                </a>
+
+                {{-- Accessories Tab --}}
+                <a href="{{ route('accessories.index') }}"
+                    class="pb-2 px-3 font-semibold 
+        {{ request()->routeIs('accessories.index') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
+                    Accessories Inventory
+                </a>
+
+                {{-- MacBooks Tab --}}
+                <a href="{{ route('macbooks.index') }}"
+                    class="pb-2 px-3 font-semibold 
+        {{ request()->routeIs('macbooks.index') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
+                    MacBooks Inventory
+                </a>
+
+                {{-- JBL Tab --}}
+                <a href="{{ route('jbl.index') }}"
+                    class="pb-2 px-3 font-semibold 
+        {{ request()->routeIs('jbl.index') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
+                    JBL Inventory
+                </a>
 
             </div>
 
