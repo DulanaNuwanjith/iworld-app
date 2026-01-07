@@ -27,6 +27,7 @@ return new class extends Migration
             $table->tinyInteger('status')->default(0); // Status: 0 = unsold, 1 = sold
             $table->string('status_availability')->default('in_stock'); // in_stock, in_repair, with_person
             $table->string('person_name')->nullable();                 // Name if "with_person"
+            $table->decimal('commission', 10, 2)->nullable(); // Commission (optional)
             $table->timestamps();                      // created_at & updated_at
         });
     }

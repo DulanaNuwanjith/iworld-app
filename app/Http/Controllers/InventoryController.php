@@ -121,6 +121,7 @@ class InventoryController extends Controller
             'date' => 'required|date',
             'supplier' => 'required|string|max:255',
             'stock_type' => 'required|string|max:50',
+            'commission' => 'nullable|numeric|min:0',
 
             'items' => 'required|array|min:1',
             'items.*.phone_type' => 'required|string|max:255',
@@ -174,6 +175,7 @@ class InventoryController extends Controller
                 'date' => $validated['date'],
                 'supplier' => $validated['supplier'],
                 'stock_type' => $validated['stock_type'],
+                'commission' => $validated['commission'] ?? 0,
                 'phone_type' => $item['phone_type'],
                 'colour' => $item['colour'],
                 'capacity' => $item['capacity'],

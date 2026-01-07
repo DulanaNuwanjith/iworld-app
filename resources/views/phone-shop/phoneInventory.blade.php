@@ -395,6 +395,15 @@
                                                 </div>
                                             </div>
 
+                                            <div class="mt-6 col-span-2 md:col-span-1">
+                                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Commission (Optional)
+                                                </label>
+                                                <input type="number" step="0.01" name="commission"
+                                                    class="w-full mt-1 px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white text-sm"
+                                                    placeholder="Enter commission amount">
+                                            </div>
+
                                             <div class="mt-3">
                                                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                                     Supplier

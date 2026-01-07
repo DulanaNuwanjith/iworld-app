@@ -24,10 +24,11 @@ class PhoneInventory extends Model
         'cost',
         'note',
         'stock_type',
+        'commission', 
         'status',
         'supplier_id_front',
         'supplier_id_back',
-        'status_availability',    // new column
+        'status_availability', 
         'person_name',
     ];
 
@@ -40,6 +41,7 @@ class PhoneInventory extends Model
         'supplier_id_back' => 'string', 
         'status_availability' => 'string',
         'person_name' => 'string',
+        'commission' => 'decimal:2',
     ];
 
     public function repairs()
