@@ -287,6 +287,47 @@
                                         </div>
                                     </div>
 
+                                    {{-- Status Availability --}}
+                                    <div class="relative inline-block text-left w-48">
+                                        <label for="statusAvailabilityDropdown"
+                                            class="block text-sm font-medium text-gray-700 mb-1">Status
+                                            Availability</label>
+                                        <input type="hidden" name="status_availability" id="statusAvailabilityInput"
+                                            value="{{ request('status_availability') }}">
+                                        <button id="statusAvailabilityDropdown" type="button"
+                                            class="inline-flex w-full justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 h-10"
+                                            onclick="toggleStatusAvailabilityDropdown(event)">
+                                            <span
+                                                id="selectedStatusAvailability">{{ request('status_availability') ? '' : 'Select Status' }}</span>
+                                            <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20"
+                                                fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                    d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+
+                                        <div id="statusAvailabilityDropdownMenu"
+                                            class="absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg hidden max-h-48 overflow-y-auto p-2">
+                                            <div onclick="selectStatusAvailability('')"
+                                                class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                All Statuses
+                                            </div>
+                                            <div onclick="selectStatusAvailability('in_stock')"
+                                                class="status-availability-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                In Stock
+                                            </div>
+                                            <div onclick="selectStatusAvailability('in_repair')"
+                                                class="status-availability-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                In Repair
+                                            </div>
+                                            <div onclick="selectStatusAvailability('with_person')"
+                                                class="status-availability-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                With Person
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     {{-- Created Date --}}
                                     <div class="inline-block text-left w-48">
                                         <label class="block text-sm font-medium text-gray-700 mb-1">Created Date</label>
@@ -1293,18 +1334,51 @@
                     .toLowerCase().includes(f) ? "block" : "none");
             }
 
+            // Mapping DB values → human-readable text
+            const statusAvailabilityMap = {
+                '': 'All Statuses',
+                'in_stock': 'In Stock',
+                'in_repair': 'In Repair',
+                'with_person': 'With Person'
+            };
+
+            // ---- STATUS AVAILABILITY ----
+            const statusMenu = document.getElementById("statusAvailabilityDropdownMenu");
+            statusMenu.addEventListener("click", e => e.stopPropagation());
+
+            window.toggleStatusAvailabilityDropdown = function(e) {
+                e.stopPropagation();
+                closeAllDropdowns();
+                statusMenu.classList.toggle("hidden");
+            }
+
+            window.selectStatusAvailability = function(val) {
+                document.getElementById("statusAvailabilityInput").value = val;
+                document.getElementById("selectedStatusAvailability").textContent = statusAvailabilityMap[
+                    val] || 'Select Status';
+                statusMenu.classList.add("hidden"); // close dropdown after selection
+            }
+
             // ---- Close dropdowns on outside click ----
             function closeAllDropdowns() {
-                phoneTypeMenu.classList.add("hidden");
-                emiMenu.classList.add("hidden");
-                supplierMenu.classList.add("hidden");
-                stockMenu.classList.add("hidden");
+                statusMenu.classList.add("hidden");
+                phoneTypeMenu?.classList.add("hidden");
+                emiMenu?.classList.add("hidden");
+                supplierMenu?.classList.add("hidden");
+                stockMenu?.classList.add("hidden");
             }
 
             document.addEventListener("click", closeAllDropdowns);
 
             window.clearFiltersInventory = function() {
                 window.location.href = window.location.pathname;
+            }
+
+            // ---- Set button text on page load or after form submit ----
+            const currentVal = document.getElementById("statusAvailabilityInput").value;
+            if (currentVal in statusAvailabilityMap) {
+                document.getElementById("selectedStatusAvailability").textContent = statusAvailabilityMap[
+                    currentVal];
             }
 
         });

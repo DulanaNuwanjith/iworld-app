@@ -33,6 +33,11 @@ class InventoryController extends Controller
             $inventoriesQuery->where('stock_type', $request->stock_type);
         }
 
+        if ($request->filled('status_availability')) {
+            $inventoriesQuery->where('status_availability', $request->status_availability);
+        }
+
+
         if ($request->filled('date')) {
             $inventoriesQuery->whereDate('date', $request->date);
         }
