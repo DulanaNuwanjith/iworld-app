@@ -31,9 +31,9 @@
                 </a>
 
                 {{-- Accessories Tab --}}
-                <a href="{{ route('accessories.index') }}"
+                <a href="{{ route('inventory.accessories') }}"
                     class="pb-2 px-3 font-semibold 
-        {{ request()->routeIs('accessories.index') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
+        {{ request()->routeIs('inventory.accessories') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
                     Accessories Inventory
                 </a>
 

@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use App\Models\PhoneInventory;
 use App\Models\PhoneRepair;
 use App\Models\Invoice;
+use App\Models\Accessory;
 
 class InventoryController extends Controller
 {
@@ -196,7 +197,6 @@ class InventoryController extends Controller
         return redirect()->back()->with('success', 'Phones added successfully.');
     }
 
-
     /**
      * Delete a phone inventory item.
      */
@@ -340,5 +340,82 @@ class InventoryController extends Controller
 
         return redirect()->back()->with('success', 'Status updated successfully!');
     }
+
+    public function accessories(Request $request)
+    {
+        $query = Accessory::query();
+
+        if ($request->filled('name')) {
+            $query->where('name', $request->name);
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        $accessories = $query->latest()->paginate(15)->appends($request->all());
+
+        return view('phone-shop.accessories', compact('accessories'));
+    }
+
+    public function storeAccessory(Request $request)
+    {
+        $validated = $request->validate([
+            'supplier' => 'required|string|max:255',
+            'date' => 'required|date',
+            'commission' => 'nullable|numeric|min:0',
+            'items' => 'required|array|min:1',
+            'items.*.type' => 'required|string|max:100',
+            'items.*.name' => 'required|string|max:255',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.cost' => 'required|numeric|min:0',
+        ]);
+
+        foreach ($validated['items'] as $item) {
+            Accessory::create([
+                'supplier' => $validated['supplier'],
+                'date' => $validated['date'],
+                'commission' => $validated['commission'] ?? 0,
+                'type' => $item['type'],
+                'name' => $item['name'],
+                'quantity' => $item['quantity'],
+                'cost' => $item['cost'],
+            ]);
+        }
+
+        return back()->with('success', 'Accessories added successfully');
+    }
+
+    public function destroyAccessory($id)
+    {
+        // Find the accessory by ID
+        $accessory = Accessory::findOrFail($id);
+
+        // Delete the accessory
+        $accessory->delete();
+
+        // Redirect back with a success message
+        return redirect()->back()->with('success', 'Accessory deleted successfully.');
+    }
+
+    public function removeDamaged(Request $request, $id)
+    {
+        $request->validate([
+            'qty' => 'required|integer|min:1',
+        ]);
+
+        $accessory = Accessory::findOrFail($id);
+
+        // Ensure quantity to remove does not exceed current quantity
+        if ($request->qty > $accessory->quantity) {
+            return back()->withErrors(['qty' => 'Quantity to remove cannot exceed available quantity.']);
+        }
+
+        $accessory->quantity -= $request->qty;
+        $accessory->save();
+
+        return back()->with('success', "Removed {$request->qty} damaged items from {$accessory->name}.");
+    }
+
 
 }

@@ -103,9 +103,17 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/inventory/exchange', [InventoryController::class, 'exchange'])
             ->name('inventory.exchange');
 
-        Route::get('/accessories', function () {
-            return view('phone-shop.accessories');
-        })->name('accessories.index');
+        Route::get('/accessories', [InventoryController::class, 'accessories'])
+            ->name('inventory.accessories');
+
+        Route::post('/inventory/storeAccessory', [InventoryController::class, 'storeAccessory'])
+            ->name('storeAccessory');
+
+        Route::delete('/accessories/{accessory}', [InventoryController::class, 'destroyAccessory'])
+            ->name('accessories.destroy');
+
+        Route::post('/accessories/remove-damaged/{accessory}', [InventoryController::class, 'removeDamaged'])
+            ->name('accessories.removeDamaged');
 
         Route::get('/macbooks', function () {
             return view('phone-shop.macbooks');
