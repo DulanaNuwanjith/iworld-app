@@ -449,7 +449,7 @@
                                     <thead class="bg-gray-200 text-left">
                                         <tr class="text-center">
                                             <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-48 text-xs text-gray-600 uppercase break-words">
+                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-52 text-xs text-gray-600 uppercase break-words">
                                                 EMI Number
                                             </th>
                                             <th
@@ -490,6 +490,11 @@
                                                     <span class="font-semibold">{{ $inventory->emi }}</span> <br>
                                                     <span
                                                         class="text-xs text-gray-500">{{ $inventory->date->format('d M Y') }}</span>
+                                                    @if ($inventory->commission)
+                                                        <div class="mt-1 text-sm text-green-600">
+                                                            Commission: LKR {{ number_format($inventory->commission, 2) }}
+                                                        </div>
+                                                    @endif
                                                 </td>
                                                 <td class="px-4 py-2 text-left">
                                                     <span class="font-semibold">Model:</span>
