@@ -316,7 +316,22 @@ class InventoryController extends Controller
         ));
     }
 
-    
+    public function updateStatusAvailability(Request $request)
+    {
+        $request->validate([
+            'inventory_id' => 'required|exists:phone_inventories,id',
+            'status_availability' => 'required|in:in_stock,in_repair,with_person',
+            'person_name' => 'nullable|string|max:255',
+        ]);
 
+        $inventory = PhoneInventory::findOrFail($request->inventory_id);
+
+        $inventory->update([
+            'status_availability' => $request->status_availability,
+            'person_name' => $request->status_availability === 'with_person' ? $request->person_name : null,
+        ]);
+
+        return redirect()->back()->with('success', 'Status updated successfully!');
+    }
 
 }

@@ -25,6 +25,8 @@ return new class extends Migration
             $table->string('supplier_id_front')->nullable();
             $table->string('supplier_id_back')->nullable();
             $table->tinyInteger('status')->default(0); // Status: 0 = unsold, 1 = sold
+            $table->string('status_availability')->default('in_stock'); // in_stock, in_repair, with_person
+            $table->string('person_name')->nullable();                 // Name if "with_person"
             $table->timestamps();                      // created_at & updated_at
         });
     }

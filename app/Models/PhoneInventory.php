@@ -27,6 +27,8 @@ class PhoneInventory extends Model
         'status',
         'supplier_id_front',
         'supplier_id_back',
+        'status_availability',    // new column
+        'person_name',
     ];
 
     // Field type casting
@@ -36,6 +38,8 @@ class PhoneInventory extends Model
         'emi' => 'string',
         'supplier_id_front' => 'string',
         'supplier_id_back' => 'string', 
+        'status_availability' => 'string',
+        'person_name' => 'string',
     ];
 
     public function repairs()

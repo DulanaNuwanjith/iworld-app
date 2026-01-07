@@ -460,6 +460,10 @@
                                                 Cost
                                             </th>
                                             <th
+                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-40 text-xs text-gray-600 uppercase break-words">
+                                                Status
+                                            </th>
+                                            <th
                                                 class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-56 text-xs text-gray-600 uppercase break-words">
                                                 Note
                                             </th>
@@ -511,6 +515,39 @@
                                                         </div>
                                                     @endif
                                                 </td>
+                                                <td class="px-4 py-2">
+                                                    <form action="{{ route('inventory.updateStatusAvailability') }}"
+                                                        method="POST" class="inline-block">
+                                                        @csrf
+                                                        <input type="hidden" name="inventory_id"
+                                                            value="{{ $inventory->id }}">
+
+                                                        <select name="status_availability"
+                                                            class="border rounded px-2 py-1 text-sm"
+                                                            onchange="if(this.value === 'with_person') { 
+                openPersonNameModal({{ $inventory->id }}, '{{ $inventory->person_name ?? '' }}') 
+            } else { this.form.submit(); }">
+                                                            <option value="in_stock"
+                                                                {{ $inventory->status_availability === 'in_stock' ? 'selected' : '' }}>
+                                                                In Stock
+                                                            </option>
+                                                            <option value="in_repair"
+                                                                {{ $inventory->status_availability === 'in_repair' ? 'selected' : '' }}>
+                                                                In Repair
+                                                            </option>
+                                                            <option value="with_person"
+                                                                {{ $inventory->status_availability === 'with_person' ? 'selected' : '' }}>
+                                                                With Another Person
+                                                            </option>
+                                                        </select>
+                                                    </form>
+
+                                                    @if ($inventory->status_availability === 'with_person' && $inventory->person_name)
+                                                        <br>
+                                                        <span
+                                                            class="text-xs text-gray-500">{{ $inventory->person_name }}</span>
+                                                    @endif
+                                                </td>
                                                 <td class="px-4 py-2 text-left">{{ $inventory->note ?? '-' }}</td>
                                                 <td class="px-4 py-2">
                                                     <div class="inline-flex items-center justify-center gap-2">
@@ -550,6 +587,41 @@
                             <div class="py-6 flex justify-center">
                                 {{ $inventories->links() }}
                             </div>
+
+                            <div id="personNameModal"
+                                class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center px-4 py-6">
+                                <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+                                    <h3 class="text-lg font-semibold mb-4">Enter Person Name</h3>
+                                    <form id="personNameForm" method="POST"
+                                        action="{{ route('inventory.updateStatusAvailability') }}">
+                                        @csrf
+                                        <input type="hidden" name="inventory_id" id="personModalInventoryId">
+                                        <input type="hidden" name="status_availability" value="with_person">
+
+                                        <input type="text" name="person_name" id="personModalName"
+                                            class="w-full border p-2 rounded mb-4" placeholder="Person Name" required>
+
+                                        <div class="flex justify-end gap-2">
+                                            <button type="button" onclick="closePersonNameModal()"
+                                                class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400">Cancel</button>
+                                            <button type="submit"
+                                                class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">Save</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <script>
+                                function openPersonNameModal(id, name = '') {
+                                    document.getElementById('personModalInventoryId').value = id;
+                                    document.getElementById('personModalName').value = name;
+                                    document.getElementById('personNameModal').classList.remove('hidden');
+                                }
+
+                                function closePersonNameModal() {
+                                    document.getElementById('personNameModal').classList.add('hidden');
+                                }
+                            </script>
 
                             <!-- Supplier ID Modal -->
                             <div id="supplierIdModal"

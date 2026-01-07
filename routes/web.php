@@ -93,6 +93,10 @@ Route::middleware(['auth'])->group(function () {
 
         Route::delete('/inventory/{inventory}', [InventoryController::class, 'destroy'])
             ->name('inventory.destroy');
+        
+        Route::post('/inventory/update-status-availability', [InventoryController::class, 'updateStatusAvailability'])
+            ->name('inventory.updateStatusAvailability');
+
     });
 
     /*
