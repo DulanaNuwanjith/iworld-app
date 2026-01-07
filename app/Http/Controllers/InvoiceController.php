@@ -38,7 +38,8 @@ class InvoiceController extends Controller
 
         // For Add Invoice form (full details)
         $addInvoiceEmis = PhoneInventory::select('emi','phone_type','colour','capacity')
-            ->where('status', 0) // optional: only available phones
+            ->where('status', 0) 
+            ->where('status_availability', 'in_stock') 
             ->get();
 
         // Add Exchange phones
