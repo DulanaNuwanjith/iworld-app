@@ -401,6 +401,7 @@
 
                                                 <!-- Actions -->
                                                 <td class="px-4 py-2">
+                                                    @if(auth()->user()->role === 'ADMIN' || auth()->user()->role === 'SUPERADMIN')
                                                     <div class="inline-flex items-center justify-center gap-2">
                                                         <button type="button"
                                                             class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm"
@@ -420,6 +421,7 @@
                                                             </button>
                                                         </form>
                                                     </div>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @empty
