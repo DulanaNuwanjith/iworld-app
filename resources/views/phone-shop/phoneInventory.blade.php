@@ -460,7 +460,7 @@
                                                 Cost
                                             </th>
                                             <th
-                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-40 text-xs text-gray-600 uppercase break-words">
+                                                class="font-bold sticky top-0 bg-gray-200 px-4 py-3 w-52 text-xs text-gray-600 uppercase break-words">
                                                 Status
                                             </th>
                                             <th
@@ -515,38 +515,64 @@
                                                         </div>
                                                     @endif
                                                 </td>
-                                                <td class="px-4 py-2">
-                                                    <form action="{{ route('inventory.updateStatusAvailability') }}"
-                                                        method="POST" class="inline-block">
-                                                        @csrf
-                                                        <input type="hidden" name="inventory_id"
-                                                            value="{{ $inventory->id }}">
+                                                <td class="px-4 py-3 text-center">
+                                                    <div x-data="{ status: '{{ $inventory->status_availability }}' }"
+                                                        class="flex flex-col items-center gap-1 w-full">
 
-                                                        <select name="status_availability"
-                                                            class="border rounded px-2 py-1 text-sm"
-                                                            onchange="if(this.value === 'with_person') { 
-                openPersonNameModal({{ $inventory->id }}, '{{ $inventory->person_name ?? '' }}') 
-            } else { this.form.submit(); }">
-                                                            <option value="in_stock"
-                                                                {{ $inventory->status_availability === 'in_stock' ? 'selected' : '' }}>
-                                                                In Stock
-                                                            </option>
-                                                            <option value="in_repair"
-                                                                {{ $inventory->status_availability === 'in_repair' ? 'selected' : '' }}>
-                                                                In Repair
-                                                            </option>
-                                                            <option value="with_person"
-                                                                {{ $inventory->status_availability === 'with_person' ? 'selected' : '' }}>
-                                                                With Another Person
-                                                            </option>
-                                                        </select>
-                                                    </form>
+                                                        <!-- Status Dropdown -->
+                                                        <form action="{{ route('inventory.updateStatusAvailability') }}"
+                                                            method="POST" class="w-full">
+                                                            @csrf
+                                                            <input type="hidden" name="inventory_id"
+                                                                value="{{ $inventory->id }}">
 
-                                                    @if ($inventory->status_availability === 'with_person' && $inventory->person_name)
-                                                        <br>
-                                                        <span
-                                                            class="text-xs text-gray-500">{{ $inventory->person_name }}</span>
-                                                    @endif
+                                                            <div class="relative w-full">
+                                                                <select name="status_availability" x-model="status"
+                                                                    @change="if(status === 'with_person'){ openPersonNameModal({{ $inventory->id }}, '{{ $inventory->person_name ?? '' }}') } else { $el.form.submit() }"
+                                                                    :class="{
+                                                                        'bg-green-100 text-green-800 border-green-400': status === 'in_stock',
+                                                                        'bg-red-100 text-red-800 border-red-400': status === 'in_repair',
+                                                                        'bg-blue-100 text-blue-800 border-blue-400': status === 'with_person',
+                                                                    }"
+                                                                    class="appearance-none w-full text-sm font-medium rounded-md px-3 py-2
+                               border shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-1
+                               focus:ring-opacity-50 pr-8 transition-colors duration-200 hover:brightness-95">
+                                                                    <option value="in_stock">✅ In Stock</option>
+                                                                    <option value="in_repair">🛠 In Repair</option>
+                                                                    <option value="with_person">👤 With Another Person
+                                                                    </option>
+                                                                </select>
+
+                                                                <!-- Custom arrow -->
+                                                                <div
+                                                                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                                                    <svg class="h-4 w-4"
+                                                                        :class="{
+                                                                            'text-green-800': status === 'in_stock',
+                                                                            'text-red-800': status === 'in_repair',
+                                                                            'text-blue-800': status === 'with_person',
+                                                                        }"
+                                                                        xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                                        <path stroke-linecap="round"
+                                                                            stroke-linejoin="round" stroke-width="2"
+                                                                            d="M19 9l-7 7-7-7" />
+                                                                    </svg>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+
+                                                        <!-- Person Name Display -->
+                                                        <template
+                                                            x-if="status === 'with_person' && '{{ $inventory->person_name }}'">
+                                                            <span
+                                                                class="mt-1 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full
+                         font-medium italic truncate max-w-[140px]"
+                                                                title="{{ $inventory->person_name }}">
+                                                                {{ $inventory->person_name }}
+                                                            </span>
+                                                        </template>
+                                                    </div>
                                                 </td>
                                                 <td class="px-4 py-2 text-left">{{ $inventory->note ?? '-' }}</td>
                                                 <td class="px-4 py-2">
