@@ -162,6 +162,28 @@ class InvoiceController extends Controller
 
         $invoice->total_amount = $total;
 
+        // Accessories keys for dropdown
+        $accessoryKeys = ['charger', 'data_cable', 'hand_free', 'airpods', 'power_bank'];
+
+        // Loop through each accessory type
+        foreach ($accessoryKeys as $key) {
+            $accId = $request->input($key . '_id');       // ID from hidden input
+            $qty   = (int) $request->input($key . '_qty'); // Quantity input
+
+            // Assign to invoice price field as before (optional)
+            $invoice->$key = $request->input($key) ?? 0;
+
+            // Update stock if accessory selected and qty > 0
+            if ($accId && $qty > 0) {
+                $accessory = Accessory::find($accId);
+                if ($accessory) {
+                    // Reduce stock
+                    $accessory->quantity = max($accessory->quantity - $qty, 0);
+                    $accessory->save();
+                }
+            }
+        }
+
         // Save invoice
         $invoice->save();
 

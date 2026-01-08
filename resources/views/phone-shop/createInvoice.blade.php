@@ -677,40 +677,62 @@
                                                         $items = $data['items'];
                                                         $key = $data['key'];
                                                     @endphp
-                                                    <div class="mb-4">
+
+                                                    <div x-data="{ selectedId: '', selectedName: '', qtyDisabled: true }" class="mb-4">
                                                         <label
                                                             class="block text-sm font-medium mb-2">{{ $type }}</label>
                                                         <div class="flex gap-3 items-center">
                                                             <div class="relative w-1/2">
-                                                                <input type="hidden" name="{{ $key }}_name">
-                                                                <input type="hidden" name="{{ $key }}_id">
+                                                                {{-- Hidden fields --}}
+                                                                <input type="hidden" name="{{ $key }}_name"
+                                                                    x-model="selectedName">
+                                                                <input type="hidden" name="{{ $key }}_id"
+                                                                    x-model="selectedId">
+
+                                                                {{-- Dropdown button --}}
                                                                 <button type="button"
-                                                                    class="w-full flex justify-between bg-white border px-3 py-2 rounded-md h-10">
-                                                                    Select {{ $type }}
+                                                                    class="w-full flex justify-between bg-white border px-3 py-2 rounded-md h-10"
+                                                                    @click="$refs.dropdown.classList.toggle('hidden')">
+                                                                    <span
+                                                                        x-text="selectedName || 'Select {{ $type }}'"></span>
                                                                 </button>
-                                                                <div
+
+                                                                {{-- Dropdown menu --}}
+                                                                <div x-ref="dropdown"
                                                                     class="hidden absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg max-h-48 overflow-y-auto p-2">
-                                                                    <div
-                                                                        class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
-                                                                        None</div>
+                                                                    {{-- None option --}}
+                                                                    <div class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                                                        @click="selectedId=''; selectedName=''; qtyDisabled = true; $refs.dropdown.classList.add('hidden')">
+                                                                        None
+                                                                    </div>
+                                                                    {{-- Accessories --}}
                                                                     @foreach ($items as $item)
-                                                                        <div
-                                                                            class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
-                                                                            {{ $item->name }}
+                                                                        <div class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                                                            @click="selectedId='{{ $item->id }}'; selectedName='{{ $item->name }}'; qtyDisabled = false; $refs.dropdown.classList.add('hidden')">
+                                                                            {{ $item->name }} (Stock:
+                                                                            {{ $item->quantity }})
                                                                         </div>
                                                                     @endforeach
                                                                 </div>
                                                             </div>
+
+                                                            {{-- Quantity input --}}
                                                             <input type="number" min="1"
-                                                                name="{{ $key }}_qty"
+                                                                name="{{ $key }}_qty" :disabled="qtyDisabled"
+                                                                :required="!qtyDisabled"
                                                                 class="w-1/4 h-10 px-3 border rounded-md">
+
+                                                            {{-- Price input --}}
                                                             <input type="number" min="0"
                                                                 name="{{ $key }}"
                                                                 x-model.number="accessories.{{ $key }}"
+                                                                :disabled="qtyDisabled" :required="!qtyDisabled"
                                                                 class="w-1/4 h-10 px-3 border rounded-md">
                                                         </div>
                                                     </div>
                                                 @endforeach
+
+
 
                                                 {{-- Simple Accessories --}}
                                                 <div class="mt-6">
@@ -1476,68 +1498,36 @@
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-
             document.querySelectorAll('.accessory-btn').forEach(button => {
                 const dropdownId = button.dataset.dropdown;
                 const dropdown = document.getElementById(dropdownId);
-                const searchInput = dropdown.querySelector('.accessory-search');
-                const defaultText = button.dataset.default; // store default text
 
                 button.addEventListener('click', e => {
                     e.stopPropagation();
-                    closeAllAccessoryDropdowns();
                     dropdown.classList.toggle('hidden');
-                    searchInput.focus();
                 });
 
-                // Select option or deselect
                 dropdown.querySelectorAll('.accessory-option').forEach(option => {
                     option.addEventListener('click', () => {
                         const name = option.dataset.name;
                         const id = option.dataset.id;
 
-                        const nameInput = document.getElementById(dropdownId.replace(
-                            '_dropdown', '_name'));
-                        const idInput = document.getElementById(dropdownId.replace(
-                            '_dropdown', '_id'));
-                        const selectedSpan = document.getElementById(dropdownId.replace(
-                            '_dropdown', '_selected'));
-
-                        if (!name) {
-                            // Deselect → reset to default text
-                            nameInput.value = '';
-                            idInput.value = '';
-                            selectedSpan.textContent = defaultText;
-                        } else {
-                            nameInput.value = name;
-                            idInput.value = id;
-                            selectedSpan.textContent = name;
-                        }
+                        document.getElementById(dropdownId.replace('_dropdown', '_name'))
+                            .value = name;
+                        document.getElementById(dropdownId.replace('_dropdown', '_id'))
+                            .value = id;
+                        document.getElementById(dropdownId.replace('_dropdown',
+                            '_selected')).textContent = name || button.dataset.default;
 
                         dropdown.classList.add('hidden');
                     });
                 });
             });
 
-            // Filter function
-            window.filterAccessoryDropdown = function(input) {
-                const filter = input.value.toLowerCase();
-                const dropdown = input.closest('.accessory-dropdown');
-                dropdown.querySelectorAll('.accessory-option').forEach(option => {
-                    option.style.display = option.textContent.toLowerCase().includes(filter) ? 'block' :
-                        'none';
-                });
-            }
-
-            // Close all dropdowns when clicking outside
-            function closeAllAccessoryDropdowns() {
-                document.querySelectorAll('.accessory-dropdown').forEach(dropdown => {
-                    dropdown.classList.add('hidden');
-                });
-            }
-
-            document.addEventListener('click', closeAllAccessoryDropdowns);
-
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.accessory-dropdown').forEach(dropdown => dropdown.classList.add(
+                    'hidden'));
+            });
         });
     </script>
 @endsection

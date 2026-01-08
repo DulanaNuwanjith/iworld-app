@@ -17,6 +17,6 @@ class Accessory extends Model
     ];
 
     protected $casts = [
-        'date' => 'datetime', // ensures $accessory->date is a Carbon instance
+        'date' => 'datetime',
     ];
 }
