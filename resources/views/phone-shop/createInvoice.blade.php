@@ -414,7 +414,8 @@
                                 class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center px-4 py-6">
 
                                 <form id="invoiceForm" action="{{ route('invoices.store') }}" method="POST"
-                                    class="w-full max-w-6xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden transform transition-all scale-95 max-h-[90vh] flex flex-col">
+                                    class="w-full max-w-6xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden transform transition-all scale-95 max-h-[90vh] flex flex-col"
+                                    x-data="invoiceModal()">
 
                                     @csrf
 
@@ -436,7 +437,7 @@
                                     </div>
 
                                     <!-- Body -->
-                                    <div class="px-8 py-6 overflow-y-auto flex-1 space-y-8" x-data="invoiceModal()">
+                                    <div class="px-8 py-6 overflow-y-auto flex-1 space-y-8">
 
                                         <!-- Customer Coordinator -->
                                         <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-6"
@@ -577,32 +578,26 @@
                                             class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                                             <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">Select
                                                 Phone</h3>
-
-                                            <div class="relative w-full inline-block text-left">
-                                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                                                <input type="hidden" name="emi" id="phoneEmiInput" required>
-                                                <button type="button"
+                                            <div class="relative w-full inline-block text-left"> <label
+                                                    class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                                <input type="hidden" name="emi" id="phoneEmiInput" required> <button
+                                                    type="button"
                                                     class="inline-flex w-full justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 h-10"
-                                                    onclick="toggleDropdown(event, 'phoneDropdownMenu')">
-                                                    <span id="selectedPhone">Select EMI</span>
-                                                    <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20"
+                                                    onclick="toggleDropdown(event, 'phoneDropdownMenu')"> <span
+                                                        id="selectedPhone">Select EMI</span> <svg
+                                                        class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20"
                                                         fill="currentColor">
                                                         <path fill-rule="evenodd"
                                                             d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
                                                             clip-rule="evenodd" />
-                                                    </svg>
-                                                </button>
-
+                                                    </svg> </button>
                                                 <div id="phoneDropdownMenu"
                                                     class="absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg hidden max-h-60 overflow-y-auto p-2">
                                                     <input type="text" id="phoneSearch"
                                                         onkeyup="filterDropdown('phoneSearch','phone-option')"
                                                         placeholder="Search..."
                                                         class="w-full px-2 py-1 text-sm border rounded-md mb-2"
-                                                        autocomplete="off">
-
-                                                    {{-- Phone options --}}
-                                                    @foreach ($addInvoiceEmis as $phone)
+                                                        autocomplete="off"> {{-- Phone options --}} @foreach ($addInvoiceEmis as $phone)
                                                         <div onclick="selectPhone('{{ $phone->id }}','{{ $phone->emi }}','{{ $phone->phone_type }}','{{ $phone->colour }}','{{ $phone->capacity }}')"
                                                             class="phone-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
                                                             {{ $phone->emi }} - {{ $phone->phone_type }}
@@ -610,12 +605,9 @@
                                                         </div>
                                                     @endforeach
                                                 </div>
-                                            </div>
-
-                                            {{-- Auto-filled phone details --}}
-                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                                                <input id="phone_type" name="phone_type" readonly
-                                                    placeholder="Phone Type"
+                                            </div> {{-- Auto-filled phone details --}} <div
+                                                class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4"> <input id="phone_type"
+                                                    name="phone_type" readonly placeholder="Phone Type"
                                                     class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
                                                 <input id="colour" name="colour" readonly placeholder="Colour"
                                                     class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
@@ -625,86 +617,144 @@
                                         </div>
 
                                         <!-- Accessories & Selling Price -->
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+
+                                            <!-- Selling Price -->
                                             <div
-                                                class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                                                <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
-                                                    Selling Price</h3>
+                                                class="col-span-1 md:col-span-4 bg-gray-50 p-6 rounded-xl border shadow-sm">
+                                                <h3 class="text-xl font-semibold mb-4">Selling Price</h3>
+
                                                 <input type="number" min="0" name="selling_price"
                                                     x-model.number="sellingPrice" placeholder="Enter Selling Price"
-                                                    required
-                                                    class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                                                    class="w-full p-4 border rounded-lg">
 
                                                 <div x-show="isExchange && exchangeSelected" class="mt-4">
-                                                    <label
-                                                        class="block text-gray-700 dark:text-gray-200 font-semibold mb-1">Exchanged
-                                                        phone price</label>
+                                                    <label class="font-semibold mb-1 block">Exchanged phone price</label>
                                                     <input type="text" readonly :value="exchangeSelected.cost"
-                                                        class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white bg-gray-100">
+                                                        class="w-full p-4 border rounded-lg bg-gray-100">
                                                 </div>
                                             </div>
 
+                                            <!-- Accessories -->
                                             <div
-                                                class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                                                <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
-                                                    Accessories</h3>
-                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    <template x-for="(value, key) in accessories" :key="key">
-                                                        <div>
-                                                            <label
-                                                                class="block text-gray-700 text-sm dark:text-gray-200 mb-1 font-semibold"
-                                                                x-text="key.replace('_',' ').toUpperCase()"></label>
+                                                class="col-span-1 md:col-span-8 bg-gray-50 p-6 rounded-xl border shadow-sm">
+                                                <h3 class="text-xl font-semibold mb-4">Accessories</h3>
+
+                                                @php
+                                                    $accessoryTypes = [
+                                                        'Charging Docks' => [
+                                                            'items' => $chargerAccessories ?? [],
+                                                            'key' => 'charger',
+                                                        ],
+                                                        'Data Cables' => [
+                                                            'items' => $dataCableAccessories ?? [],
+                                                            'key' => 'data_cable',
+                                                        ],
+                                                        'Handfrees' => [
+                                                            'items' => $handfreeAccessories ?? [],
+                                                            'key' => 'hand_free',
+                                                        ],
+                                                        'Airpods' => [
+                                                            'items' => $airpodAccessories ?? [],
+                                                            'key' => 'airpods',
+                                                        ],
+                                                        'Power Banks' => [
+                                                            'items' => $powerBankAccessories ?? [],
+                                                            'key' => 'power_bank',
+                                                        ],
+                                                    ];
+
+                                                    $simpleAccessories = [
+                                                        'Tempered' => 'tempered',
+                                                        'Back Cover' => 'back_cover',
+                                                        'Cam Glass' => 'cam_glass',
+                                                    ];
+                                                @endphp
+
+                                                {{-- Dropdown Accessories --}}
+                                                @foreach ($accessoryTypes as $type => $data)
+                                                    @php
+                                                        $items = $data['items'];
+                                                        $key = $data['key'];
+                                                    @endphp
+                                                    <div class="mb-4">
+                                                        <label
+                                                            class="block text-sm font-medium mb-2">{{ $type }}</label>
+                                                        <div class="flex gap-3 items-center">
+                                                            <div class="relative w-1/2">
+                                                                <input type="hidden" name="{{ $key }}_name">
+                                                                <input type="hidden" name="{{ $key }}_id">
+                                                                <button type="button"
+                                                                    class="w-full flex justify-between bg-white border px-3 py-2 rounded-md h-10">
+                                                                    Select {{ $type }}
+                                                                </button>
+                                                                <div
+                                                                    class="hidden absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg max-h-48 overflow-y-auto p-2">
+                                                                    <div
+                                                                        class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                                        None</div>
+                                                                    @foreach ($items as $item)
+                                                                        <div
+                                                                            class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                                            {{ $item->name }}
+                                                                        </div>
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
+                                                            <input type="number" min="1"
+                                                                name="{{ $key }}_qty"
+                                                                class="w-1/4 h-10 px-3 border rounded-md">
                                                             <input type="number" min="0"
-                                                                :placeholder="key.replace('_', ' ') + ' price'"
-                                                                :name="key" x-model.number="accessories[key]"
-                                                                class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
+                                                                name="{{ $key }}"
+                                                                x-model.number="accessories.{{ $key }}"
+                                                                class="w-1/4 h-10 px-3 border rounded-md">
                                                         </div>
-                                                    </template>
+                                                    </div>
+                                                @endforeach
+
+                                                {{-- Simple Accessories --}}
+                                                <div class="mt-6">
+                                                    <label class="block text-sm font-medium mb-2">Other Accessories</label>
+                                                    <div class="flex gap-6">
+                                                        @foreach ($simpleAccessories as $label => $key)
+                                                            <div class="flex flex-col w-1/3">
+                                                                <span
+                                                                    class="px-4 py-2 border bg-gray-100 rounded-md text-center text-sm">{{ $label }}</span>
+                                                                <input type="number" min="0"
+                                                                    name="{{ $key }}"
+                                                                    x-model.number="accessories.{{ $key }}"
+                                                                    class="mt-2 h-10 px-3 border rounded-md">
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
                                                 </div>
                                             </div>
+
                                         </div>
 
                                         <!-- Payable Section -->
-                                        <div class="flex flex-col gap-2">
-
-                                            <!-- Checkbox to toggle payable -->
+                                        <div class="flex flex-col gap-2"> <!-- Checkbox to toggle payable -->
                                             <div class="flex items-center justify-between mb-4">
-                                                <div class="flex items-center gap-2">
-                                                    <input type="hidden" name="isPayable" value="0">
-                                                    <input type="checkbox" id="is_payable" name="isPayable"
-                                                        x-model="isPayable" value="1" class="w-5 h-5">
-                                                    <label for="is_payable"
-                                                        class="text-gray-700 dark:text-gray-200 font-semibold">
-                                                        Is this Payable?
-                                                    </label>
-                                                </div>
-
-                                                <!-- Right-side note -->
-                                                <span
+                                                <div class="flex items-center gap-2"> <input type="hidden"
+                                                        name="isPayable" value="0"> <input type="checkbox"
+                                                        id="is_payable" name="isPayable" x-model="isPayable"
+                                                        value="1" class="w-5 h-5"> <label for="is_payable"
+                                                        class="text-gray-700 dark:text-gray-200 font-semibold"> Is this
+                                                        Payable? </label> </div> <!-- Right-side note --> <span
                                                     class="text-lg text-red-600 font-semibold border border-red-600 px-3 py-1 rounded-md">
-                                                    This can only be applied after CEO approval.
-                                                </span>
-                                            </div>
-
-                                            <!-- Section that appears when checkbox is checked -->
+                                                    This can only be applied after CEO approval. </span>
+                                            </div> <!-- Section that appears when checkbox is checked -->
                                             <div x-show="isPayable" x-transition
                                                 class="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-
                                                 <h1 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2">
-                                                    Payable Amount</h1>
-
-                                                <!-- Input for payable amount -->
-                                                <input type="number" name="payable_amount"
-                                                    x-model.number="payableAmount" placeholder="Enter payable amount"
-                                                    min="0"
+                                                    Payable Amount</h1> <!-- Input for payable amount --> <input
+                                                    type="number" name="payable_amount" x-model.number="payableAmount"
+                                                    placeholder="Enter payable amount" min="0"
                                                     class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
-
                                                 <!-- Display remaining amount -->
-                                                <p class="mt-2 text-gray-700 dark:text-gray-200">
-                                                    Customer need to pay Now: <span
-                                                        x-text="remainingAmount.toFixed(2)"></span>
+                                                <p class="mt-2 text-gray-700 dark:text-gray-200"> Customer need to pay Now:
+                                                    <span x-text="remainingAmount.toFixed(2)"></span>
                                                 </p>
-
                                             </div>
                                         </div>
 
@@ -736,11 +786,21 @@
                             </div>
 
                             <script>
+                                // =====================
+                                // Alpine.js Invoice Modal Data
+                                // =====================
                                 function invoiceModal() {
                                     return {
+                                        // =====================
+                                        // Exchange & Selling Price
+                                        // =====================
                                         isExchange: false,
                                         sellingPrice: 0,
                                         exchangeSelected: null,
+
+                                        // =====================
+                                        // Accessories Prices
+                                        // =====================
                                         accessories: {
                                             tempered: 0,
                                             back_cover: 0,
@@ -751,6 +811,10 @@
                                             airpods: 0,
                                             power_bank: 0,
                                         },
+
+                                        // =====================
+                                        // Exchange Dropdown
+                                        // =====================
                                         open: false,
                                         search: '',
                                         options: [
@@ -761,7 +825,7 @@
                                                     phone_type: '{{ $phone->phone_type }}',
                                                     colour: '{{ $phone->colour }}',
                                                     capacity: '{{ $phone->capacity }}',
-                                                    cost: {{ $phone->cost }}
+                                                    cost: Number({{ $phone->cost }})
                                                 }
                                                 @if (!$loop->last)
                                                     ,
@@ -769,53 +833,102 @@
                                             @endforeach
                                         ],
 
-                                        // Payable data
+                                        // =====================
+                                        // Payable Section
+                                        // =====================
                                         isPayable: false,
                                         payableAmount: 0,
 
-                                        // Computed total
+                                        // =====================
+                                        // TOTAL CALCULATION
+                                        // =====================
                                         get totalAmount() {
-                                            let total = parseFloat(this.sellingPrice) || 0;
-                                            if (this.isExchange && this.exchangeSelected) total -= parseFloat(this.exchangeSelected.cost) || 0;
-                                            for (let key in this.accessories) total += parseFloat(this.accessories[key]) || 0;
+                                            let total = Number(this.sellingPrice) || 0;
+
+                                            if (this.isExchange && this.exchangeSelected) {
+                                                total -= Number(this.exchangeSelected.cost) || 0;
+                                            }
+
+                                            Object.values(this.accessories).forEach(price => {
+                                                total += Number(price) || 0;
+                                            });
+
                                             return total;
                                         },
 
-                                        // Remaining amount after payable
+                                        // =====================
+                                        // REMAINING CALCULATION
+                                        // =====================
                                         get remainingAmount() {
-                                            return (this.totalAmount - (this.payableAmount || 0));
+                                            return this.totalAmount - (Number(this.payableAmount) || 0);
                                         },
 
+                                        // =====================
+                                        // FILTER EXCHANGE DROPDOWN
+                                        // =====================
                                         get filteredOptions() {
-                                            if (this.search === '') return this.options;
-                                            return this.options.filter(o => o.label.toLowerCase().includes(this.search.toLowerCase()));
+                                            if (!this.search) return this.options;
+
+                                            return this.options.filter(option =>
+                                                option.label.toLowerCase().includes(this.search.toLowerCase())
+                                            );
                                         },
 
+                                        // =====================
+                                        // SELECT EXCHANGE
+                                        // =====================
                                         selectExchange(option) {
                                             this.exchangeSelected = option;
                                             this.open = false;
+                                        },
+
+                                        // =====================
+                                        // RESET FORM
+                                        // =====================
+                                        reset() {
+                                            this.isExchange = false;
+                                            this.sellingPrice = 0;
+                                            this.exchangeSelected = null;
+                                            this.payableAmount = 0;
+
+                                            Object.keys(this.accessories).forEach(key => {
+                                                this.accessories[key] = 0;
+                                            });
                                         }
                                     }
                                 }
 
+                                // =====================
+                                // DOM READY: Modal Open/Close
+                                // =====================
                                 document.addEventListener('DOMContentLoaded', () => {
+                                    window.openInvoiceModal = function() {
+                                        document.getElementById('createInvoiceModal').classList.remove('hidden');
+                                    }
                                     window.closeInvoiceModal = function() {
                                         const modal = document.getElementById('createInvoiceModal');
                                         modal.classList.add('hidden');
                                         const form = document.getElementById('invoiceForm');
                                         form.reset();
-                                    }
-                                    window.openInvoiceModal = function() {
-                                        document.getElementById('createInvoiceModal').classList.remove('hidden');
+
+                                        // Reset dropdown display text
+                                        document.getElementById('selectedPhone').textContent = 'Select EMI';
+                                        document.getElementById('selectedWorker').textContent = 'Select Worker';
                                     }
                                 });
 
+                                // =====================
+                                // TOGGLE DROPDOWN (Generic)
+                                // =====================
                                 function toggleDropdown(event, dropdownId) {
                                     event.stopPropagation();
                                     const dropdown = document.getElementById(dropdownId);
                                     dropdown.classList.toggle('hidden');
                                 }
 
+                                // =====================
+                                // FILTER DROPDOWN (Generic)
+                                // =====================
                                 function filterDropdown(inputId, optionClass) {
                                     const filter = document.getElementById(inputId).value.toLowerCase();
                                     const options = document.getElementsByClassName(optionClass);
@@ -825,44 +938,9 @@
                                     }
                                 }
 
-                                function selectPhone(id, emi, phone_type, colour, capacity) {
-                                    document.getElementById('phoneEmiInput').value = emi;
-                                    document.getElementById('selectedPhone').textContent = emi;
-                                    document.getElementById('phone_type').value = phone_type;
-                                    document.getElementById('colour').value = colour;
-                                    document.getElementById('capacity').value = capacity;
-                                    document.getElementById('phoneDropdownMenu').classList.add('hidden');
-                                    document.getElementById('invoiceForm').dataset.phoneId = id; // save phone_id for backend if needed
-                                }
-
-                                document.addEventListener('click', function(event) {
-                                    const dropdown = document.getElementById('phoneDropdownMenu');
-                                    const button = document.getElementById('selectedPhone').closest('button') || null;
-                                    if (!dropdown.contains(event.target) && !button?.contains(event.target)) {
-                                        dropdown.classList.add('hidden');
-                                    }
-                                });
-                            </script>
-
-                            <script>
-                                // Toggle dropdown visibility
-                                function toggleDropdown(event, dropdownId) {
-                                    event.stopPropagation();
-                                    const dropdown = document.getElementById(dropdownId);
-                                    dropdown.classList.toggle('hidden');
-                                }
-
-                                // Generic search/filter for dropdown options
-                                function filterDropdown(inputId, optionClass) {
-                                    const filter = document.getElementById(inputId).value.toLowerCase();
-                                    const options = document.getElementsByClassName(optionClass);
-                                    for (let i = 0; i < options.length; i++) {
-                                        let txt = options[i].textContent.toLowerCase();
-                                        options[i].style.display = txt.includes(filter) ? "" : "none";
-                                    }
-                                }
-
-                                // Select worker
+                                // =====================
+                                // SELECT WORKER
+                                // =====================
                                 function selectWorker(id, name) {
                                     document.getElementById('workerIdInput').value = id;
                                     document.getElementById('workerNameInput').value = name;
@@ -870,7 +948,9 @@
                                     document.getElementById('workerDropdownMenu').classList.add('hidden');
                                 }
 
-                                // Select phone
+                                // =====================
+                                // SELECT PHONE
+                                // =====================
                                 function selectPhone(id, emi, phone_type, colour, capacity) {
                                     document.getElementById('phoneEmiInput').value = emi;
                                     document.getElementById('selectedPhone').textContent = emi;
@@ -881,7 +961,9 @@
                                     document.getElementById('invoiceForm').dataset.phoneId = id; // optional
                                 }
 
-                                // Close dropdowns if click outside
+                                // =====================
+                                // CLOSE DROPDOWNS ON CLICK OUTSIDE
+                                // =====================
                                 document.addEventListener('click', function(event) {
                                     const phoneDropdown = document.getElementById('phoneDropdownMenu');
                                     const workerDropdown = document.getElementById('workerDropdownMenu');
@@ -894,20 +976,6 @@
                                     }
                                     if (!workerDropdown.contains(event.target) && !workerButton.contains(event.target)) {
                                         workerDropdown.classList.add('hidden');
-                                    }
-                                });
-
-                                // Modal open/close
-                                document.addEventListener('DOMContentLoaded', () => {
-                                    window.openInvoiceModal = function() {
-                                        document.getElementById('createInvoiceModal').classList.remove('hidden');
-                                    }
-                                    window.closeInvoiceModal = function() {
-                                        const modal = document.getElementById('createInvoiceModal');
-                                        modal.classList.add('hidden');
-                                        document.getElementById('invoiceForm').reset();
-                                        document.getElementById('selectedPhone').textContent = 'Select EMI';
-                                        document.getElementById('selectedWorker').textContent = 'Select Worker';
                                     }
                                 });
                             </script>
@@ -1049,7 +1117,8 @@
                                                 <td class="px-4 py-2 text-center font-bold">
                                                     @if (isset($invoice->payable_amount) && $invoice->payable_amount > 0)
                                                         <div class="text-red-600">
-                                                            Payable: LKR {{ number_format($invoice->payable_amount, 2) }}
+                                                            Payable: LKR
+                                                            {{ number_format($invoice->payable_amount, 2) }}
                                                         </div>
                                                         <div class="text-gray-500">
                                                             Total: LKR {{ number_format($invoice->total_amount, 2) }}
@@ -1090,7 +1159,8 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="6" class="px-4 py-2 text-center text-gray-500">No invoices
+                                                <td colspan="6" class="px-4 py-2 text-center text-gray-500">No
+                                                    invoices
                                                     found.</td>
                                             </tr>
                                         @endforelse
@@ -1451,5 +1521,71 @@
                 option.style.display = option.innerText.toLowerCase().includes(filter) ? '' : 'none';
             });
         }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            document.querySelectorAll('.accessory-btn').forEach(button => {
+                const dropdownId = button.dataset.dropdown;
+                const dropdown = document.getElementById(dropdownId);
+                const searchInput = dropdown.querySelector('.accessory-search');
+                const defaultText = button.dataset.default; // store default text
+
+                button.addEventListener('click', e => {
+                    e.stopPropagation();
+                    closeAllAccessoryDropdowns();
+                    dropdown.classList.toggle('hidden');
+                    searchInput.focus();
+                });
+
+                // Select option or deselect
+                dropdown.querySelectorAll('.accessory-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        const name = option.dataset.name;
+                        const id = option.dataset.id;
+
+                        const nameInput = document.getElementById(dropdownId.replace(
+                            '_dropdown', '_name'));
+                        const idInput = document.getElementById(dropdownId.replace(
+                            '_dropdown', '_id'));
+                        const selectedSpan = document.getElementById(dropdownId.replace(
+                            '_dropdown', '_selected'));
+
+                        if (!name) {
+                            // Deselect → reset to default text
+                            nameInput.value = '';
+                            idInput.value = '';
+                            selectedSpan.textContent = defaultText;
+                        } else {
+                            nameInput.value = name;
+                            idInput.value = id;
+                            selectedSpan.textContent = name;
+                        }
+
+                        dropdown.classList.add('hidden');
+                    });
+                });
+            });
+
+            // Filter function
+            window.filterAccessoryDropdown = function(input) {
+                const filter = input.value.toLowerCase();
+                const dropdown = input.closest('.accessory-dropdown');
+                dropdown.querySelectorAll('.accessory-option').forEach(option => {
+                    option.style.display = option.textContent.toLowerCase().includes(filter) ? 'block' :
+                        'none';
+                });
+            }
+
+            // Close all dropdowns when clicking outside
+            function closeAllAccessoryDropdowns() {
+                document.querySelectorAll('.accessory-dropdown').forEach(dropdown => {
+                    dropdown.classList.add('hidden');
+                });
+            }
+
+            document.addEventListener('click', closeAllAccessoryDropdowns);
+
+        });
     </script>
 @endsection

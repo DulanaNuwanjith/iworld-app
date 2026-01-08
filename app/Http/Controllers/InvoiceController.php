@@ -6,6 +6,7 @@ use App\Models\Invoice;
 use App\Models\PhoneInventory;
 use Illuminate\Http\Request;
 use App\Models\Worker;
+use App\Models\Accessory;
 
 class InvoiceController extends Controller
 {
@@ -14,7 +15,6 @@ class InvoiceController extends Controller
     {
         $query = Invoice::query();
 
-        // Apply filters
         if ($request->filled('invoice_number')) {
             $query->where('invoice_number', $request->invoice_number);
         }
@@ -30,41 +30,59 @@ class InvoiceController extends Controller
 
         $invoices = $query->latest()->paginate(15)->withQueryString();
 
-        // For filter dropdowns (only distinct strings)
         $allInvoiceNumbers = Invoice::select('invoice_number')->distinct()->pluck('invoice_number');
         $allCustomerNames = Invoice::select('customer_name')->distinct()->pluck('customer_name');
-        $filterEmis = Invoice::select('emi')->distinct()->pluck('emi'); // for filter dropdown
-        $filterPhoneTypes = Invoice::select('phone_type')->distinct()->pluck('phone_type'); // for filter dropdown
+        $filterEmis = Invoice::select('emi')->distinct()->pluck('emi');
+        $filterPhoneTypes = Invoice::select('phone_type')->distinct()->pluck('phone_type');
 
-        // For Add Invoice form (full details)
         $addInvoiceEmis = PhoneInventory::select('emi','phone_type','colour','capacity')
-            ->where('status', 0) 
-            ->where('status_availability', 'in_stock') 
+            ->where('status', 0)
+            ->where('status_availability', 'in_stock')
             ->get();
 
-        // Add Exchange phones
         $exchangePhones = PhoneInventory::select('emi','phone_type','colour','capacity','cost')
             ->where('stock_type', 'Exchange')
-            ->where('status', 0) 
+            ->where('status', 0)
             ->get();
 
         $workers = Worker::select('id','name')->orderBy('name')->get();
 
-        return view('phone-shop.createInvoice', compact(
-            'invoices',
-            'allInvoiceNumbers',
-            'allCustomerNames',
-            'filterEmis',
-            'filterPhoneTypes',
-            'addInvoiceEmis',
-            'exchangePhones',
-            'workers'
+        $accessoryTypes = [
+            'Charging Docks' => 'chargerAccessories',
+            'Data Cables'    => 'dataCableAccessories',
+            'Handfrees'      => 'handfreeAccessories',
+            'Airpods'        => 'airpodAccessories',
+            'Power Banks'    => 'powerBankAccessories',
+        ];
+
+        $accessories = [];
+        foreach ($accessoryTypes as $type => $varName) {
+            $accessories[$varName] = Accessory::where('type', $type)
+                ->select('id','name','quantity','cost')
+                ->orderBy('name')
+                ->get();
+        }
+
+        return view('phone-shop.createInvoice', array_merge(
+            compact(
+                'invoices',
+                'allInvoiceNumbers',
+                'allCustomerNames',
+                'filterEmis',
+                'filterPhoneTypes',
+                'addInvoiceEmis',
+                'exchangePhones',
+                'workers'
+            ),
+            $accessories
         ));
     }
 
     public function store(Request $request)
     {
-        // Validate input
+        // =====================
+        // Validate only actual database fields
+        // =====================
         $request->validate([
             'worker_id' => 'required|exists:workers,id',
             'worker_name' => 'required|string|max:255',
@@ -81,7 +99,6 @@ class InvoiceController extends Controller
             'hand_free' => 'nullable|numeric|min:0',
             'airpods' => 'nullable|numeric|min:0',
             'power_bank' => 'nullable|numeric|min:0',
-            'isExchange' => 'sometimes|boolean',
             'exchange_emi' => 'nullable|string|exists:phone_inventories,emi',
             'exchange_phone_type' => 'nullable|string|max:255',
             'exchange_colour' => 'nullable|string|max:255',
@@ -90,38 +107,43 @@ class InvoiceController extends Controller
             'payable_amount' => 'nullable|numeric|min:0',
         ]);
 
-        // Create invoice with basic fields
-        $invoice = new Invoice($request->only([
-            'customer_name', 'customer_phone', 'customer_address',
-            'emi', 'selling_price', 'tempered', 'back_cover', 'charger',
-            'data_cable', 'cam_glass', 'hand_free', 'airpods', 'power_bank','payable_amount',
-        ]));
+        // =====================
+        // Create invoice instance
+        // =====================
+        $invoice = new Invoice();
+
+        // Assign basic info
+        $invoice->customer_name = $request->customer_name;
+        $invoice->customer_phone = $request->customer_phone;
+        $invoice->customer_address = $request->customer_address;
+        $invoice->emi = $request->emi;
+        $invoice->selling_price = $request->selling_price ?? 0;
+        $invoice->payable_amount = $request->payable_amount ?? 0;
+
+        // Assign accessories safely (empty => 0)
+        $accessories = ['tempered', 'back_cover', 'charger', 'data_cable', 'cam_glass', 'hand_free', 'airpods', 'power_bank'];
+        foreach ($accessories as $acc) {
+            $invoice->$acc = $request->$acc ? floatval($request->$acc) : 0;
+        }
+
+        // Assign exchange phone info if provided
+        $invoice->exchange_emi = $request->exchange_emi;
+        $invoice->exchange_phone_type = $request->exchange_phone_type;
+        $invoice->exchange_colour = $request->exchange_colour;
+        $invoice->exchange_capacity = $request->exchange_capacity;
+        $invoice->exchange_cost = $request->exchange_cost ?? 0;
 
         // Assign worker info
         $invoice->worker_id = $request->worker_id;
         $invoice->worker_name = $request->worker_name;
 
-        // Assign phone details
+        // Fetch phone details from inventory
         $phone = PhoneInventory::where('emi', $request->emi)->first();
         if ($phone) {
             $invoice->phone_type = $phone->phone_type;
             $invoice->colour = $phone->colour;
             $invoice->capacity = $phone->capacity;
         }
-
-        // Assign exchange phone if selected
-        if ((bool)$request->isExchange && $request->exchange_emi) {
-            $invoice->exchange_emi = $request->exchange_emi;
-            $invoice->exchange_phone_type = $request->exchange_phone_type;
-            $invoice->exchange_colour = $request->exchange_colour;
-            $invoice->exchange_capacity = $request->exchange_capacity;
-            $invoice->exchange_cost = $request->exchange_cost;
-        }
-
-        // Assign payable amount if selected
-        $invoice->payable_amount = ((bool)$request->isPayable && $request->payable_amount)
-                                    ? $request->payable_amount
-                                    : 0;
 
         // Generate invoice number
         $lastInvoiceNumber = Invoice::where('invoice_number', 'like', 'INV-GAM-%')
@@ -131,27 +153,21 @@ class InvoiceController extends Controller
         $nextNumber = $lastInvoiceNumber ? (int)substr($lastInvoiceNumber, 8) + 1 : 1;
         $invoice->invoice_number = 'INV-GAM-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
-        // Calculate total amount (Selling - Exchange + Accessories)
-        $total = ($invoice->selling_price ?? 0) +
-                ($invoice->tempered ?? 0) +
-                ($invoice->back_cover ?? 0) +
-                ($invoice->charger ?? 0) +
-                ($invoice->data_cable ?? 0) +
-                ($invoice->hand_free ?? 0) +
-                ($invoice->cam_glass ?? 0) +
-                ($invoice->airpods ?? 0) +
-                ($invoice->power_bank ?? 0);
-
-        if ($invoice->exchange_cost) $total -= floatval($invoice->exchange_cost);
+        // Calculate total amount (selling + accessories - exchange)
+        $total = $invoice->selling_price;
+        foreach ($accessories as $acc) {
+            $total += $invoice->$acc;
+        }
+        $total -= $invoice->exchange_cost ?? 0;
 
         $invoice->total_amount = $total;
 
         // Save invoice
         $invoice->save();
 
-        // Update phone inventory status
+        // Mark phone as sold
         if ($phone) {
-            $phone->status = 1; // mark as sold
+            $phone->status = 1;
             $phone->save();
         }
 
