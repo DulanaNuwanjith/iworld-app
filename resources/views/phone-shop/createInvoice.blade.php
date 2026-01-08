@@ -786,21 +786,13 @@
                             </div>
 
                             <script>
-                                // =====================
-                                // Alpine.js Invoice Modal Data
-                                // =====================
                                 function invoiceModal() {
                                     return {
-                                        // =====================
-                                        // Exchange & Selling Price
-                                        // =====================
+
                                         isExchange: false,
                                         sellingPrice: 0,
                                         exchangeSelected: null,
 
-                                        // =====================
-                                        // Accessories Prices
-                                        // =====================
                                         accessories: {
                                             tempered: 0,
                                             back_cover: 0,
@@ -812,9 +804,6 @@
                                             power_bank: 0,
                                         },
 
-                                        // =====================
-                                        // Exchange Dropdown
-                                        // =====================
                                         open: false,
                                         search: '',
                                         options: [
@@ -833,15 +822,9 @@
                                             @endforeach
                                         ],
 
-                                        // =====================
-                                        // Payable Section
-                                        // =====================
                                         isPayable: false,
                                         payableAmount: 0,
 
-                                        // =====================
-                                        // TOTAL CALCULATION
-                                        // =====================
                                         get totalAmount() {
                                             let total = Number(this.sellingPrice) || 0;
 
@@ -856,16 +839,10 @@
                                             return total;
                                         },
 
-                                        // =====================
-                                        // REMAINING CALCULATION
-                                        // =====================
                                         get remainingAmount() {
                                             return this.totalAmount - (Number(this.payableAmount) || 0);
                                         },
 
-                                        // =====================
-                                        // FILTER EXCHANGE DROPDOWN
-                                        // =====================
                                         get filteredOptions() {
                                             if (!this.search) return this.options;
 
@@ -874,17 +851,11 @@
                                             );
                                         },
 
-                                        // =====================
-                                        // SELECT EXCHANGE
-                                        // =====================
                                         selectExchange(option) {
                                             this.exchangeSelected = option;
                                             this.open = false;
                                         },
 
-                                        // =====================
-                                        // RESET FORM
-                                        // =====================
                                         reset() {
                                             this.isExchange = false;
                                             this.sellingPrice = 0;
@@ -898,9 +869,6 @@
                                     }
                                 }
 
-                                // =====================
-                                // DOM READY: Modal Open/Close
-                                // =====================
                                 document.addEventListener('DOMContentLoaded', () => {
                                     window.openInvoiceModal = function() {
                                         document.getElementById('createInvoiceModal').classList.remove('hidden');
@@ -911,24 +879,17 @@
                                         const form = document.getElementById('invoiceForm');
                                         form.reset();
 
-                                        // Reset dropdown display text
                                         document.getElementById('selectedPhone').textContent = 'Select EMI';
                                         document.getElementById('selectedWorker').textContent = 'Select Worker';
                                     }
                                 });
 
-                                // =====================
-                                // TOGGLE DROPDOWN (Generic)
-                                // =====================
                                 function toggleDropdown(event, dropdownId) {
                                     event.stopPropagation();
                                     const dropdown = document.getElementById(dropdownId);
                                     dropdown.classList.toggle('hidden');
                                 }
 
-                                // =====================
-                                // FILTER DROPDOWN (Generic)
-                                // =====================
                                 function filterDropdown(inputId, optionClass) {
                                     const filter = document.getElementById(inputId).value.toLowerCase();
                                     const options = document.getElementsByClassName(optionClass);
@@ -938,9 +899,6 @@
                                     }
                                 }
 
-                                // =====================
-                                // SELECT WORKER
-                                // =====================
                                 function selectWorker(id, name) {
                                     document.getElementById('workerIdInput').value = id;
                                     document.getElementById('workerNameInput').value = name;
@@ -948,9 +906,6 @@
                                     document.getElementById('workerDropdownMenu').classList.add('hidden');
                                 }
 
-                                // =====================
-                                // SELECT PHONE
-                                // =====================
                                 function selectPhone(id, emi, phone_type, colour, capacity) {
                                     document.getElementById('phoneEmiInput').value = emi;
                                     document.getElementById('selectedPhone').textContent = emi;
@@ -961,9 +916,6 @@
                                     document.getElementById('invoiceForm').dataset.phoneId = id; // optional
                                 }
 
-                                // =====================
-                                // CLOSE DROPDOWNS ON CLICK OUTSIDE
-                                // =====================
                                 document.addEventListener('click', function(event) {
                                     const phoneDropdown = document.getElementById('phoneDropdownMenu');
                                     const workerDropdown = document.getElementById('workerDropdownMenu');
