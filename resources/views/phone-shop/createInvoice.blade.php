@@ -306,9 +306,14 @@
                                             + Add Exchange Phone
                                         </button>
                                         <button
+                                            onclick="document.getElementById('createAccessoryInvoiceModal').classList.remove('hidden')"
+                                            class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded shadow">
+                                            + Add Accessory Invoice
+                                        </button>
+                                        <button
                                             onclick="document.getElementById('createInvoiceModal').classList.remove('hidden')"
                                             class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded shadow">
-                                            + Add Invoice
+                                            + Add Phone Invoice
                                         </button>
                                     </div>
                                 </div>
@@ -1022,6 +1027,223 @@
                                 }
                             </script>
 
+                            <!-- Create Accessory Invoice Modal -->
+                            <div id="createAccessoryInvoiceModal"
+                                class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center px-4 py-6">
+
+                                <form action="{{ route('invoices.accessory.store') }}" method="POST"
+                                    class="w-full max-w-6xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden transform transition-all scale-95 max-h-[90vh] flex flex-col"
+                                    x-data="accessoryInvoiceModal()">
+
+                                    @csrf
+
+                                    <!-- Header -->
+                                    <div
+                                        class="flex justify-between items-center px-8 py-4 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                                        <h2
+                                            class="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                            Create Accessory Invoice
+                                        </h2>
+                                        <button type="button" onclick="closeAccessoryInvoiceModal()"
+                                            class="text-gray-400 hover:text-gray-600 text-4xl font-bold">&times;</button>
+                                    </div>
+
+                                    <!-- Body -->
+                                    <div class="px-8 py-6 overflow-y-auto flex-1 space-y-8">
+
+                                        <!-- Customer Coordinator -->
+                                        <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border shadow-sm"
+                                            x-data="workerDropdown()">
+
+                                            <h3 class="text-xl font-semibold mb-4">Customer Coordinator</h3>
+
+                                            <input type="hidden" name="worker_id" id="workerIdInputAcc" required>
+                                            <input type="hidden" name="worker_name" id="workerNameInputAcc">
+
+                                            <button type="button"
+                                                class="inline-flex w-full justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-gray-300 h-10"
+                                                onclick="toggleDropdown(event,'workerDropdownMenuAcc')">
+                                                <span id="selectedWorkerAcc">Select Worker</span>
+                                                <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20"
+                                                    fill="currentColor">
+                                                    <path fill-rule="evenodd"
+                                                        d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.25 8.29a.75.75 0 01-.02-1.08z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
+
+                                            <div id="workerDropdownMenuAcc"
+                                                class="hidden mt-2 border rounded-lg bg-white max-h-60 overflow-y-auto p-2">
+
+                                                <input type="text" id="workerSearchAcc"
+                                                    onkeyup="filterDropdown('workerSearchAcc','worker-option-acc')"
+                                                    placeholder="Search..."
+                                                    class="w-full px-2 py-1 border rounded-md mb-2">
+
+                                                @foreach ($workers as $worker)
+                                                    <div onclick="selectWorkerAcc('{{ $worker->id }}','{{ $worker->name }}')"
+                                                        class="worker-option-acc px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                                        {{ $worker->name }}
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                        <!-- Customer Details -->
+                                        <div
+                                            class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                            <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
+                                                Customer Details
+                                            </h3>
+
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <input name="customer_name" placeholder="Customer Name" required
+                                                    class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+
+                                                <input name="customer_phone" placeholder="Customer Phone No" required
+                                                    pattern="^(0\d{9}|94\d{9})$"
+                                                    title="Enter a valid Sri Lankan phone number, e.g., 0777137830 or 94777137830"
+                                                    class="w-full p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                                            </div>
+
+                                            <textarea name="customer_address" placeholder="Customer Address" rows="3" maxlength="25"
+                                                class="w-full mt-4 p-4 border rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"></textarea>
+                                        </div>
+
+                                        <!-- Accessories -->
+                                        <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border shadow-sm">
+                                            <h3 class="text-xl font-semibold mb-4">Accessories</h3>
+
+                                            <template x-for="(item,index) in accessories" :key="index">
+                                                <div class="flex gap-3 items-center mb-3">
+
+                                                    <!-- Accessory Dropdown -->
+                                                    <div class="relative w-1/2" x-data="{ open: false, search: '' }">
+                                                        <input type="hidden" :name="'accessories[' + index + '][id]'"
+                                                            x-model="item.id" required>
+
+                                                        <button type="button"
+                                                            class="w-full px-3 py-2 border rounded-md bg-white flex justify-between items-center"
+                                                            @click="open = !open">
+                                                            <span x-text="item.name || 'Select Accessory'"></span>
+                                                            ⌄
+                                                        </button>
+
+                                                        <div x-show="open" @click.outside="open=false"
+                                                            class="absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto p-2">
+
+                                                            <input type="text" x-model="search"
+                                                                placeholder="Search..."
+                                                                class="w-full px-2 py-1 border rounded-md mb-2">
+
+                                                            @foreach ($allAccessories as $acc)
+                                                                <div x-show="'{{ strtolower($acc->name) }}'.includes(search.toLowerCase())"
+                                                                    @click="item.id='{{ $acc->id }}'; item.name='{{ $acc->name }}'; open=false"
+                                                                    class="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                                                    {{ $acc->name }} (Stock: {{ $acc->quantity }})
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Qty -->
+                                                    <input type="number" min="1"
+                                                        :name="'accessories[' + index + '][qty]'"
+                                                        x-model.number="item.qty"
+                                                        class="w-1/4 h-10 px-3 border rounded-md">
+
+                                                    <!-- Price -->
+                                                    <input type="number" min="0"
+                                                        :name="'accessories[' + index + '][price]'"
+                                                        x-model.number="item.price"
+                                                        class="w-1/4 h-10 px-3 border rounded-md">
+
+                                                    <!-- Remove -->
+                                                    <button type="button" @click="removeAccessory(index)"
+                                                        class="px-2 py-1 bg-red-500 text-white rounded-md">
+                                                        X
+                                                    </button>
+                                                </div>
+                                            </template>
+
+                                            <button type="button" @click="addAccessory()"
+                                                class="mt-2 px-4 py-2 bg-green-600 text-white rounded-md">
+                                                + Add Accessory
+                                            </button>
+
+                                            <!-- Total -->
+                                            <div class="mt-4 p-4 bg-gray-100 rounded-lg flex justify-between">
+                                                <span class="font-semibold">Accessories Total</span>
+                                                <span class="font-bold text-lg" x-text="total.toFixed(2)"></span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Footer -->
+                                    <div class="px-8 py-4 bg-gray-50 border-t flex justify-end gap-4">
+                                        <button type="button" onclick="closeAccessoryInvoiceModal()"
+                                            class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded hover:bg-gray-3000">
+                                            Cancel
+                                        </button>
+                                        <button type="submit" id="createInvoiceAccBtn" class="px-4 py-2 bg-gray-500 text-white text-sm rounded hover:bg-gray-600">
+                                            Create Invoice
+                                        </button>
+                                    </div>
+
+                                </form>
+                            </div>
+
+                            <script>
+                                function accessoryInvoiceModal() {
+                                    return {
+                                        accessories: [{
+                                            id: '',
+                                            name: '',
+                                            qty: 1,
+                                            price: 0
+                                        }],
+
+                                        addAccessory() {
+                                            this.accessories.push({
+                                                id: '',
+                                                name: '',
+                                                qty: 1,
+                                                price: 0
+                                            });
+                                        },
+
+                                        removeAccessory(index) {
+                                            this.accessories.splice(index, 1);
+                                        },
+
+                                        get total() {
+                                            return this.accessories.reduce((sum, i) =>
+                                                sum + (Number(i.qty) * Number(i.price)), 0);
+                                        }
+                                    }
+                                }
+
+                                function openAccessoryInvoiceModal() {
+                                    document.getElementById('createAccessoryInvoiceModal').classList.remove('hidden');
+                                }
+
+                                function closeAccessoryInvoiceModal() {
+                                    document.getElementById('createAccessoryInvoiceModal').classList.add('hidden');
+                                }
+                            </script>
+
+                            <script>
+                                function selectWorkerAcc(id, name) {
+                                    document.getElementById('workerIdInputAcc').value = id;
+                                    document.getElementById('workerNameInputAcc').value = name;
+                                    document.getElementById('selectedWorkerAcc').textContent = name;
+
+                                    // close dropdown
+                                    document.getElementById('workerDropdownMenuAcc').classList.add('hidden');
+                                }
+                            </script>
+
                             {{-- Main Table --}}
                             <div id="sampleInquiryRecordsScroll" class="overflow-x-auto bg-white shadow rounded-lg">
                                 <!-- Spinner -->
@@ -1076,7 +1298,8 @@
                                                     <span class="font-semibold">{{ $invoice->invoice_number }}</span><br>
                                                     <span
                                                         class="text-xs text-gray-500">{{ $invoice->worker->name }}</span><br>
-                                                    <span class="text-xs text-green-600">Commission: {{ number_format($invoice->total_commission, 2) }}</span><br>
+                                                    <span class="text-xs text-green-600">Commission:
+                                                        {{ number_format($invoice->total_commission, 2) }}</span><br>
                                                     <span
                                                         class="text-xs text-gray-500">{{ $invoice->updated_at->format('d M Y') }}</span>
                                                 </td>
@@ -1093,27 +1316,31 @@
 
                                                 <!-- Phone Details -->
                                                 <td class="px-4 py-2 text-left">
-                                                    <span class="font-semibold">EMI:</span> {{ $invoice->emi }}<br>
-                                                    <span class="font-semibold">Model:</span>
-                                                    {{ $invoice->phone_type }}<br>
-                                                    <span class="font-semibold">Capacity:</span>
-                                                    {{ $invoice->capacity }}<br>
-                                                    <span class="font-semibold">Colour:</span> {{ $invoice->colour }}
-
-                                                    @if ($invoice->exchange_emi)
-                                                        <hr class="my-2 border-gray-300">
-                                                        <span class="font-semibold text-blue-600">Exchange
-                                                            Phone:</span><br>
-                                                        <span class="font-semibold">EMI:</span>
-                                                        {{ $invoice->exchange_emi }}<br>
+                                                    @if ($invoice->emi || $invoice->phone_type)
+                                                        <span class="font-semibold">EMI:</span> {{ $invoice->emi }}<br>
                                                         <span class="font-semibold">Model:</span>
-                                                        {{ $invoice->exchange_phone_type }}<br>
+                                                        {{ $invoice->phone_type }}<br>
                                                         <span class="font-semibold">Capacity:</span>
-                                                        {{ $invoice->exchange_capacity }}<br>
-                                                        <span class="font-semibold">Colour:</span>
-                                                        {{ $invoice->exchange_colour }}<br>
-                                                        <span class="font-semibold">Cost:</span> LKR
-                                                        {{ number_format($invoice->exchange_cost, 2) }}
+                                                        {{ $invoice->capacity }}<br>
+                                                        <span class="font-semibold">Colour:</span> {{ $invoice->colour }}
+
+                                                        @if ($invoice->exchange_emi)
+                                                            <hr class="my-2 border-gray-300">
+                                                            <span class="font-semibold text-blue-600">Exchange
+                                                                Phone:</span><br>
+                                                            <span class="font-semibold">EMI:</span>
+                                                            {{ $invoice->exchange_emi }}<br>
+                                                            <span class="font-semibold">Model:</span>
+                                                            {{ $invoice->exchange_phone_type }}<br>
+                                                            <span class="font-semibold">Capacity:</span>
+                                                            {{ $invoice->exchange_capacity }}<br>
+                                                            <span class="font-semibold">Colour:</span>
+                                                            {{ $invoice->exchange_colour }}<br>
+                                                            <span class="font-semibold">Cost:</span> LKR
+                                                            {{ number_format($invoice->exchange_cost, 2) }}
+                                                        @endif
+                                                    @else
+                                                        <span class="text-gray-500 italic">No phone purchased</span>
                                                     @endif
                                                 </td>
 
@@ -1122,14 +1349,21 @@
                                                     @if ($invoice->selling_price > 0)
                                                         <span class="font-semibold">Phone Price:</span> LKR
                                                         {{ number_format($invoice->selling_price, 2) }}<br>
+
+                                                        @php
+                                                            $invoiceAccessories = $invoice->invoiceAccessories;
+                                                        @endphp
+
+                                                        @if ($invoiceAccessories->isNotEmpty())
+                                                            <hr class="my-1 border-gray-300">
+                                                        @endif
+                                                    @else
+                                                        @php
+                                                            $invoiceAccessories = $invoice->invoiceAccessories;
+                                                        @endphp
                                                     @endif
-                                                    <!-- Accessories for this invoice -->
-                                                    @php
-                                                        $invoiceAccessories = $invoice->invoiceAccessories;
-                                                    @endphp
 
                                                     @if ($invoiceAccessories->isNotEmpty())
-                                                        <hr class="my-1 border-gray-300">
                                                         <span
                                                             class="font-semibold text-gray-600 text-sm">Accessories:</span><br>
                                                         @foreach ($invoiceAccessories as $acc)
@@ -1140,7 +1374,6 @@
                                                             </span><br>
                                                         @endforeach
                                                     @endif
-
                                                 </td>
 
                                                 <!-- Total Price -->
@@ -1226,6 +1459,17 @@
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.querySelector('#createInvoiceModal form');
             const submitBtn = document.getElementById('createInvoiceBtn');
+
+            form.addEventListener('submit', function() {
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Submitting...';
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.querySelector('#createAccessoryInvoiceModal form');
+            const submitBtn = document.getElementById('createInvoiceAccBtn');
 
             form.addEventListener('submit', function() {
                 submitBtn.disabled = true;

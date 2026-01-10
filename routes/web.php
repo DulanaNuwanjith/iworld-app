@@ -146,6 +146,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/invoices/{id}', [InvoiceController::class, 'destroy'])
             ->name('invoices.destroy');
 
+        Route::post('/invoices/accessory', [InvoiceController::class, 'storeAccessoryInvoice'])
+            ->name('invoices.accessory.store');
+
+
     });
 
     /*
@@ -213,9 +217,6 @@ Route::middleware(['auth'])->group(function () {
             ->name('workers.salesReport');
 
         Route::get('/salary-report/print', [WorkerController::class, 'printSalaryReport'])->name('salary.report.print');
-
-
-
 
     });
 

@@ -85,22 +85,26 @@
                     <p><strong>Phone:</strong> {{ $invoice->customer_phone }}</p>
                     <p><strong>Address:</strong> {{ $invoice->customer_address ?? '-' }}</p>
                 </div>
-                <div class="break-words">
-                    <h4 class="text-gray-800 font-semibold mb-2 border-b pb-1">Phone Details</h4>
-                    <p><strong>EMI:</strong> {{ $invoice->emi }}</p>
-                    <p><strong>Model:</strong> {{ $invoice->phone_type }}</p>
-                    <p><strong>Capacity:</strong> {{ $invoice->capacity }}</p>
-                    <p><strong>Colour:</strong> {{ $invoice->colour }}</p>
-                </div>
-                <div class="break-words">
-                    @if ($invoice->exchange_emi)
+                <!-- Phone Details (only show if available) -->
+                @if ($invoice->emi && $invoice->phone_type)
+                    <div class="break-words">
+                        <h4 class="text-gray-800 font-semibold mb-2 border-b pb-1">Phone Details</h4>
+                        <p><strong>EMI:</strong> {{ $invoice->emi }}</p>
+                        <p><strong>Model:</strong> {{ $invoice->phone_type }}</p>
+                        <p><strong>Capacity:</strong> {{ $invoice->capacity }}</p>
+                        <p><strong>Colour:</strong> {{ $invoice->colour }}</p>
+                    </div>
+                @endif
+                <!-- Exchanged Phone Details (only show if available) -->
+                @if ($invoice->exchange_emi)
+                    <div class="break-words">
                         <h4 class="text-gray-800 font-semibold mb-2 border-b pb-1">Exchanged Phone</h4>
                         <p><strong>EMI:</strong> {{ $invoice->exchange_emi }}</p>
                         <p><strong>Model:</strong> {{ $invoice->exchange_phone_type }}</p>
                         <p><strong>Capacity:</strong> {{ $invoice->exchange_capacity }}</p>
                         <p><strong>Colour:</strong> {{ $invoice->exchange_colour }}</p>
-                    @endif
-                </div>
+                    </div>
+                @endif
             </div>
 
             <!-- Price Table -->
@@ -121,7 +125,8 @@
                         @if ($invoice->selling_price > 0)
                             <tr>
                                 <td class="border px-3 py-2">Phone Price</td>
-                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->selling_price, 2) }}</td>
+                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->selling_price, 2) }}
+                                </td>
                             </tr>
                         @endif
 
@@ -132,7 +137,8 @@
                                     $customerPay += $totalAccPrice;
                                 @endphp
                                 <tr>
-                                    <td class="border px-3 py-2">{{ $acc->accessory_name }} (Qty: {{ $acc->quantity }})</td>
+                                    <td class="border px-3 py-2">{{ $acc->accessory_name }} (Qty:
+                                        {{ $acc->quantity }})</td>
                                     <td class="border px-3 py-2 text-right">{{ number_format($totalAccPrice, 2) }}</td>
                                 </tr>
                             @endforeach
@@ -141,7 +147,8 @@
                         @if ($invoice->exchange_emi)
                             <tr class="bg-red-100">
                                 <td class="border px-3 py-2 font-semibold text-red-700">Exchanged Phone Deduction</td>
-                                <td class="border px-3 py-2 text-right text-red-700">-{{ number_format($invoice->exchange_cost, 2) }}</td>
+                                <td class="border px-3 py-2 text-right text-red-700">
+                                    -{{ number_format($invoice->exchange_cost, 2) }}</td>
                             </tr>
                             @php
                                 $customerPay -= $invoice->exchange_cost;
@@ -151,7 +158,8 @@
                         @if ($invoice->payable_amount)
                             <tr class="bg-blue-100">
                                 <td class="border px-3 py-2 font-semibold text-blue-700">Payable Amount</td>
-                                <td class="border px-3 py-2 text-right text-blue-700">-{{ number_format($invoice->payable_amount, 2) }}</td>
+                                <td class="border px-3 py-2 text-right text-blue-700">
+                                    -{{ number_format($invoice->payable_amount, 2) }}</td>
                             </tr>
                             @php
                                 $customerPay -= $invoice->payable_amount;

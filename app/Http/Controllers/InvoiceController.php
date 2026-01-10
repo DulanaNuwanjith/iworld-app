@@ -202,7 +202,6 @@ class InvoiceController extends Controller
         return redirect()->route('invoices.index')->with('success', 'Invoice created successfully!');
     }
 
-
     // Delete invoice
     public function destroy($id)
     {
@@ -295,6 +294,96 @@ class InvoiceController extends Controller
         $invoice->save();
 
         return redirect()->back()->with('success', 'Payment processed successfully!');
+    }
+
+    public function storeAccessoryInvoice(Request $request)
+    {
+        $request->validate([
+            'worker_id' => 'required|exists:workers,id',
+            'worker_name' => 'required|string|max:255',
+
+            'customer_name' => 'required|string|max:255',
+            'customer_phone' => 'required|string|max:50',
+            'customer_address' => 'nullable|string|max:500',
+
+            'accessories' => 'required|array|min:1',
+            'accessories.*.id' => 'required|exists:accessories,id',
+            'accessories.*.qty' => 'required|integer|min:1',
+            'accessories.*.price' => 'required|numeric|min:0',
+        ]);
+
+        // =====================
+        // Generate invoice number like INV-GAM-xxxxx
+        // =====================
+        $lastInvoiceNumber = Invoice::where('invoice_number', 'like', 'INV-GAM-%')
+            ->orderBy('id', 'desc')
+            ->value('invoice_number');
+
+        $nextNumber = $lastInvoiceNumber ? (int) substr($lastInvoiceNumber, 8) + 1 : 1;
+        $invoiceNumber = 'INV-GAM-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+
+        $accessoriesTotal = 0;
+        $totalCommission = 0;
+
+        // =====================
+        // Create Invoice
+        // =====================
+        $invoice = Invoice::create([
+            'invoice_number' => $invoiceNumber,
+            'customer_name' => $request->customer_name,
+            'customer_phone' => $request->customer_phone,
+            'customer_address' => $request->customer_address,
+
+            'worker_id' => $request->worker_id,
+            'worker_name' => $request->worker_name,
+
+            // No phone / exchange
+            'selling_price' => 0,
+            'exchange_cost' => 0,
+            'payable_amount' => 0,
+        ]);
+
+        // =====================
+        // Save Accessories
+        // =====================
+        foreach ($request->accessories as $acc) {
+
+            $accessory = Accessory::findOrFail($acc['id']);
+
+            if ($accessory->quantity < $acc['qty']) {
+                abort(422, "Insufficient stock for {$accessory->name}");
+            }
+
+            $lineTotal = $acc['qty'] * $acc['price'];
+            $accessoriesTotal += $lineTotal;
+
+            $totalCommission += ($accessory->commission ?? 0) * $acc['qty'];
+
+            InvoiceAccessory::create([
+                'invoice_id' => $invoice->id,
+                'invoice_number' => $invoice->invoice_number,
+                'accessory_id' => $accessory->id,
+                'accessory_name' => $accessory->name,
+                'quantity' => $acc['qty'],
+                'selling_price_accessory' => $acc['price'],
+            ]);
+
+            // Deduct stock
+            $accessory->decrement('quantity', $acc['qty']);
+        }
+
+        // =====================
+        // Update totals
+        // =====================
+        $invoice->update([
+            'accessories_total' => $accessoriesTotal,
+            'total_commission' => $totalCommission,
+            'total_amount' => $accessoriesTotal,
+        ]);
+
+        return redirect()
+            ->route('invoices.index')
+            ->with('success', 'Accessory invoice created successfully!');
     }
 
 }

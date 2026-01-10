@@ -31,10 +31,10 @@ return new class extends Migration
             $table->decimal('exchange_cost', 10, 2)->nullable();
 
             // Sold phone details
-            $table->string('emi');
-            $table->string('phone_type');
-            $table->string('colour');
-            $table->string('capacity');
+            $table->string('emi')->nullable();
+            $table->string('phone_type')->nullable();
+            $table->string('colour')->nullable();
+            $table->string('capacity')->nullable();
 
             // Prices
             $table->decimal('selling_price', 10, 2);
