@@ -111,15 +111,23 @@ class InvoiceController extends Controller
         $invoice->worker_id = $request->worker_id;
         $invoice->worker_name = $request->worker_name;
 
+        // =====================
         // Fetch phone details
+        // =====================
         $phone = PhoneInventory::where('emi', $request->emi)->first();
+        $phoneCommission = 0;
         if ($phone) {
             $invoice->phone_type = $phone->phone_type;
             $invoice->colour = $phone->colour;
             $invoice->capacity = $phone->capacity;
+
+            // Phone commission
+            $phoneCommission = $phone->commission ?? 0;
         }
 
+        // =====================
         // Generate invoice number
+        // =====================
         $lastInvoiceNumber = Invoice::where('invoice_number', 'like', 'INV-GAM-%')
             ->orderBy('id', 'desc')
             ->value('invoice_number');
@@ -127,21 +135,23 @@ class InvoiceController extends Controller
         $invoice->invoice_number = 'INV-GAM-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
         // =====================
-        // Calculate accessories total
+        // Calculate accessories total & commission
         // =====================
         $accessoriesTotal = 0;
-
-        // We'll save selected accessories in a temporary array
+        $accessoriesCommission = 0;
         $selectedAccessories = $request->input('accessories', []);
 
         foreach ($selectedAccessories as $acc) {
             if (!empty($acc['id']) && $acc['qty'] > 0 && $acc['price'] >= 0) {
-                // Correct calculation: qty * price
+                // Accessories total
                 $accessoriesTotal += $acc['qty'] * $acc['price'];
 
-                // Deduct stock
+                // Accessories commission
                 $accessory = Accessory::find($acc['id']);
                 if ($accessory) {
+                    $accessoriesCommission += ($accessory->commission ?? 0) * $acc['qty'];
+
+                    // Deduct stock
                     $accessory->quantity = max($accessory->quantity - $acc['qty'], 0);
                     $accessory->save();
                 }
@@ -150,10 +160,19 @@ class InvoiceController extends Controller
 
         $invoice->accessories_total = $accessoriesTotal;
 
-        // Total = selling + accessories - exchange
+        // =====================
+        // Total commission
+        // =====================
+        $invoice->total_commission = $phoneCommission + $accessoriesCommission;
+
+        // =====================
+        // Calculate total amount (Selling + Accessories - Exchange)
+        // =====================
         $invoice->total_amount = $invoice->selling_price + $invoice->accessories_total - ($invoice->exchange_cost ?? 0);
 
+        // =====================
         // Save invoice first to get ID
+        // =====================
         $invoice->save();
 
         // =====================
@@ -172,7 +191,9 @@ class InvoiceController extends Controller
             }
         }
 
+        // =====================
         // Mark phone as sold
+        // =====================
         if ($phone) {
             $phone->status = 1;
             $phone->save();

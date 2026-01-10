@@ -44,6 +44,9 @@ return new class extends Migration
             $table->decimal('total_amount', 10, 2)->default(0);
             $table->decimal('payable_amount', 10, 2)->nullable();
 
+            // Total Commission
+            $table->decimal('total_commission', 10, 2)->default(0);
+
             $table->timestamps();
         });
     }

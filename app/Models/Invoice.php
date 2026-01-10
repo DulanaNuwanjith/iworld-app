@@ -19,7 +19,7 @@ class Invoice extends Model
         'colour',
         'capacity',
         'selling_price',
-        'accessories_total',   // only total, not individual accessories
+        'accessories_total',  
         'total_amount',
         'exchange_emi',
         'exchange_phone_type',
@@ -29,6 +29,7 @@ class Invoice extends Model
         'payable_amount',
         'worker_id',
         'worker_name',
+        'total_commission',  
     ];
 
     // Default values
@@ -38,6 +39,7 @@ class Invoice extends Model
         'total_amount' => 0,
         'payable_amount' => 0,
         'exchange_cost' => 0,
+        'total_commission' => 0, 
     ];
 
     // Dates
@@ -63,5 +65,4 @@ class Invoice extends Model
     {
         return $this->hasMany(InvoiceAccessory::class);
     }
-
 }
