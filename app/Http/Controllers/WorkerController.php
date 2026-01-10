@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Worker;
+use App\Models\Salary;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class WorkerController extends Controller
 {
@@ -89,5 +91,87 @@ class WorkerController extends Controller
         return redirect()->back()->with('success', 'Worker deleted successfully!');
     }
 
+    public function salaryReport(Request $request)
+    {
+        $monthYear = $request->input('month_year', now()->format('Y-m'));
+        $date = Carbon::parse($monthYear);
+
+        $month = $date->month;
+        $year  = $date->year;
+
+        $workers = Worker::with(['invoices' => function ($q) use ($month, $year) {
+            $q->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month);
+        }])->get();
+
+        $salaries = $workers->map(function ($worker) use ($month, $year) {
+
+            $totalCommission = $worker->invoices->sum('total_commission');
+            $totalSales      = $worker->invoices->sum('total_amount');
+            $invoiceCount    = $worker->invoices->count();
+
+            Salary::updateOrCreate(
+                [
+                    'worker_id' => $worker->id,
+                    'month'     => $month,
+                    'year'      => $year,
+                ],
+                [
+                    'worker_name'      => $worker->name,
+                    'basic_salary'     => $worker->basic_salary,
+                    'total_commission' => $totalCommission,
+                    'total_sales'      => $totalSales,
+                    'invoice_count'    => $invoiceCount,
+                ]
+            );
+
+            return [
+                'worker_name'      => $worker->name,
+                'basic_salary'     => $worker->basic_salary,
+                'total_commission' => $totalCommission,
+                'total_sales'      => $totalSales,
+                'invoice_count'    => $invoiceCount,
+                'month'            => $month,
+                'year'             => $year,
+                'note'             => $worker->note,
+            ];
+        });
+
+        return view('Compensation.salaryDetails', [
+            'salaries'  => $salaries,
+            'monthYear' => $monthYear
+        ]);
+    }
+
+    public function printSalaryReport(Request $request)
+    {
+        $monthYear = $request->input('month_year', now()->format('Y-m'));
+        $date = Carbon::parse($monthYear);
+        $month = $date->month;
+        $year  = $date->year;
+
+        $workers = Worker::with(['invoices' => function ($q) use ($month, $year) {
+            $q->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month);
+        }])->get();
+
+        $salaries = $workers->map(function ($worker) use ($month, $year) {
+            $totalCommission = $worker->invoices->sum('total_commission');
+            $totalSales      = $worker->invoices->sum('total_amount');
+            $invoiceCount    = $worker->invoices->count();
+
+            return [
+                'worker_name'      => $worker->name,
+                'basic_salary'     => $worker->basic_salary,
+                'total_commission' => $totalCommission,
+                'total_sales'      => $totalSales,
+                'invoice_count'    => $invoiceCount,
+                'month'            => $month,
+                'year'             => $year,
+            ];
+        });
+
+        return view('Compensation.salaryReportPrint', compact('salaries', 'monthYear'));
+    }
 
 }

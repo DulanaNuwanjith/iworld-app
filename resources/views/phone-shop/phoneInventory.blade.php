@@ -278,9 +278,12 @@
                                             <div onclick="selectStockType('')"
                                                 class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">All Stock Types
                                             </div>
-                                            <div onclick="selectStockType('Direct Import')"
+                                            <div onclick="selectStockType('Direct Import Used')"
                                                 class="stock-type-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
-                                                Direct Import</div>
+                                                Direct Import Used</div>
+                                            <div onclick="selectStockType('Direct Import Brand New')"
+                                                class="stock-type-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                Direct Import Brand New</div>
                                             <div onclick="selectStockType('Exchange')"
                                                 class="stock-type-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
                                                 Exchange</div>

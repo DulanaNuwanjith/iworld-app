@@ -124,8 +124,8 @@
                 <!-- Compensation (SUPERADMIN, ADMIN) -->
                 @if (auth()->user()->hasRole(['SUPERADMIN', 'ADMIN']))
                     <li>
-                        <a href="{{ route('workers.index') }}"
-                            class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('workers.index') ? 'bg-gray-200' : '' }}">
+                        <a href="{{ route('salary.report') }}"
+                            class="flex items-center px-4 py-2 rounded hover:bg-gray-200 {{ request()->routeIs('workers.index', 'salary.report') ? 'bg-gray-200' : '' }}">
                             <img src="{{ asset('images/wages.png') }}" class="w-6 h-6 mr-5" />
                             <span x-show="initialized && !collapsed">Compensation</span>
                         </a>

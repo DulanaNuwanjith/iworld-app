@@ -18,8 +18,8 @@
             <!-- ✅ TAB NAVIGATION (VISIBLE IN ALL PAGES) -->
             <div class="sticky top-0 z-10 flex space-x-4 border-b border-gray-300 bg-white p-5 ">
 
-                <a href="{{ route('workers.index') }}"
-                    class="pb-2 px-3 font-semibold {{ request()->routeIs('workers.index') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
+                <a href="{{ route('salary.report') }}"
+                    class="pb-2 px-3 font-semibold {{ request()->routeIs('salary.report') ? 'border-b-2 border-gray-500 text-gray-600' : 'text-gray-600' }}">
                     Salary Details
                 </a>
 

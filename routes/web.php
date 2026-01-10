@@ -206,6 +206,17 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/workers/{worker}/update-inline',[WorkerController::class, 'updateInline'])->name('workers.update-inline');
         Route::delete('/workers/{worker}', [WorkerController::class, 'destroy'])->name('workers.destroy');
 
+        Route::get('/salary-report', [WorkerController::class, 'salaryReport'])
+            ->name('salary.report');
+        
+        Route::get('/workers/sales-report', [WorkerController::class, 'workerSalesReport'])
+            ->name('workers.salesReport');
+
+        Route::get('/salary-report/print', [WorkerController::class, 'printSalaryReport'])->name('salary.report.print');
+
+
+
+
     });
 
     /*

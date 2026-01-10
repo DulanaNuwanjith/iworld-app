@@ -1076,7 +1076,7 @@
                                                     <span class="font-semibold">{{ $invoice->invoice_number }}</span><br>
                                                     <span
                                                         class="text-xs text-gray-500">{{ $invoice->worker->name }}</span><br>
-                                                    <span class="text-xs text-gray-500">Commission: {{ number_format($invoice->total_commission, 2) }}</span><br>
+                                                    <span class="text-xs text-green-600">Commission: {{ number_format($invoice->total_commission, 2) }}</span><br>
                                                     <span
                                                         class="text-xs text-gray-500">{{ $invoice->updated_at->format('d M Y') }}</span>
                                                 </td>

@@ -20,4 +20,16 @@ class Worker extends Model
         'basic_salary',
         'note',
     ];
+
+    // Relationships
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class, 'worker_id');
+    }
+
+    public function salaries()
+    {
+        return $this->hasMany(Salary::class, 'worker_id');
+    }
+
 }
