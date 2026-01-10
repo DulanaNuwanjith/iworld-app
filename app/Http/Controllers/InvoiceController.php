@@ -7,6 +7,7 @@ use App\Models\PhoneInventory;
 use Illuminate\Http\Request;
 use App\Models\Worker;
 use App\Models\Accessory;
+use App\Models\InvoiceAccessory;
 
 class InvoiceController extends Controller
 {
@@ -28,7 +29,7 @@ class InvoiceController extends Controller
             $query->where('phone_type', $request->phone_type);
         }
 
-        $invoices = $query->latest()->paginate(15)->withQueryString();
+        $invoices = $query->with('invoiceAccessories')->latest()->paginate(15)->withQueryString();
 
         $allInvoiceNumbers = Invoice::select('invoice_number')->distinct()->pluck('invoice_number');
         $allCustomerNames = Invoice::select('customer_name')->distinct()->pluck('customer_name');
@@ -46,22 +47,7 @@ class InvoiceController extends Controller
             ->get();
 
         $workers = Worker::select('id','name')->orderBy('name')->get();
-
-        $accessoryTypes = [
-            'Charging Docks' => 'chargerAccessories',
-            'Data Cables'    => 'dataCableAccessories',
-            'Handfrees'      => 'handfreeAccessories',
-            'Airpods'        => 'airpodAccessories',
-            'Power Banks'    => 'powerBankAccessories',
-        ];
-
-        $accessories = [];
-        foreach ($accessoryTypes as $type => $varName) {
-            $accessories[$varName] = Accessory::where('type', $type)
-                ->select('id','name','quantity','cost')
-                ->orderBy('name')
-                ->get();
-        }
+        $allAccessories = Accessory::where('quantity', '>', 0)->get();
 
         return view('phone-shop.createInvoice', array_merge(
             compact(
@@ -72,16 +58,17 @@ class InvoiceController extends Controller
                 'filterPhoneTypes',
                 'addInvoiceEmis',
                 'exchangePhones',
-                'workers'
+                'workers',
+                'allAccessories'
             ),
-            $accessories
+
         ));
     }
 
     public function store(Request $request)
     {
         // =====================
-        // Validate only actual database fields
+        // Validate inputs
         // =====================
         $request->validate([
             'worker_id' => 'required|exists:workers,id',
@@ -91,14 +78,9 @@ class InvoiceController extends Controller
             'customer_address' => 'nullable|string|max:500',
             'emi' => 'required|string|exists:phone_inventories,emi',
             'selling_price' => 'required|numeric|min:0',
-            'tempered' => 'nullable|numeric|min:0',
-            'back_cover' => 'nullable|numeric|min:0',
-            'charger' => 'nullable|numeric|min:0',
-            'data_cable' => 'nullable|numeric|min:0',
-            'cam_glass' => 'nullable|numeric|min:0',
-            'hand_free' => 'nullable|numeric|min:0',
-            'airpods' => 'nullable|numeric|min:0',
-            'power_bank' => 'nullable|numeric|min:0',
+            'accessories.*.id' => 'nullable|exists:accessories,id',
+            'accessories.*.qty' => 'nullable|integer|min:1',
+            'accessories.*.price' => 'nullable|numeric|min:0',
             'exchange_emi' => 'nullable|string|exists:phone_inventories,emi',
             'exchange_phone_type' => 'nullable|string|max:255',
             'exchange_colour' => 'nullable|string|max:255',
@@ -108,11 +90,9 @@ class InvoiceController extends Controller
         ]);
 
         // =====================
-        // Create invoice instance
+        // Create invoice
         // =====================
         $invoice = new Invoice();
-
-        // Assign basic info
         $invoice->customer_name = $request->customer_name;
         $invoice->customer_phone = $request->customer_phone;
         $invoice->customer_address = $request->customer_address;
@@ -120,24 +100,18 @@ class InvoiceController extends Controller
         $invoice->selling_price = $request->selling_price ?? 0;
         $invoice->payable_amount = $request->payable_amount ?? 0;
 
-        // Assign accessories safely (empty => 0)
-        $accessories = ['tempered', 'back_cover', 'charger', 'data_cable', 'cam_glass', 'hand_free', 'airpods', 'power_bank'];
-        foreach ($accessories as $acc) {
-            $invoice->$acc = $request->$acc ? floatval($request->$acc) : 0;
-        }
-
-        // Assign exchange phone info if provided
+        // Exchange phone
         $invoice->exchange_emi = $request->exchange_emi;
         $invoice->exchange_phone_type = $request->exchange_phone_type;
         $invoice->exchange_colour = $request->exchange_colour;
         $invoice->exchange_capacity = $request->exchange_capacity;
         $invoice->exchange_cost = $request->exchange_cost ?? 0;
 
-        // Assign worker info
+        // Worker info
         $invoice->worker_id = $request->worker_id;
         $invoice->worker_name = $request->worker_name;
 
-        // Fetch phone details from inventory
+        // Fetch phone details
         $phone = PhoneInventory::where('emi', $request->emi)->first();
         if ($phone) {
             $invoice->phone_type = $phone->phone_type;
@@ -149,43 +123,54 @@ class InvoiceController extends Controller
         $lastInvoiceNumber = Invoice::where('invoice_number', 'like', 'INV-GAM-%')
             ->orderBy('id', 'desc')
             ->value('invoice_number');
-
         $nextNumber = $lastInvoiceNumber ? (int)substr($lastInvoiceNumber, 8) + 1 : 1;
         $invoice->invoice_number = 'INV-GAM-' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
-        // Calculate total amount (selling + accessories - exchange)
-        $total = $invoice->selling_price;
-        foreach ($accessories as $acc) {
-            $total += $invoice->$acc;
-        }
-        $total -= $invoice->exchange_cost ?? 0;
+        // =====================
+        // Calculate accessories total
+        // =====================
+        $accessoriesTotal = 0;
 
-        $invoice->total_amount = $total;
+        // We'll save selected accessories in a temporary array
+        $selectedAccessories = $request->input('accessories', []);
 
-        // Accessories keys for dropdown
-        $accessoryKeys = ['charger', 'data_cable', 'hand_free', 'airpods', 'power_bank'];
+        foreach ($selectedAccessories as $acc) {
+            if (!empty($acc['id']) && $acc['qty'] > 0 && $acc['price'] >= 0) {
+                // Correct calculation: qty * price
+                $accessoriesTotal += $acc['qty'] * $acc['price'];
 
-        // Loop through each accessory type
-        foreach ($accessoryKeys as $key) {
-            $accId = $request->input($key . '_id');       // ID from hidden input
-            $qty   = (int) $request->input($key . '_qty'); // Quantity input
-
-            // Assign to invoice price field as before (optional)
-            $invoice->$key = $request->input($key) ?? 0;
-
-            // Update stock if accessory selected and qty > 0
-            if ($accId && $qty > 0) {
-                $accessory = Accessory::find($accId);
+                // Deduct stock
+                $accessory = Accessory::find($acc['id']);
                 if ($accessory) {
-                    // Reduce stock
-                    $accessory->quantity = max($accessory->quantity - $qty, 0);
+                    $accessory->quantity = max($accessory->quantity - $acc['qty'], 0);
                     $accessory->save();
                 }
             }
         }
 
-        // Save invoice
+        $invoice->accessories_total = $accessoriesTotal;
+
+        // Total = selling + accessories - exchange
+        $invoice->total_amount = $invoice->selling_price + $invoice->accessories_total - ($invoice->exchange_cost ?? 0);
+
+        // Save invoice first to get ID
         $invoice->save();
+
+        // =====================
+        // Save Invoice Accessories
+        // =====================
+        foreach ($selectedAccessories as $acc) {
+            if (!empty($acc['id']) && $acc['qty'] > 0 && $acc['price'] >= 0) {
+                InvoiceAccessory::create([
+                    'invoice_id' => $invoice->id,
+                    'invoice_number' => $invoice->invoice_number,
+                    'accessory_id' => $acc['id'],
+                    'accessory_name' => Accessory::find($acc['id'])->name,
+                    'quantity' => $acc['qty'],
+                    'selling_price_accessory' => $acc['price'],
+                ]);
+            }
+        }
 
         // Mark phone as sold
         if ($phone) {
@@ -195,6 +180,7 @@ class InvoiceController extends Controller
 
         return redirect()->route('invoices.index')->with('success', 'Invoice created successfully!');
     }
+
 
     // Delete invoice
     public function destroy($id)

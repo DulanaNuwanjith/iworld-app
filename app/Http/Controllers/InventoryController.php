@@ -133,12 +133,22 @@ class InventoryController extends Controller
             'items.*.phone_type' => 'required|string|max:255',
             'items.*.colour' => 'required|string|max:255',
             'items.*.capacity' => 'required|string|max:50',
-            'items.*.emi' => 'required|string|max:255',
+            'items.*.emi' => [
+                'required',
+                'string',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    // Check if EMI already exists in the database
+                    if (\App\Models\PhoneInventory::where('emi', $value)->exists()) {
+                        $fail("The EMI '$value' has already been added.");
+                    }
+                }
+            ],
             'items.*.cost' => 'required|numeric|min:0',
             'items.*.note' => 'nullable|string|max:255',
         ];
 
-        // ✅ ONLY require images if Exchange
+        // Only require images if Exchange
         if ($request->stock_type === 'Exchange') {
             $rules['supplier_id_front'] = 'required|image|mimes:jpg,jpeg,png|max:2048';
             $rules['supplier_id_back']  = 'required|image|mimes:jpg,jpeg,png|max:2048';
@@ -151,24 +161,18 @@ class InventoryController extends Controller
         $supplierIdBackPath = null;
 
         if ($validated['stock_type'] === 'Exchange') {
-
-            // Use first item for naming
             $firstItem = $validated['items'][0];
 
-            // Clean values for filenames
             $emi = preg_replace('/\s+/', '_', $firstItem['emi']);
             $phoneType = preg_replace('/\s+/', '_', $firstItem['phone_type']);
             $supplier = preg_replace('/\s+/', '_', $validated['supplier']);
 
-            // Extensions
             $frontExt = $request->file('supplier_id_front')->getClientOriginalExtension();
             $backExt  = $request->file('supplier_id_back')->getClientOriginalExtension();
 
-            // Custom filenames
             $frontFileName = "{$emi}-{$phoneType}-{$supplier}-id-front.{$frontExt}";
             $backFileName  = "{$emi}-{$phoneType}-{$supplier}-id-back.{$backExt}";
 
-            // Store files
             $supplierIdFrontPath = $request->file('supplier_id_front')
                 ->storeAs('supplier_ids', $frontFileName, 'public');
 

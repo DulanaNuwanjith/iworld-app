@@ -578,26 +578,29 @@
                                             class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
                                             <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">Select
                                                 Phone</h3>
-                                            <div class="relative w-full inline-block text-left"> <label
-                                                    class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                                                <input type="hidden" name="emi" id="phoneEmiInput" required> <button
-                                                    type="button"
+                                            <div class="relative w-full inline-block text-left">
+                                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                                <input type="hidden" name="emi" id="phoneEmiInput" required>
+                                                <button type="button"
                                                     class="inline-flex w-full justify-between rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 hover:bg-gray-50 h-10"
-                                                    onclick="toggleDropdown(event, 'phoneDropdownMenu')"> <span
-                                                        id="selectedPhone">Select EMI</span> <svg
-                                                        class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20"
+                                                    onclick="toggleDropdown(event, 'phoneDropdownMenu')">
+                                                    <span id="selectedPhone">Select EMI</span>
+                                                    <svg class="ml-2 h-5 w-5 text-gray-400" viewBox="0 0 20 20"
                                                         fill="currentColor">
                                                         <path fill-rule="evenodd"
                                                             d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.25 8.29a.75.75 0 0 1-.02-1.08z"
                                                             clip-rule="evenodd" />
-                                                    </svg> </button>
+                                                    </svg>
+                                                </button>
                                                 <div id="phoneDropdownMenu"
                                                     class="absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg hidden max-h-60 overflow-y-auto p-2">
                                                     <input type="text" id="phoneSearch"
                                                         onkeyup="filterDropdown('phoneSearch','phone-option')"
                                                         placeholder="Search..."
                                                         class="w-full px-2 py-1 text-sm border rounded-md mb-2"
-                                                        autocomplete="off"> {{-- Phone options --}} @foreach ($addInvoiceEmis as $phone)
+                                                        autocomplete="off">
+                                                    {{-- Phone options --}}
+                                                    @foreach ($addInvoiceEmis as $phone)
                                                         <div onclick="selectPhone('{{ $phone->id }}','{{ $phone->emi }}','{{ $phone->phone_type }}','{{ $phone->colour }}','{{ $phone->capacity }}')"
                                                             class="phone-option px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm">
                                                             {{ $phone->emi }} - {{ $phone->phone_type }}
@@ -605,9 +608,10 @@
                                                         </div>
                                                     @endforeach
                                                 </div>
-                                            </div> {{-- Auto-filled phone details --}} <div
-                                                class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4"> <input id="phone_type"
-                                                    name="phone_type" readonly placeholder="Phone Type"
+                                            </div>
+                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                                <input id="phone_type" name="phone_type" readonly
+                                                    placeholder="Phone Type"
                                                     class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
                                                 <input id="colour" name="colour" readonly placeholder="Colour"
                                                     class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:text-white">
@@ -623,135 +627,108 @@
                                             <div
                                                 class="col-span-1 md:col-span-4 bg-gray-50 p-6 rounded-xl border shadow-sm">
                                                 <h3 class="text-xl font-semibold mb-4">Selling Price</h3>
-
                                                 <input type="number" min="0" name="selling_price"
                                                     x-model.number="sellingPrice" placeholder="Enter Selling Price"
                                                     class="w-full p-4 border rounded-lg">
-
-                                                <div x-show="isExchange && exchangeSelected" class="mt-4">
-                                                    <label class="font-semibold mb-1 block">Exchanged phone price</label>
-                                                    <input type="text" readonly :value="exchangeSelected.cost"
-                                                        class="w-full p-4 border rounded-lg bg-gray-100">
-                                                </div>
                                             </div>
 
-                                            <!-- Accessories -->
+                                            <!-- Accessories Cart -->
                                             <div
                                                 class="col-span-1 md:col-span-8 bg-gray-50 p-6 rounded-xl border shadow-sm">
+
                                                 <h3 class="text-xl font-semibold mb-4">Accessories</h3>
 
-                                                @php
-                                                    $accessoryTypes = [
-                                                        'Charging Docks' => [
-                                                            'items' => $chargerAccessories ?? [],
-                                                            'key' => 'charger',
-                                                        ],
-                                                        'Data Cables' => [
-                                                            'items' => $dataCableAccessories ?? [],
-                                                            'key' => 'data_cable',
-                                                        ],
-                                                        'Handfrees' => [
-                                                            'items' => $handfreeAccessories ?? [],
-                                                            'key' => 'hand_free',
-                                                        ],
-                                                        'Airpods' => [
-                                                            'items' => $airpodAccessories ?? [],
-                                                            'key' => 'airpods',
-                                                        ],
-                                                        'Power Banks' => [
-                                                            'items' => $powerBankAccessories ?? [],
-                                                            'key' => 'power_bank',
-                                                        ],
-                                                    ];
+                                                <template x-for="(item, index) in accessoriesCart" :key="index">
+                                                    <div class="flex gap-3 items-center mb-3" x-data="{ open: false, search: '' }">
 
-                                                    $simpleAccessories = [
-                                                        'Tempered' => 'tempered',
-                                                        'Back Cover' => 'back_cover',
-                                                        'Cam Glass' => 'cam_glass',
-                                                    ];
-                                                @endphp
+                                                        <div x-data="{
+                                                            open: false,
+                                                            search: '',
+                                                            item: { id: '', name: '' },
+                                                            allOptions: [
+                                                                @foreach ($allAccessories as $acc)
+        { id: '{{ $acc->id }}', name: '{{ $acc->name }}', stock: '{{ $acc->quantity }}' }@if (!$loop->last),@endif @endforeach
+                                                            ]
+                                                        }" class="relative w-1/2">
 
-                                                {{-- Dropdown Accessories --}}
-                                                @foreach ($accessoryTypes as $type => $data)
-                                                    @php
-                                                        $items = $data['items'];
-                                                        $key = $data['key'];
-                                                    @endphp
+                                                            <input type="hidden" :name="'accessories[' + index + '][id]'"
+                                                                x-model="item.id" required>
 
-                                                    <div x-data="{ selectedId: '', selectedName: '', qtyDisabled: true }" class="mb-4">
-                                                        <label
-                                                            class="block text-sm font-medium mb-2">{{ $type }}</label>
-                                                        <div class="flex gap-3 items-center">
-                                                            <div class="relative w-1/2">
-                                                                {{-- Hidden fields --}}
-                                                                <input type="hidden" name="{{ $key }}_name"
-                                                                    x-model="selectedName">
-                                                                <input type="hidden" name="{{ $key }}_id"
-                                                                    x-model="selectedId">
+                                                            <button type="button"
+                                                                class="w-full text-left px-3 py-2 border rounded-md bg-white dark:bg-gray-700 dark:text-white flex justify-between items-center"
+                                                                @click.stop="open = !open">
+                                                                <span
+                                                                    x-text="item.name ? item.name : 'Select Accessory'"></span>
+                                                                <svg class="ml-2 h-5 w-5 text-gray-400"
+                                                                    fill="currentColor" viewBox="0 0 20 20">
+                                                                    <path fill-rule="evenodd"
+                                                                        d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.25 8.29a.75.75 0 01-.02-1.08z"
+                                                                        clip-rule="evenodd" />
+                                                                </svg>
+                                                            </button>
 
-                                                                {{-- Dropdown button --}}
-                                                                <button type="button"
-                                                                    class="w-full flex justify-between bg-white border px-3 py-2 rounded-md h-10"
-                                                                    @click="$refs.dropdown.classList.toggle('hidden')">
-                                                                    <span
-                                                                        x-text="selectedName || 'Select {{ $type }}'"></span>
-                                                                </button>
+                                                            <div x-show="open" @click.outside="open = false" x-transition
+                                                                class="absolute z-40 mt-1 w-full bg-white dark:bg-gray-700 border rounded-lg shadow-lg max-h-60 overflow-y-auto p-2">
 
-                                                                {{-- Dropdown menu --}}
-                                                                <div x-ref="dropdown"
-                                                                    class="hidden absolute z-40 mt-1 w-full bg-white border rounded-lg shadow-lg max-h-48 overflow-y-auto p-2">
-                                                                    {{-- None option --}}
-                                                                    <div class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                                                                        @click="selectedId=''; selectedName=''; qtyDisabled = true; $refs.dropdown.classList.add('hidden')">
-                                                                        None
+                                                                <!-- Search Box -->
+                                                                <input type="text" x-model="search"
+                                                                    placeholder="Search..."
+                                                                    class="w-full px-2 py-1 text-sm border rounded-md mb-2 dark:bg-gray-600 dark:text-white">
+
+                                                                <!-- Filtered Accessories -->
+                                                                <template
+                                                                    x-for="option in allOptions.filter(o => !search || o.name.toLowerCase().includes(search.toLowerCase()))"
+                                                                    :key="option.id">
+                                                                    <div @click="item.id = option.id; item.name = option.name; open=false"
+                                                                        class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer text-sm">
+                                                                        <span
+                                                                            x-text="option.name + ' (Stock: ' + option.stock + ')'"></span>
                                                                     </div>
-                                                                    {{-- Accessories --}}
-                                                                    @foreach ($items as $item)
-                                                                        <div class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                                                                            @click="selectedId='{{ $item->id }}'; selectedName='{{ $item->name }}'; qtyDisabled = false; $refs.dropdown.classList.add('hidden')">
-                                                                            {{ $item->name }} (Stock:
-                                                                            {{ $item->quantity }})
-                                                                        </div>
-                                                                    @endforeach
+                                                                </template>
+
+                                                                <!-- No Results -->
+                                                                <div x-show="allOptions.filter(o => !search || o.name.toLowerCase().includes(search.toLowerCase())).length === 0"
+                                                                    class="px-4 py-2 text-gray-400 dark:text-gray-300">
+                                                                    No results found
                                                                 </div>
                                                             </div>
-
-                                                            {{-- Quantity input --}}
-                                                            <input type="number" min="1"
-                                                                name="{{ $key }}_qty" :disabled="qtyDisabled"
-                                                                :required="!qtyDisabled"
-                                                                class="w-1/4 h-10 px-3 border rounded-md">
-
-                                                            {{-- Price input --}}
-                                                            <input type="number" min="0"
-                                                                name="{{ $key }}"
-                                                                x-model.number="accessories.{{ $key }}"
-                                                                :disabled="qtyDisabled" :required="!qtyDisabled"
-                                                                class="w-1/4 h-10 px-3 border rounded-md">
                                                         </div>
+
+                                                        <!-- Quantity -->
+                                                        <input type="number" min="1"
+                                                            :name="'accessories[' + index + '][qty]'"
+                                                            x-model.number="item.qty"
+                                                            class="w-1/4 h-10 px-3 border rounded-md" placeholder="Qty">
+
+                                                        <!-- Price -->
+                                                        <input type="number" min="0"
+                                                            :name="'accessories[' + index + '][price]'"
+                                                            x-model.number="item.price"
+                                                            class="w-1/4 h-10 px-3 border rounded-md" placeholder="Price">
+
+                                                        <!-- Remove Button -->
+                                                        <button type="button" @click="accessoriesCart.splice(index,1)"
+                                                            class="px-2 py-1 bg-red-500 text-white rounded-md">X</button>
+
                                                     </div>
-                                                @endforeach
+                                                </template>
 
+                                                <!-- Add New Accessory Button -->
+                                                <button type="button" @click="addAccessory()"
+                                                    class="mt-2 px-4 py-2 bg-green-500 text-white rounded-md">+ Add
+                                                    Accessory</button>
 
-
-                                                {{-- Simple Accessories --}}
-                                                <div class="mt-6">
-                                                    <label class="block text-sm font-medium mb-2">Other Accessories</label>
-                                                    <div class="flex gap-6">
-                                                        @foreach ($simpleAccessories as $label => $key)
-                                                            <div class="flex flex-col w-1/3">
-                                                                <span
-                                                                    class="px-4 py-2 border bg-gray-100 rounded-md text-center text-sm">{{ $label }}</span>
-                                                                <input type="number" min="0"
-                                                                    name="{{ $key }}"
-                                                                    x-model.number="accessories.{{ $key }}"
-                                                                    class="mt-2 h-10 px-3 border rounded-md">
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
+                                                <!-- Accessories Total -->
+                                                <div
+                                                    class="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+                                                    <span
+                                                        class="font-semibold text-gray-700 dark:text-gray-200">Accessories
+                                                        Total: </span>
+                                                    <span class="font-bold text-lg text-gray-800 dark:text-white"
+                                                        x-text="accessoriesTotal.toFixed(2)"></span>
                                                 </div>
-                                            </div>
 
+                                            </div>
                                         </div>
 
                                         <!-- Payable Section -->
@@ -815,16 +792,12 @@
                                         sellingPrice: 0,
                                         exchangeSelected: null,
 
-                                        accessories: {
-                                            tempered: 0,
-                                            back_cover: 0,
-                                            charger: 0,
-                                            data_cable: 0,
-                                            hand_free: 0,
-                                            cam_glass: 0,
-                                            airpods: 0,
-                                            power_bank: 0,
-                                        },
+                                        // new reactive accessoriesCart
+                                        accessoriesCart: [{
+                                            id: '',
+                                            qty: 1,
+                                            price: 0
+                                        }],
 
                                         open: false,
                                         search: '',
@@ -847,6 +820,15 @@
                                         isPayable: false,
                                         payableAmount: 0,
 
+                                        // accessories total
+                                        get accessoriesTotal() {
+                                            return this.accessoriesCart.reduce((sum, item) => {
+                                                const qty = Number(item.qty) || 0;
+                                                const price = Number(item.price) || 0;
+                                                return sum + qty * price;
+                                            }, 0);
+                                        },
+
                                         get totalAmount() {
                                             let total = Number(this.sellingPrice) || 0;
 
@@ -854,9 +836,7 @@
                                                 total -= Number(this.exchangeSelected.cost) || 0;
                                             }
 
-                                            Object.values(this.accessories).forEach(price => {
-                                                total += Number(price) || 0;
-                                            });
+                                            total += this.accessoriesTotal;
 
                                             return total;
                                         },
@@ -883,75 +863,163 @@
                                             this.sellingPrice = 0;
                                             this.exchangeSelected = null;
                                             this.payableAmount = 0;
+                                            this.accessoriesCart = [{
+                                                id: '',
+                                                qty: 1,
+                                                price: 0
+                                            }];
 
                                             Object.keys(this.accessories).forEach(key => {
                                                 this.accessories[key] = 0;
                                             });
+                                        },
+
+                                        addAccessory() {
+                                            this.accessoriesCart.push({
+                                                id: '',
+                                                qty: 1,
+                                                price: 0
+                                            });
+                                        },
+
+                                        removeAccessory(index) {
+                                            this.accessoriesCart.splice(index, 1);
                                         }
                                     }
                                 }
 
                                 document.addEventListener('DOMContentLoaded', () => {
+
+                                    // -----------------------------
+                                    // Open / Close Modal
+                                    // -----------------------------
                                     window.openInvoiceModal = function() {
                                         document.getElementById('createInvoiceModal').classList.remove('hidden');
                                     }
+
                                     window.closeInvoiceModal = function() {
                                         const modal = document.getElementById('createInvoiceModal');
                                         modal.classList.add('hidden');
                                         const form = document.getElementById('invoiceForm');
                                         form.reset();
 
+                                        // Reset visible text for dropdowns
                                         document.getElementById('selectedPhone').textContent = 'Select EMI';
                                         document.getElementById('selectedWorker').textContent = 'Select Worker';
+
+                                        // Reset all accessory dropdowns
+                                        document.querySelectorAll('[x-data]').forEach(drop => {
+                                            if (drop.__x) drop.__x.$data.open = false;
+                                        });
                                     }
+
+                                    // -----------------------------
+                                    // Central Dropdown Toggle
+                                    // -----------------------------
+                                    window.toggleDropdown = function(event, dropdownId) {
+                                        event.stopPropagation();
+                                        const dropdown = document.getElementById(dropdownId);
+                                        dropdown.classList.toggle('hidden');
+                                    }
+
+                                    // -----------------------------
+                                    // Central Search Filter
+                                    // -----------------------------
+                                    window.filterDropdown = function(inputId, optionClass) {
+                                        const filter = document.getElementById(inputId).value.toLowerCase();
+                                        const options = document.getElementsByClassName(optionClass);
+
+                                        Array.from(options).forEach(option => {
+                                            const txt = option.textContent.toLowerCase();
+                                            option.style.display = txt.includes(filter) ? "" : "none";
+                                        });
+                                    }
+
+                                    // -----------------------------
+                                    // Select Worker
+                                    // -----------------------------
+                                    window.selectWorker = function(id, name) {
+                                        document.getElementById('workerIdInput').value = id;
+                                        document.getElementById('workerNameInput').value = name;
+                                        document.getElementById('selectedWorker').textContent = name;
+
+                                        document.getElementById('workerDropdownMenu').classList.add('hidden');
+                                    }
+
+                                    // -----------------------------
+                                    // Select Phone
+                                    // -----------------------------
+                                    window.selectPhone = function(id, emi, phone_type, colour, capacity) {
+                                        document.getElementById('phoneEmiInput').value = emi;
+                                        document.getElementById('selectedPhone').textContent = emi;
+                                        document.getElementById('phone_type').value = phone_type;
+                                        document.getElementById('colour').value = colour;
+                                        document.getElementById('capacity').value = capacity;
+
+                                        document.getElementById('phoneDropdownMenu').classList.add('hidden');
+                                        document.getElementById('invoiceForm').dataset.phoneId = id;
+                                    }
+
+                                    // -----------------------------
+                                    // Global click listener to close dropdowns
+                                    // -----------------------------
+                                    document.addEventListener('click', function(event) {
+                                        // Phone Dropdown
+                                        const phoneDropdown = document.getElementById('phoneDropdownMenu');
+                                        const phoneButton = document.getElementById('selectedPhone').closest('button');
+                                        if (!phoneDropdown.contains(event.target) && !phoneButton.contains(event.target)) {
+                                            phoneDropdown.classList.add('hidden');
+                                        }
+
+                                        // Worker Dropdown
+                                        const workerDropdown = document.getElementById('workerDropdownMenu');
+                                        const workerButton = document.getElementById('selectedWorker').closest('button');
+                                        if (!workerDropdown.contains(event.target) && !workerButton.contains(event.target)) {
+                                            workerDropdown.classList.add('hidden');
+                                        }
+
+                                        // Accessory Dropdowns (dynamic, inside x-for)
+                                        document.querySelectorAll('[x-data]').forEach(drop => {
+                                            if (!drop.contains(event.target) && drop.__x) {
+                                                drop.__x.$data.open = false;
+                                            }
+                                        });
+                                    });
+
                                 });
+                            </script>
 
-                                function toggleDropdown(event, dropdownId) {
-                                    event.stopPropagation();
-                                    const dropdown = document.getElementById(dropdownId);
-                                    dropdown.classList.toggle('hidden');
-                                }
+                            <script>
+                                function accessoryCart() {
+                                    return {
+                                        cart: [{
+                                                id: '',
+                                                qty: 1,
+                                                price: 0
+                                            } // initial row
+                                        ],
 
-                                function filterDropdown(inputId, optionClass) {
-                                    const filter = document.getElementById(inputId).value.toLowerCase();
-                                    const options = document.getElementsByClassName(optionClass);
-                                    for (let i = 0; i < options.length; i++) {
-                                        let txt = options[i].textContent.toLowerCase();
-                                        options[i].style.display = txt.includes(filter) ? "" : "none";
+                                        get accessoriesTotal() {
+                                            return this.cart.reduce((sum, item) => {
+                                                const qty = Number(item.qty) || 0;
+                                                const price = Number(item.price) || 0;
+                                                return sum + qty * price;
+                                            }, 0);
+                                        },
+
+                                        addItem() {
+                                            this.cart.push({
+                                                id: '',
+                                                qty: 1,
+                                                price: 0
+                                            });
+                                        },
+
+                                        removeItem(index) {
+                                            this.cart.splice(index, 1);
+                                        }
                                     }
                                 }
-
-                                function selectWorker(id, name) {
-                                    document.getElementById('workerIdInput').value = id;
-                                    document.getElementById('workerNameInput').value = name;
-                                    document.getElementById('selectedWorker').textContent = name;
-                                    document.getElementById('workerDropdownMenu').classList.add('hidden');
-                                }
-
-                                function selectPhone(id, emi, phone_type, colour, capacity) {
-                                    document.getElementById('phoneEmiInput').value = emi;
-                                    document.getElementById('selectedPhone').textContent = emi;
-                                    document.getElementById('phone_type').value = phone_type;
-                                    document.getElementById('colour').value = colour;
-                                    document.getElementById('capacity').value = capacity;
-                                    document.getElementById('phoneDropdownMenu').classList.add('hidden');
-                                    document.getElementById('invoiceForm').dataset.phoneId = id; // optional
-                                }
-
-                                document.addEventListener('click', function(event) {
-                                    const phoneDropdown = document.getElementById('phoneDropdownMenu');
-                                    const workerDropdown = document.getElementById('workerDropdownMenu');
-
-                                    const phoneButton = document.getElementById('selectedPhone').closest('button');
-                                    const workerButton = document.getElementById('selectedWorker').closest('button');
-
-                                    if (!phoneDropdown.contains(event.target) && !phoneButton.contains(event.target)) {
-                                        phoneDropdown.classList.add('hidden');
-                                    }
-                                    if (!workerDropdown.contains(event.target) && !workerButton.contains(event.target)) {
-                                        workerDropdown.classList.add('hidden');
-                                    }
-                                });
                             </script>
 
                             {{-- Main Table --}}
@@ -965,7 +1033,8 @@
                                             stroke="currentColor" stroke-width="4">
                                         </circle>
                                         <path class="opacity-75" fill="currentColor"
-                                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z">
+                                        </path>
                                     </svg>
                                     <p class="mt-3 text-gray-700 font-semibold">Loading data...</p>
                                 </div>
@@ -1053,38 +1122,24 @@
                                                         <span class="font-semibold">Phone Price:</span> LKR
                                                         {{ number_format($invoice->selling_price, 2) }}<br>
                                                     @endif
-                                                    @if ($invoice->tempered > 0)
-                                                        <span class="font-semibold">Tempered:</span> LKR
-                                                        {{ number_format($invoice->tempered, 2) }}<br>
+                                                    <!-- Accessories for this invoice -->
+                                                    @php
+                                                        $invoiceAccessories = $invoice->invoiceAccessories;
+                                                    @endphp
+
+                                                    @if ($invoiceAccessories->isNotEmpty())
+                                                        <hr class="my-1 border-gray-300">
+                                                        <span
+                                                            class="font-semibold text-gray-600 text-sm">Accessories:</span><br>
+                                                        @foreach ($invoiceAccessories as $acc)
+                                                            <span class="text-xs text-gray-600">
+                                                                {{ $acc->accessory_name }}: LKR
+                                                                {{ number_format($acc->selling_price_accessory * $acc->quantity, 2) }}
+                                                                (Qty: {{ $acc->quantity }})
+                                                            </span><br>
+                                                        @endforeach
                                                     @endif
-                                                    @if ($invoice->back_cover > 0)
-                                                        <span class="font-semibold">Back Cover:</span> LKR
-                                                        {{ number_format($invoice->back_cover, 2) }}<br>
-                                                    @endif
-                                                    @if ($invoice->charger > 0)
-                                                        <span class="font-semibold">Charger:</span> LKR
-                                                        {{ number_format($invoice->charger, 2) }}<br>
-                                                    @endif
-                                                    @if ($invoice->data_cable > 0)
-                                                        <span class="font-semibold">Data Cable:</span> LKR
-                                                        {{ number_format($invoice->data_cable, 2) }}<br>
-                                                    @endif
-                                                    @if ($invoice->hand_free > 0)
-                                                        <span class="font-semibold">Hand Free:</span> LKR
-                                                        {{ number_format($invoice->hand_free, 2) }}<br>
-                                                    @endif
-                                                    @if ($invoice->cam_glass > 0)
-                                                        <span class="font-semibold">Camera Glass:</span> LKR
-                                                        {{ number_format($invoice->cam_glass, 2) }}<br>
-                                                    @endif
-                                                    @if ($invoice->airpods > 0)
-                                                        <span class="font-semibold">AirPods:</span> LKR
-                                                        {{ number_format($invoice->airpods, 2) }}<br>
-                                                    @endif
-                                                    @if ($invoice->power_bank > 0)
-                                                        <span class="font-semibold">Power Bank:</span> LKR
-                                                        {{ number_format($invoice->power_bank, 2) }}<br>
-                                                    @endif
+
                                                 </td>
 
                                                 <!-- Total Price -->
@@ -1495,39 +1550,5 @@
                 option.style.display = option.innerText.toLowerCase().includes(filter) ? '' : 'none';
             });
         }
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelectorAll('.accessory-btn').forEach(button => {
-                const dropdownId = button.dataset.dropdown;
-                const dropdown = document.getElementById(dropdownId);
-
-                button.addEventListener('click', e => {
-                    e.stopPropagation();
-                    dropdown.classList.toggle('hidden');
-                });
-
-                dropdown.querySelectorAll('.accessory-option').forEach(option => {
-                    option.addEventListener('click', () => {
-                        const name = option.dataset.name;
-                        const id = option.dataset.id;
-
-                        document.getElementById(dropdownId.replace('_dropdown', '_name'))
-                            .value = name;
-                        document.getElementById(dropdownId.replace('_dropdown', '_id'))
-                            .value = id;
-                        document.getElementById(dropdownId.replace('_dropdown',
-                            '_selected')).textContent = name || button.dataset.default;
-
-                        dropdown.classList.add('hidden');
-                    });
-                });
-            });
-
-            document.addEventListener('click', () => {
-                document.querySelectorAll('.accessory-dropdown').forEach(dropdown => dropdown.classList.add(
-                    'hidden'));
-            });
-        });
     </script>
 @endsection

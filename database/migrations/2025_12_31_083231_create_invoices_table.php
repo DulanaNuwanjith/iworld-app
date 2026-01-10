@@ -11,46 +11,37 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
 
-            // Worker / Coordinator (required)
-            $table->foreignId('worker_id')->constrained('workers')->onDelete('restrict');
+            // Worker / Coordinator
+            $table->foreignId('worker_id')
+                  ->constrained('workers')
+                  ->restrictOnDelete();
             $table->string('worker_name');
 
-            // Invoice info (required)
+            // Invoice info
             $table->string('invoice_number')->unique();
             $table->string('customer_name');
             $table->string('customer_phone');
             $table->text('customer_address')->nullable();
 
-            // Exchange phone details (optional)
+            // Exchange phone details
             $table->string('exchange_emi')->nullable();
             $table->string('exchange_phone_type')->nullable();
             $table->string('exchange_colour')->nullable();
             $table->string('exchange_capacity')->nullable();
             $table->decimal('exchange_cost', 10, 2)->nullable();
 
-            // Phone details (required)
-            $table->string('emi'); 
+            // Sold phone details
+            $table->string('emi');
             $table->string('phone_type');
             $table->string('colour');
             $table->string('capacity');
 
-            // Selling price (required)
+            // Prices
             $table->decimal('selling_price', 10, 2);
+            $table->decimal('accessories_total', 10, 2)->default(0);
 
-            // Accessories (optional)
-            $table->decimal('tempered', 10, 2)->nullable();
-            $table->decimal('back_cover', 10, 2)->nullable();
-            $table->decimal('charger', 10, 2)->nullable();
-            $table->decimal('data_cable', 10, 2)->nullable();
-            $table->decimal('hand_free', 10, 2)->nullable();
-            $table->decimal('cam_glass', 10, 2)->nullable();
-            $table->decimal('airpods', 10, 2)->nullable();
-            $table->decimal('power_bank', 10, 2)->nullable();
-
-            // Total amount (required, default 0)
+            // Final amounts
             $table->decimal('total_amount', 10, 2)->default(0);
-
-            // Payable amount (optional)
             $table->decimal('payable_amount', 10, 2)->nullable();
 
             $table->timestamps();

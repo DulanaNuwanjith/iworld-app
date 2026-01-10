@@ -115,95 +115,43 @@
                     </thead>
                     <tbody>
                         @php
-                            $customerPay =
-                                $invoice->selling_price +
-                                $invoice->tempered +
-                                $invoice->back_cover +
-                                $invoice->charger +
-                                $invoice->data_cable +
-                                $invoice->hand_free +
-                                $invoice->cam_glass +
-                                $invoice->airpods +
-                                $invoice->power_bank;
+                            $customerPay = $invoice->selling_price;
                         @endphp
 
                         @if ($invoice->selling_price > 0)
                             <tr>
                                 <td class="border px-3 py-2">Phone Price</td>
-                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->selling_price, 2) }}
-                                </td>
+                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->selling_price, 2) }}</td>
                             </tr>
                         @endif
 
-                        @if ($invoice->tempered > 0)
-                            <tr>
-                                <td class="border px-3 py-2">Tempered</td>
-                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->tempered, 2) }}</td>
-                            </tr>
-                        @endif
-                        @if ($invoice->back_cover > 0)
-                            <tr>
-                                <td class="border px-3 py-2">Back Cover</td>
-                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->back_cover, 2) }}
-                                </td>
-                            </tr>
-                        @endif
-                        @if ($invoice->charger > 0)
-                            <tr>
-                                <td class="border px-3 py-2">Charger</td>
-                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->charger, 2) }}</td>
-                            </tr>
-                        @endif
-                        @if ($invoice->data_cable > 0)
-                            <tr>
-                                <td class="border px-3 py-2">Data Cable</td>
-                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->data_cable, 2) }}
-                                </td>
-                            </tr>
-                        @endif
-                        @if ($invoice->hand_free > 0)
-                            <tr>
-                                <td class="border px-3 py-2">Hand Free</td>
-                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->hand_free, 2) }}
-                                </td>
-                            </tr>
-                        @endif
-                        @if ($invoice->cam_glass > 0)
-                            <tr>
-                                <td class="border px-3 py-2">Camera Glass</td>
-                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->cam_glass, 2) }}
-                                </td>
-                            </tr>
-                        @endif
-                        @if ($invoice->airpods > 0)
-                            <tr>
-                                <td class="border px-3 py-2">AirPods</td>
-                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->airpods, 2) }}</td>
-                            </tr>
-                        @endif
-                        @if ($invoice->power_bank > 0)
-                            <tr>
-                                <td class="border px-3 py-2">Power Bank</td>
-                                <td class="border px-3 py-2 text-right">{{ number_format($invoice->power_bank, 2) }}
-                                </td>
-                            </tr>
+                        @if ($invoice->invoiceAccessories->isNotEmpty())
+                            @foreach ($invoice->invoiceAccessories as $acc)
+                                @php
+                                    $totalAccPrice = $acc->selling_price_accessory * $acc->quantity;
+                                    $customerPay += $totalAccPrice;
+                                @endphp
+                                <tr>
+                                    <td class="border px-3 py-2">{{ $acc->accessory_name }} (Qty: {{ $acc->quantity }})</td>
+                                    <td class="border px-3 py-2 text-right">{{ number_format($totalAccPrice, 2) }}</td>
+                                </tr>
+                            @endforeach
                         @endif
 
                         @if ($invoice->exchange_emi)
                             <tr class="bg-red-100">
                                 <td class="border px-3 py-2 font-semibold text-red-700">Exchanged Phone Deduction</td>
-                                <td class="border px-3 py-2 text-right text-red-700">-
-                                    {{ number_format($invoice->exchange_cost, 2) }}</td>
+                                <td class="border px-3 py-2 text-right text-red-700">-{{ number_format($invoice->exchange_cost, 2) }}</td>
                             </tr>
                             @php
                                 $customerPay -= $invoice->exchange_cost;
                             @endphp
                         @endif
+
                         @if ($invoice->payable_amount)
                             <tr class="bg-blue-100">
                                 <td class="border px-3 py-2 font-semibold text-blue-700">Payable Amount</td>
-                                <td class="border px-3 py-2 text-right text-blue-700">-
-                                    {{ number_format($invoice->payable_amount, 2) }}</td>
+                                <td class="border px-3 py-2 text-right text-blue-700">-{{ number_format($invoice->payable_amount, 2) }}</td>
                             </tr>
                             @php
                                 $customerPay -= $invoice->payable_amount;

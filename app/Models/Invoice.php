@@ -19,14 +19,7 @@ class Invoice extends Model
         'colour',
         'capacity',
         'selling_price',
-        'tempered',
-        'back_cover',
-        'charger',
-        'data_cable',
-        'hand_free',
-        'cam_glass',
-        'airpods',
-        'power_bank',
+        'accessories_total',   // only total, not individual accessories
         'total_amount',
         'exchange_emi',
         'exchange_phone_type',
@@ -38,20 +31,13 @@ class Invoice extends Model
         'worker_name',
     ];
 
-
     // Default values
     protected $attributes = [
         'selling_price' => 0,
-        'tempered' => 0,
-        'back_cover' => 0,
-        'charger' => 0,
-        'data_cable' => 0,
-        'hand_free' => 0,
-        'cam_glass' => 0,
-        'airpods' => 0,
-        'power_bank' => 0,
-        'payable_amount' => 0,
+        'accessories_total' => 0,
         'total_amount' => 0,
+        'payable_amount' => 0,
+        'exchange_cost' => 0,
     ];
 
     // Dates
@@ -67,4 +53,15 @@ class Invoice extends Model
     {
         return $this->belongsTo(Worker::class, 'worker_id');
     }
+
+    public function accessories()
+    {
+        return $this->hasMany(InvoiceAccessory::class, 'invoice_id');
+    }
+
+    public function invoiceAccessories()
+    {
+        return $this->hasMany(InvoiceAccessory::class);
+    }
+
 }
