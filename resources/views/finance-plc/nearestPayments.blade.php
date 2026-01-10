@@ -27,7 +27,7 @@
                                     </svg>
                                     <p class="mt-3 text-gray-700 font-semibold">Loading data...</p>
                                 </div>
-                                <table class="table-fixed text-sm divide-y divide-gray-200">
+                                <table class="table-fixed w-full text-sm divide-y divide-gray-200">
                                     <thead class="bg-gray-200">
                                         <tr class="text-center text-xs text-gray-600 uppercase">
                                             <th class="px-4 py-3">Order Number</th>
